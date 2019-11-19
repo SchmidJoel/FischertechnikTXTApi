@@ -1,6 +1,8 @@
 #include "FTLib.hpp"
 #include <stdexcept>
 
+unsigned int DebugFlags;
+FILE *DebugFile;
 
 //TXT
 TXT::TXT(){
@@ -16,18 +18,22 @@ TXT::~TXT(){
     StopTxtDownloadProg();
 }
 
-TXT::DigitalInput(uint8_t pin){
+DigitalInput TXT::digitalInput(uint8_t pin){
     if(pin > 15){
         throw std::invalid_argument("pin must be between 0 and 7 for master and 8 and 15 for extension");
     }
     return DigitalInput{(pTArea+pin/8),pin%8};
 }
 
-TXT::Output(uint8_t pin){
+Output TXT::output(uint8_t pin){
     if(pin > 15){
         throw std::invalid_argument("pin must be between 0 and 7 for master and 8 and 15 for extension");
     }
-    return Output{(pTArea+pin/8),pin%8};
+    return Output{pTArea,pin};
+}
+
+FISH_X1_TRANSFER* TXT::getArea(){
+    return pTArea;
 }
 
 
@@ -145,11 +151,11 @@ TrackSensor::TrackSensor(FISH_X1_TRANSFER* pTArea,uint8_t left, uint8_t right): 
     pTArea->ftX1state.config_id ++; 
 }
 
-uint16_t TrackSensor::valueLeft(){
+bool TrackSensor::valueLeft(){
     return pTArea->ftX1in.uni[left];
 }
 
-uint16_t TrackSensor::valueRight(){
+bool TrackSensor::valueRight(){
     return pTArea->ftX1in.uni[right];
 }
 
@@ -163,7 +169,7 @@ uint8_t TrackSensor::getPinRight(){
 
 
 //Motor
-Motor::Motor(FISH_X1_TRANSFER* pTArea,uint8_t pin): pin(pin), pTArea(pTArea){
+Motor::Motor(FISH_X1_TRANSFER* pTArea, uint8_t pin): pin(pin), pTArea(pTArea){}
 
 
 void Motor::left(uint16_t level){
@@ -186,11 +192,10 @@ uint8_t Motor::getPin(){
 }
 
 //EncoderMotor
-EncoderMotor::EncoderMotor(uint8_t pin, uint8_t c_pin) : pin(pin), c_pin(c_pin) {}
+EncoderMotor::EncoderMotor(FISH_X1_TRANSFER* pTArea,uint8_t pin, uint8_t c_pin) : Motor(pTArea,pin), c_pin(c_pin) {}
 
 void EncoderMotor::distanceLeft(uint16_t steps){
     pTArea->ftX1out.distance[pin] = steps;  // Distance to drive Motor 1 [0]
 	pTArea->ftX1out.motor_ex_cmd_id[pin]++; // Set new Distance Value for Motor 1 [0]
-    left();
 }
 

@@ -2,8 +2,16 @@
 
 
 int main(void) {
-	TXT txt = TXT{};
-	txt.Output(0).on();
-	sleep(5);
+	TXT txt = TXT();
+	DigitalInput Taster = txt.digitalInput(0);
+	Output Licht = txt.output(0);
+	while(true){
+		if(Taster.value()){
+			Licht.on();
+		}
+		else{
+			Licht.off();
+		}
+	}
 	return 0;
 }
