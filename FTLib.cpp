@@ -22,14 +22,69 @@ DigitalInput TXT::digitalInput(uint8_t pin){
     if(pin > 15){
         throw std::invalid_argument("pin must be between 0 and 7 for master and 8 and 15 for extension");
     }
-    return DigitalInput{(pTArea+pin/8),pin%8};
+    return DigitalInput{(pTArea+(pin>>3)),pin&7};
+}
+
+AnalogInput TXT::analogInput(uint8_t pin){
+    if(pin > 15){
+        throw std::invalid_argument("pin must be between 0 and 7 for master and 8 and 15 for extension");
+    }
+    return AnalogInput{(pTArea+(pin>>3)),pin&7};
+}
+
+Ultrasonic TXT::ultrasonic(uint8_t pin){
+    if(pin > 15){
+        throw std::invalid_argument("pin must be between 0 and 7 for master and 8 and 15 for extension");
+    }
+    return Ultrasonic{(pTArea+(pin>>3)),pin&7};
+}
+
+Voltage TXT::voltage(uint8_t pin){
+    if(pin > 15){
+        throw std::invalid_argument("pin must be between 0 and 7 for master and 8 and 15 for extension");
+    }
+    return Voltage{(pTArea+(pin>>3)),pin&7};
+}
+
+ColorSensor TXT::colorSensor(uint8_t pin){
+    if(pin > 15){
+        throw std::invalid_argument("pin must be between 0 and 7 for master and 8 and 15 for extension");
+    }
+    return ColorSensor{(pTArea+(pin>>3)),pin&7};
 }
 
 Output TXT::output(uint8_t pin){
     if(pin > 15){
         throw std::invalid_argument("pin must be between 0 and 7 for master and 8 and 15 for extension");
     }
-    return Output{pTArea,pin};
+    return Output{(pTArea+(pin>>3)),pin&7};
+}
+
+TrackSensor TXT::trackSensor(uint8_t left, uint8_t right){
+    if(left > 15 || right > 15){
+        throw std::invalid_argument("pin must be between 0 and 7 for master and 8 and 15 for extension");
+    }
+    else if((left>>3) != (right>>3)){
+        throw std::invalid_argument("both pins must be on the same TXT");
+    }
+    return TrackSensor{(pTArea+(left>>3)),left&7, right&7};
+}
+
+Motor TXT::motor(uint8_t pin){
+    if(pin > 8){
+        throw std::invalid_argument("pin must be between 0 and 3 for master and 4 and 8 for extension");
+    }
+    return Motor{(pTArea+(pin>>2)),pin&3};
+}
+
+EncoderMotor TXT::encoderMotor(uint8_t pin, uint8_t c_pin){
+    if(pin > 8 || c_pin > 8){
+        throw std::invalid_argument("pin must be between 0 and 3 for master and 4 and 8 for extension");
+    }
+    else if((pin>>2) != (c_pin>>2)){
+        throw std::invalid_argument("both pins must be on the same TXT");
+    }
+    return EncoderMotor{(pTArea+(pin>>2)),pin&3, c_pin&3};
 }
 
 FISH_X1_TRANSFER* TXT::getArea(){
