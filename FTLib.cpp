@@ -1,10 +1,11 @@
 #include "FTLib.hpp"
 #include <stdexcept>
 
+// needed for some debugging stuff of the ft-Libraries ("KeLibTxtDl.h", "FtShmem.h")
 unsigned int DebugFlags;
 FILE *DebugFile;
 
-//TXT
+
 TXT::TXT(){
     if(StartTxtDownloadProg() == KELIB_ERROR_NONE){
         pTArea = GetKeLibTransferAreaMainAddress();

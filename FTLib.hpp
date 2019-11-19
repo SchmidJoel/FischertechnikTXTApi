@@ -1,20 +1,18 @@
 #ifndef FTLib
 #define FTLib
 
-#include <unistd.h>
-#include <fstream>
-#include <iostream>
-
 #include "KeLibTxtDl.h"
 #include "FtShmem.h"
 
-#define MAX_LVL 512
+/*  This is a lowlevel API for Programming the fischertechnik TXT controller
+    To compile programms you need the arm cross-compiler:
+    https://releases.linaro.org/components/toolchain/binaries/7.2-2017.11/arm-linux-gnueabihf/gcc-linaro-7.2.1-2017.11-i686-mingw32_arm-linux-gnueabihf.tar.xz
+*/
 
 
 
-
-
-
+/* Output: O1-O8
+*/
 class Output{
     private:
     uint8_t pin;
@@ -27,6 +25,8 @@ class Output{
     uint8_t getPin();    
 };
 
+/* DigitalInput for e.g. Taster, Fototransistor or reedcontact: I1-I8
+*/
 class DigitalInput{
     private:
     uint8_t pin;
@@ -37,6 +37,8 @@ class DigitalInput{
     uint8_t getPin();    
 };
 
+/*AnalogInput for NTC-Resistor: I1-I8
+*/
 class AnalogInput{
     private:
     uint8_t pin;
@@ -47,6 +49,8 @@ class AnalogInput{
     uint8_t getPin();    
 };
 
+/*Ultrasonic: I1-I8
+*/
 class Ultrasonic{
     private:
     uint8_t pin;
@@ -57,12 +61,16 @@ class Ultrasonic{
     uint8_t getPin();    
 };
 
+/*Colors for the ColorSensor
+*/
 enum Color{
     BLUE,
     WHITE,
     RED
 };
 
+/*ColorSensor: I1-I8
+*/
 class ColorSensor{
     private:
     uint8_t pin;
@@ -74,6 +82,8 @@ class ColorSensor{
     uint8_t getPin();
 };
 
+/*For measure the Voltage (same as the ColorSensor): I1-I8
+*/
 class Voltage{
     private:
     uint8_t pin;
@@ -84,6 +94,7 @@ class Voltage{
     uint8_t getPin();
 };
 
+/*TrackSensor: I1-I8*/
 class TrackSensor{
     private:
     uint8_t left;
@@ -97,6 +108,7 @@ class TrackSensor{
     uint8_t getPinRight();
 };
 
+/*Motor: M1-M4*/
 class Motor{
     protected:
     uint8_t pin;
@@ -109,7 +121,8 @@ class Motor{
     uint8_t getPin(); 
 };
 
-
+/*EncoderMotor: M1-M4, C1-C4
+*/
 class EncoderMotor : public Motor{
     private:
     uint8_t c_pin;
