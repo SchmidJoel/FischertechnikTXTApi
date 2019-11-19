@@ -1,5 +1,6 @@
 #include "FTLib.hpp"
 #include <stdexcept>
+#include "unistd.h"
 
 // needed for some debugging stuff of the ft-Libraries ("KeLibTxtDl.h", "FtShmem.h")
 unsigned int DebugFlags;
@@ -14,6 +15,8 @@ TXT::TXT(){
         throw std::runtime_error("KELIB_ERROR");
     }
 }
+
+TXT::TXT(FISH_X1_TRANSFER* pTArea, bool extension): pTArea(pTArea),_extension(extension){}
 
 TXT::~TXT(){
     StopTxtDownloadProg();
@@ -87,6 +90,30 @@ EncoderMotor TXT::encoderMotor(uint8_t pin){
 
 FISH_X1_TRANSFER* TXT::getArea(){
     return pTArea;
+}
+
+void TXT::playSound(uint8_t index, uint8_t repeats){
+    pTArea->sTxtOutputs.u16SoundCmdId = 0;
+    pTArea->sTxtOutputs.u16SoundIndex = index;
+    pTArea->sTxtOutputs.u16SoundRepeat = repeats;
+    pTArea->sTxtOutputs.u16SoundCmdId++;
+}
+
+void TXT::playSoundAndWait(uint8_t index, uint8_t repeats){
+    pTArea->sTxtOutputs.u16SoundCmdId = 0;
+    pTArea->sTxtOutputs.u16SoundIndex = index;
+    pTArea->sTxtOutputs.u16SoundRepeat = repeats;
+    pTArea->sTxtOutputs.u16SoundCmdId++;
+    while(pTArea->sTxtInputs.u16SoundCmdId == 0){
+        usleep(10000);
+    }
+}
+
+TXT TXT::extension(){
+    if(_extension){
+       throw std::runtime_error ("a extension cannot have another extension");
+    }
+    return TXT{pTArea+1,true};
 }
 
 

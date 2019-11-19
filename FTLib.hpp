@@ -139,6 +139,7 @@ class TXT{
     bool _extension;
     public:
     TXT();
+    TXT(FISH_X1_TRANSFER*,bool);
     ~TXT();
     bool isExtension();
     FISH_X1_TRANSFER* getArea();
@@ -152,6 +153,8 @@ class TXT{
     ColorSensor colorSensor(uint8_t);
     TrackSensor trackSensor(uint8_t,uint8_t);
     TXT extension();
+    void playSound(uint8_t,uint8_t);
+    void playSoundAndWait(uint8_t,uint8_t);
 };
 
 
