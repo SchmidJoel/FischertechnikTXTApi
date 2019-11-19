@@ -124,14 +124,12 @@ class Motor{
 /*EncoderMotor: M1-M4, C1-C4
 */
 class EncoderMotor : public Motor{
-    private:
-    uint8_t c_pin;
     public:
-    EncoderMotor(FISH_X1_TRANSFER* ,uint8_t, uint8_t);
-    void distanceLeft(uint16_t);
-    void distanceRight(uint16_t);
-    void syncTo(EncoderMotor&);
-    uint8_t getC_Pin();
+    EncoderMotor(FISH_X1_TRANSFER* ,uint8_t);
+    void distanceLeft(uint16_t,uint16_t);
+    void distanceRight(uint16_t,uint16_t);
+    void synchronizeTo(EncoderMotor&);
+    void stopSynchronization();
 };
 
 
@@ -146,7 +144,7 @@ class TXT{
     FISH_X1_TRANSFER* getArea();
     Output output(uint8_t);
     Motor motor(uint8_t);
-    EncoderMotor encoderMotor(uint8_t,uint8_t);
+    EncoderMotor encoderMotor(uint8_t);
     AnalogInput analogInput(uint8_t);
     DigitalInput digitalInput(uint8_t);
     Ultrasonic ultrasonic(uint8_t);

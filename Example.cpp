@@ -1,18 +1,16 @@
 #include "FTLib.hpp"
+#include "unistd.h"
 
 
 int main(void) {
 	TXT txt = TXT();
 	DigitalInput Taster = txt.digitalInput(0);
-	Output Licht = txt.output(0);
-	Motor m3 = txt.motor(2);
-	while(true){
-		if(Taster.value()){
-			m3.left(512);
-		}
-		else{
-			m3.stop();
-		}
-	}
+	Motor m2 = txt.motor(1);
+	EncoderMotor em1 = txt.encoderMotor(0);
+	EncoderMotor em2 = txt.encoderMotor(1);
+	em1.distanceLeft(1000,512);
+	em2.distanceLeft(1000,512);
+	em2.synchronizeTo(em1);
+	sleep(10);
 	return 0;
 }

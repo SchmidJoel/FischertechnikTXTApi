@@ -78,14 +78,11 @@ Motor TXT::motor(uint8_t pin){
     return Motor{(pTArea+(pin>>2)),pin&3};
 }
 
-EncoderMotor TXT::encoderMotor(uint8_t pin, uint8_t c_pin){
-    if(pin > 8 || c_pin > 8){
+EncoderMotor TXT::encoderMotor(uint8_t pin){
+    if(pin > 8){
         throw std::invalid_argument("pin must be between 0 and 3 for master and 4 and 8 for extension");
     }
-    else if((pin>>2) != (c_pin>>2)){
-        throw std::invalid_argument("both pins must be on the same TXT");
-    }
-    return EncoderMotor{(pTArea+(pin>>2)),pin&3, c_pin&3};
+    return EncoderMotor{(pTArea+(pin>>2)),pin&3};
 }
 
 FISH_X1_TRANSFER* TXT::getArea(){
@@ -248,10 +245,25 @@ uint8_t Motor::getPin(){
 }
 
 //EncoderMotor
-EncoderMotor::EncoderMotor(FISH_X1_TRANSFER* pTArea,uint8_t pin, uint8_t c_pin) : Motor(pTArea,pin), c_pin(c_pin) {}
+EncoderMotor::EncoderMotor(FISH_X1_TRANSFER* pTArea,uint8_t pin) : Motor(pTArea,pin) {}
 
-void EncoderMotor::distanceLeft(uint16_t steps){
-    pTArea->ftX1out.distance[pin] = steps;  // Distance to drive Motor 1 [0]
-	pTArea->ftX1out.motor_ex_cmd_id[pin]++; // Set new Distance Value for Motor 1 [0]
+void EncoderMotor::distanceLeft(uint16_t steps, uint16_t level){
+    pTArea->ftX1out.distance[pin] = steps;  // Distance to drive 
+	pTArea->ftX1out.motor_ex_cmd_id[pin]++; // Set new Distance Value 
+    left(level);
+}
+
+void EncoderMotor::distanceRight(uint16_t steps, uint16_t level){
+    pTArea->ftX1out.distance[pin] = steps;  // Distance to drive
+	pTArea->ftX1out.motor_ex_cmd_id[pin]++; // Set new Distance Value 
+    right(level);
+}
+
+void EncoderMotor::synchronizeTo(EncoderMotor& other){
+    pTArea->ftX1out.master[pin] = other.getPin()+1;
+}
+
+void EncoderMotor::stopSynchronization(){
+    pTArea->ftX1out.master[pin] = 0;
 }
 
