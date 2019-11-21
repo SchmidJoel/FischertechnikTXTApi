@@ -130,6 +130,7 @@ class EncoderMotor : public Motor{
     void distanceRight(uint16_t,uint16_t);
     void synchronizeTo(EncoderMotor&);
     void stopSynchronization();
+    void waitToEnd();
 };
 
 

@@ -151,6 +151,7 @@ uint8_t DigitalInput::getPin(){
     return pin;
 }
 
+//AnalogInput (Widerstandsmessung)
 AnalogInput::AnalogInput(FISH_X1_TRANSFER* pTArea,uint8_t pin): pin(pin), pTArea(pTArea){
     pTArea->ftX1config.uni[pin].mode = MODE_R; 	    //  resistor
     pTArea->ftX1config.uni[pin].digital = 0;        //  analog Input
@@ -165,7 +166,7 @@ uint8_t AnalogInput::getPin(){
     return pin;
 }
 
-//Colorsensor
+//Farbsensor
 ColorSensor::ColorSensor(FISH_X1_TRANSFER* pTArea,uint8_t pin): pin(pin), pTArea(pTArea){
     pTArea->ftX1config.uni[pin].mode = MODE_U; 	//	Spannung
     pTArea->ftX1config.uni[pin].digital = 0;    //  analog Input
@@ -192,7 +193,7 @@ uint8_t ColorSensor::getPin(){
     return pin;
 }
 
-//Colorsensor
+//Spannungsmessung
 Voltage::Voltage(FISH_X1_TRANSFER* pTArea,uint8_t pin): pin(pin), pTArea(pTArea){
     pTArea->ftX1config.uni[pin].mode = MODE_U; 	//	Spannung
     pTArea->ftX1config.uni[pin].digital = 0;    //  analog Input
@@ -207,10 +208,9 @@ uint8_t Voltage::getPin(){
     return pin;
 }
 
-//Colorsensor
+//Ultraschallsensor für Abstand
 Ultrasonic::Ultrasonic(FISH_X1_TRANSFER* pTArea,uint8_t pin): pin(pin), pTArea(pTArea){
     pTArea->ftX1config.uni[pin].mode = MODE_ULTRASONIC; 
-    pTArea->ftX1config.uni[pin].digital = 0;  
     pTArea->ftX1state.config_id ++; 
 }
 
@@ -292,5 +292,11 @@ void EncoderMotor::synchronizeTo(EncoderMotor& other){
 
 void EncoderMotor::stopSynchronization(){
     pTArea->ftX1out.master[pin] = 0;
+}
+
+void EncoderMotor::waitToEnd(){
+    while(! pTArea->ftX1in.motor_ex_reached[pin]){        
+        usleep(10000);
+    }
 }
 
