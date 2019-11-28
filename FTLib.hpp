@@ -156,6 +156,7 @@ class TXT{
     TXT extension();
     void playSound(uint8_t,uint8_t);
     void playSoundAndWait(uint8_t,uint8_t);
+    uint16_t getTXTVoltage();
 };
 
 

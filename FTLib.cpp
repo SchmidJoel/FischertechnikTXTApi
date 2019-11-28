@@ -116,6 +116,10 @@ TXT TXT::extension(){
     return TXT{pTArea+1,true};
 }
 
+uint16_t TXT::getTXTVoltage(){
+    return pTArea->sTxtInputs.u16TxtPower;
+}
+
 
 //Output
 Output::Output(FISH_X1_TRANSFER* pTArea,uint8_t pin): pin(pin), pTArea(pTArea){}
