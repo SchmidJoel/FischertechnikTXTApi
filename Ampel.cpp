@@ -4,9 +4,9 @@
 
 int main(void) {
 	TXT txt = TXT();
-	Output red = txt.output(0);
-    Output yellow = txt.output(1);
-    Output green = txt.output(2);
+	Output red = txt.output(1);
+    Output yellow = txt.output(2);
+    Output green = txt.output(3);
     while(true){
         red.on();
         sleep(3);
