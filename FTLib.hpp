@@ -18,7 +18,7 @@ class Output{
     uint8_t pin;
     FISH_X1_TRANSFER* pTArea;
     public:
-    Output(FISH_X1_TRANSFER*,uint8_t);
+    Output(FISH_X1_TRANSFER*,uint8_t pin);
     void on();
     void off();
     void setLevel(uint16_t);
@@ -32,7 +32,7 @@ class DigitalInput{
     uint8_t pin;
     FISH_X1_TRANSFER* pTArea;
     public:
-    DigitalInput(FISH_X1_TRANSFER*, uint8_t);
+    DigitalInput(FISH_X1_TRANSFER*, uint8_t pin);
     bool value();
     uint8_t getPin();    
 };
@@ -44,7 +44,7 @@ class AnalogInput{
     uint8_t pin;
     FISH_X1_TRANSFER* pTArea;
     public:
-    AnalogInput(FISH_X1_TRANSFER*,uint8_t);
+    AnalogInput(FISH_X1_TRANSFER*,uint8_t pin);
     uint16_t value();
     uint8_t getPin();    
 };
@@ -56,7 +56,7 @@ class Ultrasonic{
     uint8_t pin;
     FISH_X1_TRANSFER* pTArea;
     public:
-    Ultrasonic(FISH_X1_TRANSFER*,uint8_t);
+    Ultrasonic(FISH_X1_TRANSFER*,uint8_t pin);
     uint16_t value();
     uint8_t getPin();    
 };
@@ -76,7 +76,7 @@ class ColorSensor{
     uint8_t pin;
     FISH_X1_TRANSFER* pTArea;
     public:
-    ColorSensor(FISH_X1_TRANSFER*,uint8_t);
+    ColorSensor(FISH_X1_TRANSFER*,uint8_t pin);
     uint16_t value();
     Color color();
     uint8_t getPin();
@@ -89,7 +89,7 @@ class Voltage{
     uint8_t pin;
     FISH_X1_TRANSFER* pTArea;
     public:
-    Voltage(FISH_X1_TRANSFER*,uint8_t);
+    Voltage(FISH_X1_TRANSFER*,uint8_t pin);
     uint16_t value();
     uint8_t getPin();
 };
@@ -101,7 +101,7 @@ class TrackSensor{
     uint8_t right;
     FISH_X1_TRANSFER* pTArea;
     public:
-    TrackSensor(FISH_X1_TRANSFER*,uint8_t,uint8_t);
+    TrackSensor(FISH_X1_TRANSFER*,uint8_t left,uint8_t right);
     bool valueLeft();
     bool valueRight();
     uint8_t getPinLeft();
@@ -114,9 +114,9 @@ class Motor{
     uint8_t pin;
     FISH_X1_TRANSFER* pTArea;
     public:
-    Motor(FISH_X1_TRANSFER* ,uint8_t);
-    void left(uint16_t);
-    void right(uint16_t);
+    Motor(FISH_X1_TRANSFER* ,uint8_t pin);
+    void left(uint16_t level);
+    void right(uint16_t level);
     void stop();
     uint8_t getPin(); 
 };
@@ -125,12 +125,14 @@ class Motor{
 */
 class EncoderMotor : public Motor{
     public:
-    EncoderMotor(FISH_X1_TRANSFER* ,uint8_t);
-    void distanceLeft(uint16_t,uint16_t);
-    void distanceRight(uint16_t,uint16_t);
-    void synchronizeTo(EncoderMotor&);
+    EncoderMotor(FISH_X1_TRANSFER* ,uint8_t pin);
+    void distanceLeft(uint16_t steps,uint16_t level);
+    void distanceRight(uint16_t steps,uint16_t level);
+    void synchronizeTo(EncoderMotor& other);
     void stopSynchronization();
     void waitToEnd();
+    uint16_t counter();
+    void resetCounter();
 };
 
 
@@ -144,18 +146,18 @@ class TXT{
     ~TXT();
     bool isExtension();
     FISH_X1_TRANSFER* getArea();
-    Output output(uint8_t);
-    Motor motor(uint8_t);
-    EncoderMotor encoderMotor(uint8_t);
-    AnalogInput analogInput(uint8_t);
-    DigitalInput digitalInput(uint8_t);
-    Ultrasonic ultrasonic(uint8_t);
-    Voltage voltage(uint8_t);
-    ColorSensor colorSensor(uint8_t);
-    TrackSensor trackSensor(uint8_t,uint8_t);
+    Output output(uint8_t pin);
+    Motor motor(uint8_t pin);
+    EncoderMotor encoderMotor(uint8_t pin);
+    AnalogInput analogInput(uint8_t pin);
+    DigitalInput digitalInput(uint8_t pin);
+    Ultrasonic ultrasonic(uint8_t pin);
+    Voltage voltage(uint8_t pin);
+    ColorSensor colorSensor(uint8_t pin);
+    TrackSensor trackSensor(uint8_t left,uint8_t right);
     TXT extension();
-    void playSound(uint8_t,uint8_t);
-    void playSoundAndWait(uint8_t,uint8_t);
+    void playSound(uint8_t index,uint8_t repeats);
+    void playSoundAndWait(uint8_t index,uint8_t repeats);
     uint16_t getTXTVoltage();
 };
 
