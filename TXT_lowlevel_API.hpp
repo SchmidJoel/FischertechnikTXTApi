@@ -1,5 +1,5 @@
-#ifndef FTLib
-#define FTLib
+#ifndef TXT_LOWLEVEL_API
+#define TXT_LOWLEVEL_API
 
 #include "KeLibTxtDl.h"
 #include "FtShmem.h"
@@ -37,7 +37,7 @@ class DigitalInput{
     uint8_t getPin();    
 };
 
-/*AnalogInput for NTC-Resistor: I1-I8
+/*AnalogInput for NTC-Resistor, Photo-Resistor: I1-I8
 */
 class AnalogInput{
     private:
@@ -47,6 +47,12 @@ class AnalogInput{
     AnalogInput(FISH_X1_TRANSFER*,uint8_t pin);
     uint16_t value();
     uint8_t getPin();    
+};
+
+class NTC : public AnalogInput{
+    public:
+    NTC(FISH_X1_TRANSFER*,uint8_t pin);
+    double getTemperature();
 };
 
 /*Ultrasonic: I1-I8
@@ -150,6 +156,7 @@ class TXT{
     Motor motor(uint8_t pin);
     EncoderMotor encoderMotor(uint8_t pin);
     AnalogInput analogInput(uint8_t pin);
+    NTC ntc(uint8_t pin);
     DigitalInput digitalInput(uint8_t pin);
     Ultrasonic ultrasonic(uint8_t pin);
     Voltage voltage(uint8_t pin);

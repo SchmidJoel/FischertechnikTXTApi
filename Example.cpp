@@ -1,17 +1,37 @@
-#include "FTLib.hpp"
 #include "unistd.h"
+#include "TXT_lowlevel_API.hpp"
+#include "TXT_highlevel_API.hpp"
+#include <iostream>
+#include <fstream>
 
 
 int main(void) {
 	TXT txt = TXT();
-	EncoderMotor em1 = txt.encoderMotor(0);
-	Output Lampe = txt.output(2);
-	em1.distanceLeft(500,512);
-	em1.waitToEnd();
-	sleep(1);
-	em1.distanceLeft(600,512);
-	em1.waitToEnd();
-	Lampe.on();
-	sleep(10);
+
+	/*
+	NTC ntc = txt.ntc(1);
+	std::ofstream output("out.txt");
+	for(int i = 0; i < 20; i++){
+		output << ntc.getTemperature() << std::endl;
+		sleep(1);
+	}
+	output.close();
+	*/
+
+
+	auto lampe = txt.output(3);
+	//lampe.on();
+
+
+	AxisXS axis = AxisXS(txt, 1, 1, 2, 160);
+	axis.reference();
+	axis.moveAbsolut(80);
+	for(int i = 0; i < 100; i++){
+		axis.moveRelative(20);
+		sleep(1);
+	}
+
+	
+
 	return 0;
 }

@@ -1,12 +1,17 @@
-INCLUDE_PATH="-ID:\\Code\\fischertechnik\\txt_demo_c_download\\TxtDemo\\Txt_Includes"
-TXT_LIB_PATH="-LD:\\Code\\fischertechnik\\txt_demo_c_download\\TxtDemo\\Txt_Libs"
-TXT_LIB_DEP_PATH="-LD:\\Code\\fischertechnik\\txt_demo_c_download\\TxtDemo\\Txt_Libs_deps"
+INCLUDE_PATH="-IC:\Users\joels\Programmieren\fischertechnik\txt_demo_c_download\deps\include"
+LIB_PATH="-LC:\Users\joels\Programmieren\fischertechnik\txt_demo_c_download\deps\lib"
+LIBS=-lKeLibTxt -lMotorIOLib -lROBOProLib -lSDLWidgetsLib -lTxtControlLib -lSDL -lSDL_gfx -lSDL_ttf -lSDL_image -lts -lfreetype -lz -lpng16 -lbz2 -ljpeg -lasound
+COMPILER="arm-linux-gnueabihf-g++" 
 
-all: output/Example.o output/FTLib.o
-	arm-linux-gnueabihf-g++ $(TXT_LIB_PATH) $(TXT_LIB_DEP_PATH) -o output/Example_compiled $^ -lKeLibTxt -lMotorIOLib -lROBOProLib -lSDLWidgetsLib -lTxtControlLib -lSDL -lSDL_gfx -lSDL_ttf -lSDL_image -lts -lfreetype -lz -lpng16 -lbz2 -ljpeg -lasound -ldirectfb -lfusion -ldirect -ltiff -std=c++17
 
-FTLib.o: FTLib.cpp
-	arm-linux-gnueabihf-g++.exe $(INCLUDE_PATH) -O3 -Wall -c -fmessage-length=0 -o output/FTLib.o FTLib.cpp -std=c++17
+all: output/Example.o output/txtlowlevelapi.o output/txthighlevelapi.o
+	$(COMPILER) $(LIB_PATH) -o output/Example_compiled $^ $(LIBS) -std=c++17
 
-Example.o: Example.cpp
-	arm-linux-gnueabihf-g++.exe $(INCLUDE_PATH) -O3 -Wall -c -fmessage-length=0 -o output/Example.o Example.cpp -std=c++17
+output/txtlowlevelapi.o: TXT_lowlevel_API.cpp
+	$(COMPILER) $(INCLUDE_PATH) -O3 -Wall -c -fmessage-length=0 -o output/txtlowlevelapi.o TXT_lowlevel_API.cpp -std=c++17
+
+output/txthighlevelapi.o: TXT_highlevel_API.cpp
+	$(COMPILER) $(INCLUDE_PATH) -O3 -Wall -c -fmessage-length=0 -o output/txthighlevelapi.o TXT_highlevel_API.cpp -std=c++17
+
+output/Example.o: Example.cpp
+	$(COMPILER) $(INCLUDE_PATH) -O3 -Wall -c -fmessage-length=0 -o output/Example.o Example.cpp -std=c++17

@@ -1,5 +1,6 @@
-#include "FTLib.hpp"
+#include "TXT_lowlevel_API.hpp"
 #include <stdexcept>
+#include "math.h"
 #include "unistd.h"
 
 // needed for some debugging stuff of the ft-Libraries ("KeLibTxtDl.h", "FtShmem.h")
@@ -40,6 +41,14 @@ AnalogInput TXT::analogInput(uint8_t pin){
         throw std::invalid_argument(ERR_8_PIN);
     }
     return AnalogInput{(pTArea+(pin>>3)),pin&7};
+}
+
+NTC TXT::ntc(uint8_t pin){
+    pin--;
+    if(pin > 15){
+        throw std::invalid_argument(ERR_8_PIN);
+    }
+    return NTC{(pTArea+(pin>>3)),pin&7};
 }
 
 Ultrasonic TXT::ultrasonic(uint8_t pin){
@@ -184,6 +193,13 @@ uint8_t AnalogInput::getPin(){
     return pin;
 }
 
+//NTC
+NTC::NTC(FISH_X1_TRANSFER* pTArea,uint8_t pin): AnalogInput(pTArea,pin){}
+
+double NTC::getTemperature(){    
+    return log(value()) * log(value()) * 1.3932 + log(value()) * -43.942 + 271.87;
+}
+
 //Farbsensor
 ColorSensor::ColorSensor(FISH_X1_TRANSFER* pTArea,uint8_t pin): pin(pin), pTArea(pTArea){
     pTArea->ftX1config.uni[pin].mode = MODE_U; 	//	Spannung
@@ -293,19 +309,21 @@ uint8_t Motor::getPin(){
 EncoderMotor::EncoderMotor(FISH_X1_TRANSFER* pTArea,uint8_t pin) : Motor(pTArea,pin) {}
 
 void EncoderMotor::distanceLeft(uint16_t steps, uint16_t level){
+    resetCounter();
     pTArea->ftX1out.distance[pin] = steps;  // Distance to drive 
 	pTArea->ftX1out.motor_ex_cmd_id[pin]++; // Set new Distance Value 
     left(level);
 }
 
 void EncoderMotor::distanceRight(uint16_t steps, uint16_t level){
+    resetCounter();
     pTArea->ftX1out.distance[pin] = steps;  // Distance to drive
 	pTArea->ftX1out.motor_ex_cmd_id[pin]++; // Set new Distance Value 
     right(level);
 }
 
 void EncoderMotor::synchronizeTo(EncoderMotor& other){
-    pTArea->ftX1out.master[pin] = other.getPin()+1;
+    pTArea->ftX1out.master[pin] = other.getPin()-1;
 }
 
 void EncoderMotor::stopSynchronization(){
@@ -324,5 +342,6 @@ uint16_t EncoderMotor::counter(){
 
 void EncoderMotor::resetCounter(){
     pTArea->ftX1out.cnt_reset_cmd_id[pin]++;
+    pTArea->ftX1in.motor_ex_reached[pin] = 0;
 }
 
