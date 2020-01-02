@@ -35,6 +35,10 @@ int main(void) {
 	axis.pos1();
 	axis.pos2();
 	axis.pos1();
+
+	std::ofstream output("out.txt");
+	output << lampe.getPin();
+	output.close();
 	
 
 	return 0;
