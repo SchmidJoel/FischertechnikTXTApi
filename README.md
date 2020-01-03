@@ -9,3 +9,8 @@ To compile programms you need the [arm cross-compiler](https://releases.linaro.o
 [C Helper classes](https://github.com/fischertechnik/txt_demo_c_download)
 
 [TXT Training Factory Industry Program](https://github.com/fischertechnik/txt_training_factory)
+
+## Paths
+
+INCLUDE_PATH="-ID:\Code\fischertechnik\txt_demo_c_download\deps\include"
+LIB_PATH="-LD:\Code\fischertechnik\txt_demo_c_download\deps\lib"
