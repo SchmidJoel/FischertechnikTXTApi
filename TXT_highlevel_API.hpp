@@ -46,6 +46,20 @@ public:
 };
 
 
+class TwoRefAxis{
+private:
+    DigitalInput ref1;
+    DigitalInput ref2;
+    Motor m;
+public:
+    TwoRefAxis(TXT& txt, uint8_t motorpin, uint8_t refpin1, uint8_t refpin2);
+    void pos1();
+    void pos2();
+    bool isPos1();
+    bool isPos2();
+};
+
+
 
 
 

@@ -22,7 +22,7 @@ int main(void) {
 	auto lampe = txt.output(3);
 	//lampe.on();
 
-
+/*
 	AxisXS axis = AxisXS(txt, 1, 1, 2, 160);
 	axis.reference();
 	axis.moveAbsolut(80);
@@ -30,7 +30,15 @@ int main(void) {
 		axis.moveRelative(20);
 		sleep(1);
 	}
+*/
+	TwoRefAxis axis = TwoRefAxis(txt, 1, 1, 3);
+	axis.pos1();
+	axis.pos2();
+	axis.pos1();
 
+	std::ofstream output("out.txt");
+	output << lampe.getPin();
+	output.close();
 	
 
 	return 0;

@@ -104,3 +104,32 @@ bool AxisXS::moveRelative(int16_t distance) {
     m.stop();
     return true;
 }
+
+/*axis with two endswitch*/
+TwoRefAxis::TwoRefAxis(TXT& txt, uint8_t motorpin, uint8_t refpin1, uint8_t refpin2) : m(txt.motor(motorpin)), ref1(txt.digitalInput(refpin1)), ref2(txt.digitalInput(refpin2)) {}
+
+/*move to pos 1*/
+void TwoRefAxis::pos1(){
+    while( ref1.value()){
+        m.left(512);
+    }
+    m.stop();
+}
+
+/*move to pos 2*/
+void TwoRefAxis::pos2(){
+    while( ref2.value()){
+        m.right(512);
+    }
+    m.stop();
+}
+
+/*is Axis at pos1*/
+bool TwoRefAxis::isPos1(){
+    return ref1.value();
+}
+
+/*is axis at pos2*/
+bool TwoRefAxis::isPos2(){
+    return ref2.value();
+}

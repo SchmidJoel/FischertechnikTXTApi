@@ -160,7 +160,7 @@ void Output::setLevel(uint16_t level){
 }
 
 uint8_t Output::getPin(){
-    return pin;
+    return pin+1;
 }
 
 //DigitalInput
@@ -175,7 +175,7 @@ bool DigitalInput::value(){
 }
 
 uint8_t DigitalInput::getPin(){
-    return pin;
+    return pin+1;
 }
 
 //AnalogInput (Widerstandsmessung)
@@ -190,7 +190,7 @@ uint16_t AnalogInput::value(){
 }
 
 uint8_t AnalogInput::getPin(){
-    return pin;
+    return pin+1;
 }
 
 //NTC
@@ -224,7 +224,7 @@ Color ColorSensor::color(){
 }
 
 uint8_t ColorSensor::getPin(){
-    return pin;
+    return pin+1;
 }
 
 //Spannungsmessung
@@ -239,7 +239,7 @@ uint16_t Voltage::value(){
 }
 
 uint8_t Voltage::getPin(){
-    return pin;
+    return pin+1;
 }
 
 //Ultraschallsensor für Abstand
@@ -253,7 +253,7 @@ uint16_t Ultrasonic::value(){
 }
 
 uint8_t Ultrasonic::getPin(){
-    return pin;
+    return pin+1;
 }
 
 //Spurensensor
@@ -274,11 +274,11 @@ bool TrackSensor::valueRight(){
 }
 
 uint8_t TrackSensor::getPinLeft(){
-    return left;
+    return left+1;
 }
 
 uint8_t TrackSensor::getPinRight(){
-    return left;
+    return right+1;
 }
 
 
@@ -302,7 +302,7 @@ void Motor::stop(){
 }
 
 uint8_t Motor::getPin(){
-    return pin;
+    return pin+1;
 }
 
 //EncoderMotor
