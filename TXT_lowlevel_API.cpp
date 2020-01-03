@@ -1,7 +1,7 @@
 #include "TXT_lowlevel_API.hpp"
 #include <stdexcept>
+#include <unistd.h>
 #include "math.h"
-#include "unistd.h"
 
 // needed for some debugging stuff of the ft-Libraries ("KeLibTxtDl.h", "FtShmem.h")
 unsigned int DebugFlags;
