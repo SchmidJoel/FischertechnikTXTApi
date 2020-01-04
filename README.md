@@ -12,5 +12,5 @@ To compile programms you need the [arm cross-compiler](https://releases.linaro.o
 
 ## Paths
 
-INCLUDE_PATH="-ID:\Code\fischertechnik\txt_demo_c_download\deps\include"
-LIB_PATH="-LD:\Code\fischertechnik\txt_demo_c_download\deps\lib"
+            "windowsSdkVersion": "10.0.18362.0",
+            "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.24.28314/bin/Hostx64/x64/cl.exe",

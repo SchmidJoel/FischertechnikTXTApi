@@ -5,7 +5,7 @@
 #include <atomic>
 #include <chrono>
 #include <cstring>
-#include <mqtt/async_client.h>
+#include "mqtt/async_client.h"
 
 unsigned int DebugFlags;
 FILE *DebugFile;
@@ -32,7 +32,6 @@ int main(int argc, char* argv[])
     std::string	address  = (argc > 1) ? std::string(argv[1]) : DFLT_SERVER_ADDRESS,
 			clientID = (argc > 2) ? std::string(argv[2]) : DFLT_CLIENT_ID;
 
-	std::cout << "Initializing for server '" << address << "'..." << std::endl;
 	mqtt::async_client client(address, clientID);
 
 	mqtt::callback cb;
@@ -43,24 +42,25 @@ int main(int argc, char* argv[])
 	mqtt::will_options will(willmsg);
 	conopts.set_will(will);
 
-	std::cout << "  ...OK" << std::endl;
-
     try {
         // Connect
-        std::cout << "\nConnecting..." << std::endl;
 		mqtt::token_ptr conntok = client.connect(conopts);
-		std::cout << "Waiting for the connection..." << std::endl;
 		conntok->wait();
-		std::cout << "  ...OK" << std::endl;
+
+		mqtt::message_ptr pubmsg = mqtt::make_message(TOPIC, PAYLOAD1);
+		pubmsg->set_qos(QOS);
+		client.publish(pubmsg)->wait_for(TIMEOUT);
+
+		mqtt::delivery_token_ptr pubtok;
+		pubtok = client.publish(TOPIC, PAYLOAD2, strlen(PAYLOAD2), QOS, false);
+		pubtok->wait_for(TIMEOUT);
 
         // Wait
         std::this_thread::sleep_for(std::chrono::seconds(2));
 
         // Disconnect
-		std::cout << "\nDisconnecting..." << std::endl;
 		conntok = client.disconnect();
 		conntok->wait();
-		std::cout << "  ...OK" << std::endl;
     }
     catch (const mqtt::exception& exc) {
 		std::cerr << exc.what() << std::endl;
