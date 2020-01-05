@@ -143,10 +143,11 @@ class EncoderMotor : public Motor{
 
 
 class TXT{
-    private:
+private:
     FISH_X1_TRANSFER *pTArea;
     bool _extension;
-    public:
+    
+public:
     TXT();
     TXT(FISH_X1_TRANSFER*,bool);
     ~TXT();
