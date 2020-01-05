@@ -28,11 +28,14 @@ LIBS = -l"SDLWidgetsLib" \
 all: output/Example.o output/txtlowlevelapi.o output/txthighlevelapi.o
 	$(COMPILER) $(LIB_PATH) -o output/Example_compiled $^ $(LIBS)
 
-mqtt: output/MqttTest.o
+mqtt: output/MqttTest.o output/TxtMqttFactoryClient.o
 	$(COMPILER) $(LIB_PATH) -o output/MqttTest_compiled $^ $(LIBS)
 
 output/MqttTest.o : mqtt/MqttTest.cpp
 	$(COMPILER) $(INCLUDE_PATH) -o output/MqttTest.o mqtt/MqttTest.cpp
+
+output/TxtMqttFactoryClient.o : mqtt/TxtMqttFactoryClient.cpp
+	$(COMPILER) $(INCLUDE_PATH) -o output/TxtMqttFactoryClient.o mqtt/TxtMqttFactoryClient.cpp
 
 output/txtlowlevelapi.o: TXT_lowlevel_API.cpp
 	$(COMPILER) $(INCLUDE_PATH) -o output/txtlowlevelapi.o TXT_lowlevel_API.cpp

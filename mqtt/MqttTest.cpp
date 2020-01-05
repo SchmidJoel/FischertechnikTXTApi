@@ -1,71 +1,29 @@
-#include <iostream>
-#include <cstdlib>
-#include <string>
-#include <thread>	// For sleep
-#include <atomic>
-#include <chrono>
-#include <cstring>
-#include "mqtt/async_client.h"
+#include "TxtMqttFactoryClient.h"
 
 unsigned int DebugFlags;
 FILE *DebugFile;
 
-const std::string DFLT_SERVER_ADDRESS	{ "tcp://192.168.178.69:1883" };
-const std::string DFLT_CLIENT_ID		{ "async_publish" };
+bool end = false;
 
-const std::string TOPIC { "hello" };
+void test(const std::string& message) {
+	end = true;
+}
 
-const char* PAYLOAD1 = "Hello World!";
-const char* PAYLOAD2 = "Hi there!";
-const char* PAYLOAD3 = "Is anyone listening?";
-const char* PAYLOAD4 = "Someone is always listening.";
-
-const char* LWT_PAYLOAD = "Last will and testament.";
-
-const int  QOS = 1;
-
-const auto TIMEOUT = std::chrono::seconds(10);
-
-
-int main(int argc, char* argv[])
+int main(void)
 {
-    std::string	address  = (argc > 1) ? std::string(argv[1]) : DFLT_SERVER_ADDRESS,
-			clientID = (argc > 2) ? std::string(argv[2]) : DFLT_CLIENT_ID;
+    TxtMqttFactoryClient mqttClient("TestClient", "192.168.178.69", "", "");
 
-	mqtt::async_client client(address, clientID);
+	mqttClient.connect(1000);
 
-	mqtt::callback cb;
-	client.set_callback(cb);
+	mqttClient.subTopicAsync(TOPIC_INPUT_STOCK, test);
 
-	mqtt::connect_options conopts;
-	mqtt::message willmsg(TOPIC, LWT_PAYLOAD, 1, true);
-	mqtt::will_options will(willmsg);
-	conopts.set_will(will);
+	//mqttClient.publishMessage(TOPIC_INPUT_STOCK, "1");
 
-    try {
-        // Connect
-		mqtt::token_ptr conntok = client.connect(conopts);
-		conntok->wait();
-
-		mqtt::message_ptr pubmsg = mqtt::make_message(TOPIC, PAYLOAD1);
-		pubmsg->set_qos(QOS);
-		client.publish(pubmsg)->wait_for(TIMEOUT);
-
-		mqtt::delivery_token_ptr pubtok;
-		pubtok = client.publish(TOPIC, PAYLOAD2, strlen(PAYLOAD2), QOS, false);
-		pubtok->wait_for(TIMEOUT);
-
-        // Wait
-        std::this_thread::sleep_for(std::chrono::seconds(2));
-
-        // Disconnect
-		conntok = client.disconnect();
-		conntok->wait();
-    }
-    catch (const mqtt::exception& exc) {
-		std::cerr << exc.what() << std::endl;
-		return 1;
+	while (!end)
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
-
+	
+	
     return 0;
 }

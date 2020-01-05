@@ -1,11 +1,9 @@
-
 #include "TxtMqttFactoryClient.h"
 
 TxtMqttFactoryClient::TxtMqttFactoryClient(std::string clientname, std::string host,
-		std::string mqtt_user, mqtt::binary_ref mqtt_pass, std::string port, bool bretained, int iqos)
+		std::string mqtt_user, mqtt::binary_ref mqtt_pass, std::string port)
       : clientname(clientname), host(host), port(port), mqtt_user(mqtt_user), mqtt_pass(mqtt_pass),
-	  bretained(bretained), iqos(iqos),
-	cli("tcp://" + host + ":" + port, clientname)
+		cli("tcp://" + host + ":" + port, clientname)
 {
     connOpts.set_connect_timeout(DFLT_TIMEOUT_CONNECT);
 	connOpts.set_keep_alive_interval(DFLT_KEEPALIVE_INTERVAL);
@@ -15,7 +13,6 @@ TxtMqttFactoryClient::TxtMqttFactoryClient(std::string clientname, std::string h
 	connOpts.set_user_name(mqtt_user);
 	connOpts.set_password(mqtt_pass);
 
-	callback cb;
 	cli.set_callback(cb);
 	// TODO will message
 }
@@ -36,42 +33,52 @@ bool TxtMqttFactoryClient::connect(long timeout) {
 }
 
 void TxtMqttFactoryClient::disconnect(long timeout) {
-	auto toks = cli.get_pending_delivery_tokens();
+	// auto toks = cli.get_pending_delivery_tokens();
 	// TODO wait for pending tokens
 	// TODO unsub? 
 	cli.disconnect(timeout);
 }
 
-void TxtMqttFactoryClient::publishMessageSync(const std::string& topic, const std::string& message) {
-	mqtt::delivery_token_ptr pubtok = cli.publish(topic, message);
-	pubtok->wait_for(DFLT_TIMEOUT_MS_PUBLISH);
-}
-
-void TxtMqttFactoryClient::publishMessageSync(const std::string& topic, const std::string& message,
-		long timeout = DFLT_TIMEOUT_MS_PUBLISH, int qos = DFLT_QUALITY_OF_SERVICE, bool retained = false) {
-	mqtt::delivery_token_ptr pubtok = cli.publish(topic, message, qos, retained);
+void TxtMqttFactoryClient::publishMessage(const std::string& topicFilter, const std::string& message, long timeout, int qos, bool retained) {
+	mqtt::delivery_token_ptr pubtok = cli.publish(topicFilter, message, qos, retained);
 	pubtok->wait_for(timeout);
 }
 
-void TxtMqttFactoryClient::publishMessageAsync(const std::string& topic, const std::string& message) {
-	mqtt::message_ptr pubmsg = mqtt::make_message(topic, message);
-	// TODO handle token
-	cli.publish(pubmsg);
+void TxtMqttFactoryClient::subTopicAsync(const std::string& topicFilter, void(*func)(const std::string& message), int qos, long timeout) {
+	mqtt::token_ptr subtok = cli.subscribe(topicFilter, qos);
+	subtok->wait_for(timeout);
+
+	cb.register_topic(topicFilter, func);
 }
 
-void TxtMqttFactoryClient::publishMessageAsync(const std::string& topic, const std::string& message, int qos = 1, bool retained = false) {
-	mqtt::message_ptr pubmsg = mqtt::make_message(topic, message, qos, retained);
-	cli.publish(pubmsg);
-}
-
-void TxtMqttFactoryClient::subTopic(const std::string& topicFilter, int qos = DFLT_QUALITY_OF_SERVICE, long timeout = DFLT_TIMEOUT_MS_PUBLISH) {
+void TxtMqttFactoryClient::subTopicSync(const std::string& topicFilter, int qos, long timeout) {
 	mqtt::token_ptr subtok = cli.subscribe(topicFilter, qos);
 	subtok->wait_for(timeout);
 }
 
-void TxtMqttFactoryClient::unsubTopic(const std::string& topicFilter, long timeout = DFLT_TIMEOUT_MS_PUBLISH) {
+void TxtMqttFactoryClient::unsubTopic(const std::string& topicFilter, long timeout) {
 	mqtt::token_ptr unsubtok = cli.unsubscribe(topicFilter);
 	bool r = unsubtok->wait_for(timeout);
+
+	cb.remove_topic(topicFilter);
 }
 
-void TxtMqttFactoryClient
+std::string TxtMqttFactoryClient::consume_topic(const std::string& topicFilter) {
+	std::string message;
+
+	cli.start_consuming();
+
+	while (true) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+		auto msg = cli.consume_message();
+		if ((msg->get_topic().compare(topicFilter)) == 0) {
+			message = msg->get_payload_str();
+			break;
+		}
+	}
+
+	cli.stop_consuming();
+
+	return message;
+}
