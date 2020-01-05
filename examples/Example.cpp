@@ -1,6 +1,6 @@
 #include "unistd.h"
-#include "TXT_lowlevel_API.hpp"
-#include "TXT_highlevel_API.hpp"
+#include "TXT_lowlevel_API.h"
+#include "TXT_highlevel_API.h"
 #include <iostream>
 #include <fstream>
 

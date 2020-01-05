@@ -1,6 +1,10 @@
-INCLUDE_PATH = -std=gnu++0x -std=c++0x -I"deps\include" -O3 -Wall -c -fmessage-length=0 -Wno-psabi
+INCLUDE_PATH = -std=gnu++0x -std=c++0x -I"deps\include" -I"FactoryLib/include" -O3 -Wall -c -fmessage-length=0 -Wno-psabi
 LIB_PATH = -L"deps\lib"
-COMPILER = "arm-linux-gnueabihf-g++" 
+COMPILER = "arm-linux-gnueabihf-g++"
+
+BIN_DIR = "bin"
+SRC_DIR = FactoryLib/src/
+EXAMPLE_DIR = examples/
 
 LIBS = -l"SDLWidgetsLib" \
 	-l"paho-mqtt3c" \
@@ -25,23 +29,35 @@ LIBS = -l"SDLWidgetsLib" \
 	-l"MotorIOLib" \
 	-l"KeLibTxt"
 
-all: output/Example.o output/txtlowlevelapi.o output/txthighlevelapi.o
-	$(COMPILER) $(LIB_PATH) -o output/Example_compiled $^ $(LIBS)
+$(shell mkdir -p $(BIN_DIR))
 
-mqtt: output/MqttTest.o output/TxtMqttFactoryClient.o
-	$(COMPILER) $(LIB_PATH) -o output/MqttTest_compiled $^ $(LIBS)
+all: $(BIN_DIR)/Example.o $(BIN_DIR)/txtlowlevelapi.o $(BIN_DIR)/txthighlevelapi.o
+	$(COMPILER) $(LIB_PATH) -o $(BIN_DIR)/Example_compiled $^ $(LIBS)
 
-output/MqttTest.o : mqtt/MqttTest.cpp
-	$(COMPILER) $(INCLUDE_PATH) -o output/MqttTest.o mqtt/MqttTest.cpp
+mqtt: $(BIN_DIR)/MqttTest.o $(BIN_DIR)/TxtMqttFactoryClient.o
+	$(COMPILER) $(LIB_PATH) -o $(BIN_DIR)/MqttTest_compiled $^ $(LIBS)
 
-output/TxtMqttFactoryClient.o : mqtt/TxtMqttFactoryClient.cpp
-	$(COMPILER) $(INCLUDE_PATH) -o output/TxtMqttFactoryClient.o mqtt/TxtMqttFactoryClient.cpp
+threads: $(BIN_DIR)/Threads.o $(BIN_DIR)/txtlowlevelapi.o
+	$(COMPILER) $(LIB_PATH) -o $(BIN_DIR)/Threads_compiled $^ $(LIBS)
 
-output/txtlowlevelapi.o: TXT_lowlevel_API.cpp
-	$(COMPILER) $(INCLUDE_PATH) -o output/txtlowlevelapi.o TXT_lowlevel_API.cpp
+$(BIN_DIR)/Threads.o : $(EXAMPLE_DIR)Threads.cpp
+	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/Threads.o $(EXAMPLE_DIR)Threads.cpp
 
-output/txthighlevelapi.o: TXT_highlevel_API.cpp
-	$(COMPILER) $(INCLUDE_PATH) -o output/txthighlevelapi.o TXT_highlevel_API.cpp
+$(BIN_DIR)/MqttTest.o : $(EXAMPLE_DIR)MqttTest.cpp
+	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/MqttTest.o $(EXAMPLE_DIR)MqttTest.cpp
 
-output/Example.o: Example.cpp
-	$(COMPILER) $(INCLUDE_PATH) -o output/Example.o Example.cpp
+$(BIN_DIR)/TxtMqttFactoryClient.o : $(SRC_DIR)TxtMqttFactoryClient.cpp
+	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/TxtMqttFactoryClient.o $(SRC_DIR)TxtMqttFactoryClient.cpp
+
+$(BIN_DIR)/txtlowlevelapi.o: $(SRC_DIR)TXT_lowlevel_API.cpp
+	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/txtlowlevelapi.o $(SRC_DIR)TXT_lowlevel_API.cpp
+
+$(BIN_DIR)/txthighlevelapi.o: $(SRC_DIR)TXT_highlevel_API.cpp
+	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/txthighlevelapi.o $(SRC_DIR)TXT_highlevel_API.cpp
+
+$(BIN_DIR)/Example.o: $(EXAMPLE_DIR)Example.cpp
+	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/Example.o $(EXAMPLE_DIR)Example.cpp
+
+.PHONY: clean
+clean:
+	rm -f -r $(BIN_DIR)

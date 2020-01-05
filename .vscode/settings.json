@@ -76,6 +76,7 @@
         "map": "cpp",
         "set": "cpp",
         "stack": "cpp",
-        "xtree": "cpp"
+        "xtree": "cpp",
+        "*.rh": "cpp"
     }
 }

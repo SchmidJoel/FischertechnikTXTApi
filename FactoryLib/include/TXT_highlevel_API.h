@@ -1,7 +1,7 @@
 #ifndef TXT_HIGHLEVEL_API
 #define TXT_HIGHLEVEL_API
 
-#include "TXT_lowlevel_API.hpp"
+#include "TXT_lowlevel_API.h"
 
 enum AxisState{
     UNREFERENCED,
