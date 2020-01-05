@@ -2,9 +2,14 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
+#include <thread>
+
 
 /*Axis with encodermotor, referenceswitch (opener) and maxpos*/
-AxisEM::AxisEM(TXT& txt, uint8_t motorpin, uint8_t refpin, uint16_t max) : em(txt.encoderMotor(motorpin)), ref(txt.digitalInput(refpin)), maxPos(max) {}
+AxisEM::AxisEM(TXT& txt, uint8_t motorpin, uint8_t refpin, uint16_t max) : em(txt.encoderMotor(motorpin)), ref(txt.digitalInput(refpin)), maxPos(max) {
+    speed = 512;
+    state = AxisState::UNREFERENCED;
+}
 
 /*Axis with encodermotor and referenceswitch (opener) - maxpos = maxvalue(uint16_t)*/
 AxisEM::AxisEM(TXT& txt, uint8_t motorpin, uint8_t refpin) : AxisEM(txt, motorpin, refpin, std::numeric_limits<uint16_t>::max()){}
@@ -12,11 +17,12 @@ AxisEM::AxisEM(TXT& txt, uint8_t motorpin, uint8_t refpin) : AxisEM(txt, motorpi
 /*reference drive until ref is pressed*/
 void AxisEM::reference() {
 	 while(ref.value()){
-        em.left(512);
+        em.left(speed);
     }
     em.stop();
     pos = 0;
-    em.resetCounter();
+    em.reset();
+    state = AxisState::READY;
 }
 
 /*stop the axis*/
@@ -26,32 +32,66 @@ void AxisEM::stop() {
 
 /*get current position*/
 uint16_t AxisEM::getPos() {
-    return pos;
+    return pos + em.counter();
 }
 
 /*move for a absolute value, return false if maxpos would exceed*/
-bool AxisEM::moveAbsolut(uint16_t destination) {
-    return moveRelative(destination - pos);
+bool AxisEM::moveAbsolut(uint16_t pos) {
+    if(pos > maxPos || pos < 0 || state != AxisState::READY){
+        return false;
+    }
+    dest = pos;
+    drive();
+    return true;
+}
+
+void AxisEM::setSpeed(uint16_t speed_){
+    if(speed_ <= 512 && speed_ >= 0){
+        speed = speed_;
+    }
+    if(state == AxisState::LEFT){
+        em.left(speed);
+    }
+    else if(state == AxisState::RIGHT){
+        em.right(speed);
+    }
+}
+
+void AxisEM::drive(){
+    if(pos > dest){
+        state = AxisState::LEFT;
+        em.distanceLeft(pos - dest, speed);
+    }
+    else if(pos < dest){
+        state = AxisState::RIGHT;
+        em.distanceRight(dest - pos, speed);
+    }
+    em.waitToEnd();
+    pos = dest;
+    state = AxisState::READY;
 }
 
 /*move for a relative value, return false if maxpos would exceed*/
 bool AxisEM::moveRelative(int16_t distance) {
-    if(pos + distance > maxPos){
+    if(pos + distance > maxPos || pos + distance < 0 || state != AxisState::READY){
         return false;
     }
-    if(distance > 0){
-        em.distanceRight(distance,512);        
-    }
-    else{
-        em.distanceLeft(abs(distance),512);
-    }
-    em.waitToEnd();
-    pos += distance;
+    dest = pos + distance;
+    drive();
     return true;
 }
 
+AxisState AxisEM::getState(){
+    return state;
+}
+
+
+
 /*Axis with normal motor and stepper, referenceswitch (opener), stepperpin and maxpos*/
-AxisXS::AxisXS(TXT& txt, uint8_t motorpin, uint8_t refpin, uint8_t countpin, uint16_t max) : m(txt.encoderMotor(motorpin)), ref(txt.digitalInput(refpin)), counter(txt.digitalInput(countpin)), maxPos(max) {}
+AxisXS::AxisXS(TXT& txt, uint8_t motorpin, uint8_t refpin, uint8_t countpin, uint16_t max) : m(txt.encoderMotor(motorpin)), ref(txt.digitalInput(refpin)), counter(txt.digitalInput(countpin)), maxPos(max) {
+    state = AxisState::UNREFERENCED;
+    speed = 512;
+}
 
 /*Axis with normal motor and stepper, referenceswitch (opener), stepperpin - maxpos = maxvalue(uint16_t)*/
 AxisXS::AxisXS(TXT& txt, uint8_t motorpin, uint8_t refpin, uint8_t countpin) : AxisXS(txt, motorpin, countpin, refpin, std::numeric_limits<uint16_t>::max()){}
@@ -63,11 +103,12 @@ uint16_t AxisXS::getPos() {
 
 /*referencedrive until ref is pressed*/
 void AxisXS::reference() {
-	 while(ref.value()){
-        m.left(512);
+	while(ref.value()){
+        m.left(speed);
     }
     m.stop();
     pos = 0;
+    state = AxisState::READY;
 }
 
 /*stop the axis*/
@@ -75,34 +116,57 @@ void AxisXS::stop(){
     m.stop();
 }
 
+void AxisXS::drive(){
+    if(pos > dest){
+        state = AxisState::LEFT;
+        m.left(speed);
+    }
+    else if(pos < dest){
+        state = AxisState::RIGHT;
+        m.right(speed);
+    }
+    while(pos != dest){
+        auto val = counter.value();
+        while(val == counter.value());
+        if(state == AxisState::LEFT){
+            pos--;
+        }
+        else if(state == AxisState::RIGHT){
+            pos++;
+        }
+    }
+    m.stop();
+    state = AxisState::READY;
+}
+
 /*move for a absolute value, return false if maxpos would exceed*/
 bool AxisXS::moveAbsolut(uint16_t destination) {
-    return moveRelative(destination - pos);
+    if(pos > maxPos || pos < 0 || state != AxisState::READY){
+        return false;
+    }
+    dest = pos;
+    drive();
+    return true;
 }
 
 /*move for a relative value, return false if maxpos would exceed*/
 bool AxisXS::moveRelative(int16_t distance) {
-    if(pos + distance > maxPos){
+    if(pos + distance > maxPos || pos + distance < 0 || state != AxisState::READY){
         return false;
     }
-    uint16_t dist = 0;
-    if(distance > 0){
-        m.right(512);
-    }
-    else{
-        m.left(512);
-    }
-    while(dist < abs(distance)){
-        auto val = counter.value();
-        while(val == counter.value() || !ref.value());
-        dist++;
-        pos += distance > 0 ? 1 : -1;
-        if(!ref.value()){
-            reference();
-        }
-    }
-    m.stop();
+    dest = pos + distance;
+    drive();
     return true;
+}
+
+void AxisXS::setSpeed(uint16_t speed_){
+    if(speed_ <= 512 && speed_ >= 0){
+        speed = speed_;
+    }
+}
+
+AxisState AxisXS::getState(){
+    return state;
 }
 
 /*axis with two endswitch*/
@@ -133,3 +197,5 @@ bool TwoRefAxis::isPos1(){
 bool TwoRefAxis::isPos2(){
     return ref2.value();
 }
+
+

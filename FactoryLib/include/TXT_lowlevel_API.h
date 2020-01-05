@@ -138,7 +138,7 @@ class EncoderMotor : public Motor{
     void stopSynchronization();
     void waitToEnd();
     uint16_t counter();
-    void resetCounter();
+    void reset();
 };
 
 
