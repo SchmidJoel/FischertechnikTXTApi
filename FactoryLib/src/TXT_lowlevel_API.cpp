@@ -1,4 +1,4 @@
-#include "TXT_lowlevel_API.hpp"
+#include "TXT_lowlevel_API.h"
 #include <stdexcept>
 #include <unistd.h>
 #include "math.h"
