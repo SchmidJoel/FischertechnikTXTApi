@@ -1,7 +1,8 @@
 #include "TXT_lowlevel_API.hpp"
 #include <stdexcept>
-#include <unistd.h>
 #include "math.h"
+#include "unistd.h"
+#include <fstream>
 
 // needed for some debugging stuff of the ft-Libraries ("KeLibTxtDl.h", "FtShmem.h")
 unsigned int DebugFlags;
@@ -309,14 +310,14 @@ uint8_t Motor::getPin(){
 EncoderMotor::EncoderMotor(FISH_X1_TRANSFER* pTArea,uint8_t pin) : Motor(pTArea,pin) {}
 
 void EncoderMotor::distanceLeft(uint16_t steps, uint16_t level){
-    resetCounter();
+    reset();
     pTArea->ftX1out.distance[pin] = steps;  // Distance to drive 
 	pTArea->ftX1out.motor_ex_cmd_id[pin]++; // Set new Distance Value 
     left(level);
 }
 
 void EncoderMotor::distanceRight(uint16_t steps, uint16_t level){
-    resetCounter();
+    reset();
     pTArea->ftX1out.distance[pin] = steps;  // Distance to drive
 	pTArea->ftX1out.motor_ex_cmd_id[pin]++; // Set new Distance Value 
     right(level);
@@ -340,8 +341,28 @@ uint16_t EncoderMotor::counter(){
     return pTArea->ftX1in.counter[pin];
 }
 
-void EncoderMotor::resetCounter(){
+void EncoderMotor::reset(){
+    //stoppen und warten bis Motor steht
+    stop();
+    uint16_t first;
+    uint16_t second = counter();
+    int i = 0;
+    do {
+        usleep(40000);
+        first = second;
+        second = counter();
+        i++;
+    } while(first != second && i < 5);
+    
+    //resetten
     pTArea->ftX1out.cnt_reset_cmd_id[pin]++;
     pTArea->ftX1in.motor_ex_reached[pin] = 0;
+
+    //Es dauert einige Zeit bis der resetvorgang durchgeführt wurde, deshalb solange warten, max 0,1 s
+    i = 0;
+    while(counter() != 0 && i < 100){
+        usleep(1000);
+        i++;
+    }
 }
 
