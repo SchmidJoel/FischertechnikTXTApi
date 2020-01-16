@@ -16,7 +16,7 @@ AxisEM::AxisEM(TXT& txt, uint8_t motorpin, uint8_t refpin) : AxisEM(txt, motorpi
 
 /*reference drive until ref is pressed*/
 void AxisEM::reference() {
-	 while(ref.value()){
+	 while(!ref.value()){
         em.left(speed);
     }
     em.stop();
@@ -43,6 +43,10 @@ bool AxisEM::moveAbsolut(uint16_t pos) {
     dest = pos;
     drive();
     return true;
+}
+
+std::thread AxisEM::moveAbsolutAsync(uint16_t pos){
+    return std::thread (&AxisEM::moveAbsolut, this, pos);
 }
 
 void AxisEM::setSpeed(uint16_t speed_){
@@ -81,6 +85,10 @@ bool AxisEM::moveRelative(int16_t distance) {
     return true;
 }
 
+std::thread AxisEM::moveRelativeAsync(int16_t pos){
+    return std::thread (&AxisEM::moveRelative, this, pos);
+}
+
 AxisState AxisEM::getState(){
     return state;
 }
@@ -103,7 +111,7 @@ uint16_t AxisXS::getPos() {
 
 /*referencedrive until ref is pressed*/
 void AxisXS::reference() {
-	while(ref.value()){
+	while(!ref.value()){
         m.left(speed);
     }
     m.stop();
@@ -149,6 +157,10 @@ bool AxisXS::moveAbsolut(uint16_t destination) {
     return true;
 }
 
+std::thread AxisXS::moveAbsolutAsync(uint16_t pos){
+    return std::thread (&AxisXS::moveAbsolut, this, pos);
+}
+
 /*move for a relative value, return false if maxpos would exceed*/
 bool AxisXS::moveRelative(int16_t distance) {
     if(pos + distance > maxPos || pos + distance < 0 || state != AxisState::READY){
@@ -157,6 +169,10 @@ bool AxisXS::moveRelative(int16_t distance) {
     dest = pos + distance;
     drive();
     return true;
+}
+
+std::thread AxisXS::moveRelativeAsync(int16_t pos){
+    return std::thread (&AxisXS::moveRelative, this, pos);
 }
 
 void AxisXS::setSpeed(uint16_t speed_){
@@ -174,7 +190,7 @@ TwoRefAxis::TwoRefAxis(TXT& txt, uint8_t motorpin, uint8_t refpin1, uint8_t refp
 
 /*move to pos 1*/
 void TwoRefAxis::pos1(){
-    while( ref1.value()){
+    while( !ref1.value()){
         m.left(512);
     }
     m.stop();
@@ -182,7 +198,7 @@ void TwoRefAxis::pos1(){
 
 /*move to pos 2*/
 void TwoRefAxis::pos2(){
-    while( ref2.value()){
+    while( !ref2.value()){
         m.right(512);
     }
     m.stop();

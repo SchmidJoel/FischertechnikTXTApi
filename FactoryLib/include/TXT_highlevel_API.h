@@ -2,6 +2,7 @@
 #define TXT_HIGHLEVEL_API
 
 #include "TXT_lowlevel_API.h"
+#include <thread>
 
 enum AxisState{
     UNREFERENCED,
@@ -15,7 +16,9 @@ public:
     virtual uint16_t getPos() = 0;
     virtual void reference() = 0;
     virtual bool moveAbsolut(uint16_t destination) = 0;
-    virtual bool moveRelative(int16_t distance) = 0;
+    virtual std::thread moveAbsolutAsync(uint16_t destination) = 0;
+    virtual bool moveRelative(int16_t distance) = 0;    
+    virtual std::thread moveRelativeAsync(int16_t distance) = 0;
     virtual void stop() = 0;
     virtual void setSpeed(uint16_t speed) = 0;
     virtual AxisState getState() = 0;
@@ -37,7 +40,9 @@ public:
     uint16_t getPos() override;
     void reference() override;
     bool moveAbsolut(uint16_t destination) override;
+    std::thread moveAbsolutAsync(uint16_t destination) override;
     bool moveRelative(int16_t distance) override;
+    std::thread moveRelativeAsync(int16_t destination) override;
     void stop() override;
     void setSpeed(uint16_t speed) override;
     AxisState getState() override;
@@ -60,7 +65,9 @@ public:
     uint16_t getPos() override;
     void reference() override;
     bool moveAbsolut(uint16_t destination) override;
+    std::thread moveAbsolutAsync(uint16_t destination) override;
     bool moveRelative(int16_t distance) override;
+    std::thread moveRelativeAsync(int16_t distance) override;
     void stop() override;
     void setSpeed(uint16_t speed) override;
     AxisState getState() override;

@@ -31,8 +31,8 @@ LIBS = -l"SDLWidgetsLib" \
 
 $(shell mkdir -p $(BIN_DIR))
 
-all: $(BIN_DIR)/Example.o $(BIN_DIR)/txtlowlevelapi.o $(BIN_DIR)/txthighlevelapi.o
-	$(COMPILER) $(LIB_PATH) -o $(BIN_DIR)/Example_compiled $^ $(LIBS)
+all: $(BIN_DIR)/main.o $(BIN_DIR)/txtlowlevelapi.o $(BIN_DIR)/txthighlevelapi.o
+	$(COMPILER) $(LIB_PATH) -o $(BIN_DIR)/Main_compiled $^ $(LIBS)
 
 mqtt: $(BIN_DIR)/MqttTest.o $(BIN_DIR)/TxtMqttFactoryClient.o
 	$(COMPILER) $(LIB_PATH) -o $(BIN_DIR)/MqttTest_compiled $^ $(LIBS)
@@ -55,8 +55,8 @@ $(BIN_DIR)/txtlowlevelapi.o: $(SRC_DIR)TXT_lowlevel_API.cpp
 $(BIN_DIR)/txthighlevelapi.o: $(SRC_DIR)TXT_highlevel_API.cpp
 	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/txthighlevelapi.o $(SRC_DIR)TXT_highlevel_API.cpp
 
-$(BIN_DIR)/Example.o: $(EXAMPLE_DIR)Example.cpp
-	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/Example.o $(EXAMPLE_DIR)Example.cpp
+$(BIN_DIR)/main.o: main.cpp
+	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/main.o main.cpp
 
 .PHONY: clean
 clean:

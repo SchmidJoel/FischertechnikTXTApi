@@ -1,7 +1,6 @@
 #include "TXT_lowlevel_API.h"
 #include <stdexcept>
 #include "math.h"
-#include "unistd.h"
 #include <fstream>
 
 // needed for some debugging stuff of the ft-Libraries ("KeLibTxtDl.h", "FtShmem.h")
