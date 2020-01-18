@@ -8,11 +8,6 @@ int main(void) {
 	return 0;
 }
 
-void test(uint8_t pins[]){
-   pins[0];
-   sizeof(pins);
-}
-
 void vgr(TXT &txt){
     AxisEM x = AxisEM {txt, 5, 9};
     AxisEM y = AxisEM{txt, 6, 10};

@@ -5,6 +5,7 @@ COMPILER = "arm-linux-gnueabihf-g++"
 BIN_DIR = "bin"
 SRC_DIR = FactoryLib/src/
 EXAMPLE_DIR = examples/
+FACTORY_DIR = factory/
 
 LIBS = -l"SDLWidgetsLib" \
 	-l"jsoncpp" \
@@ -62,6 +63,12 @@ $(BIN_DIR)/utils.o: $(SRC_DIR)utils.cpp
 
 $(BIN_DIR)/main.o: main.cpp
 	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/main.o main.cpp
+
+$(BIN_DIR)/highbay.o: $(FACTORY_DIR)HighBayWarehouse.hpp
+	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/highbay.o $(FACTORY_DIR)HighBayWarehouse.hpp
+
+$(BIN_DIR)/vacuum.o: $(FACTORY_DIR)VacuumRobot.hpp
+	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/vacuum.o $(FACTORY_DIR)VacuumRobot.hpp
 
 .PHONY: clean
 clean:
