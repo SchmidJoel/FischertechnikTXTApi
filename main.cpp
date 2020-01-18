@@ -1,36 +1,16 @@
 #include "TXT_lowlevel_API.h"
 #include "TXT_highlevel_API.h"
-#include <iostream>
-#include <fstream>
-#include <chrono>
-/*
-todo:
-c-Taster abfragen
-utils.h mit farbwertconverter und zeit
-achsen async, encoderpos
-n-Axis
 
-*/
 
 int main(void) {
 	TXT txt = TXT();
 
-    TwoRefAxis ofen = TwoRefAxis{txt, 6, 10, 9};
-    TwoRefAxis vacuum = TwoRefAxis{txt, 6, 5, 11};
-    TwoRefAxis dreh = TwoRefAxis{txt, 1, 1, 3};
-    ofen.pos1();
-    vacuum.pos1();
-    dreh.pos1();
-
-    Output runter = txt.output(14);
-    Output comp = txt.output(8);
-    comp.on();
-    runter.on();
-    
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    
-    
 	return 0;
+}
+
+void test(uint8_t pins[]){
+   pins[0];
+   sizeof(pins);
 }
 
 void vgr(TXT &txt){
@@ -59,7 +39,7 @@ void vgr(TXT &txt){
 void hgr(TXT &txt){
     AxisEM x = AxisEM {txt, 2, 5};
     AxisEM y = AxisEM{txt, 4, 8};
-    TwoRefAxis z = TwoRefAxis{txt, 3, 6, 7};
+    TwoRefAxis z = TwoRefAxis{txt, 3, 6, 7, ButtonMode::CLOSER, ButtonMode::CLOSER};
 
     z.pos1();
     x.reference();
@@ -141,5 +121,25 @@ void sortingline(TXT &txt){
     white.on();
     red.on();
     blue.on();
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+}
+
+void workingStation(TXT &txt){
+    TwoRefAxis ofen = TwoRefAxis{txt, 6, 10, 9};
+    TwoRefAxis vacuum = TwoRefAxis{txt, 6, 5, 11};
+    std::vector<uint8_t> pos;
+    pos.push_back(1);
+    pos.push_back(2);
+    pos.push_back(3);
+    NRefAxis dreh = NRefAxis{txt, 1, pos};
+    ofen.pos1();
+    vacuum.pos1();
+    dreh.reference();
+
+    Output runter = txt.output(14);
+    Output comp = txt.output(8);
+    comp.on();
+    runter.on();
+    
     std::this_thread::sleep_for(std::chrono::seconds(1));
 }

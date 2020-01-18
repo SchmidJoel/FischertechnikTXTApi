@@ -9,6 +9,8 @@
     https://releases.linaro.org/components/toolchain/binaries/7.2-2017.11/arm-linux-gnueabihf/gcc-linaro-7.2.1-2017.11-i686-mingw32_arm-linux-gnueabihf.tar.xz
 */
 
+#include "utils.hpp"
+
 
 
 /* Output: O1-O8
@@ -35,6 +37,19 @@ class DigitalInput{
     DigitalInput(FISH_X1_TRANSFER*, uint8_t pin);
     bool value();
     uint8_t getPin();    
+};
+
+/*
+*/
+class Counter{
+    private:
+    uint8_t pin;
+    FISH_X1_TRANSFER* pTArea;
+    public:
+    Counter(FISH_X1_TRANSFER*, uint8_t pin);
+    bool value();
+    uint8_t getPin();  
+    void waitSteps(uint16_t);  
 };
 
 /*AnalogInput for NTC-Resistor, Photo-Resistor: I1-I8
@@ -65,14 +80,6 @@ class Ultrasonic{
     Ultrasonic(FISH_X1_TRANSFER*,uint8_t pin);
     uint16_t value();
     uint8_t getPin();    
-};
-
-/*Colors for the ColorSensor
-*/
-enum Color{
-    BLUE,
-    WHITE,
-    RED
 };
 
 /*ColorSensor: I1-I8
@@ -159,6 +166,7 @@ public:
     AnalogInput analogInput(uint8_t pin);
     NTC ntc(uint8_t pin);
     DigitalInput digitalInput(uint8_t pin);
+    Counter counter(uint8_t pin);
     Ultrasonic ultrasonic(uint8_t pin);
     Voltage voltage(uint8_t pin);
     ColorSensor colorSensor(uint8_t pin);

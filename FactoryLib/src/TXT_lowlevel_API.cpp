@@ -35,6 +35,14 @@ DigitalInput TXT::digitalInput(uint8_t pin){
     return DigitalInput{(pTArea+(pin>>3)),pin&7};
 }
 
+Counter TXT::counter(uint8_t pin){
+    pin--;
+    if(pin > 8){
+        throw std::invalid_argument(ERR_4_PIN);
+    }
+    return Counter{(pTArea+(pin>>2)),pin&3};
+}
+
 AnalogInput TXT::analogInput(uint8_t pin){
     pin--;
     if(pin > 15){
@@ -128,7 +136,7 @@ void TXT::playSoundAndWait(uint8_t index, uint8_t repeats){
     pTArea->sTxtOutputs.u16SoundRepeat = repeats;
     pTArea->sTxtOutputs.u16SoundCmdId++;
     while(pTArea->sTxtInputs.u16SoundCmdId == 0){
-        usleep(10000);
+        msleep(1);
     }
 }
 
@@ -142,6 +150,7 @@ TXT TXT::extension(){
 uint16_t TXT::getTXTVoltage(){
     return pTArea->sTxtInputs.u16TxtPower;
 }
+
 
 
 //Output
@@ -163,6 +172,7 @@ uint8_t Output::getPin(){
     return pin+1;
 }
 
+
 //DigitalInput
 DigitalInput::DigitalInput(FISH_X1_TRANSFER* pTArea,uint8_t pin): pin(pin), pTArea(pTArea){
     pTArea->ftX1config.uni[pin].mode = MODE_R; 	    //  resistor
@@ -177,6 +187,31 @@ bool DigitalInput::value(){
 uint8_t DigitalInput::getPin(){
     return pin+1;
 }
+
+//Counter C1-C4
+Counter::Counter(FISH_X1_TRANSFER* pTArea,uint8_t pin): pin(pin), pTArea(pTArea){}
+
+bool Counter::value(){
+    return pTArea->ftX1in.cnt_in[pin];
+}
+
+uint8_t Counter::getPin(){
+    return pin+1;
+}
+
+void Counter::waitSteps(uint16_t steps){
+    while(steps){
+        auto val = pTArea->ftX1in.cnt_in[pin];
+        while(val == pTArea->ftX1in.cnt_in[pin]){
+            usleep(100);
+        }
+        steps--;        
+    }
+    pTArea->ftX1out.cnt_reset_cmd_id[pin]++;
+    pTArea->ftX1in.motor_ex_reached[pin] = 0;
+    msleep(1);
+}
+
 
 //AnalogInput (Widerstandsmessung)
 AnalogInput::AnalogInput(FISH_X1_TRANSFER* pTArea,uint8_t pin): pin(pin), pTArea(pTArea){
@@ -332,7 +367,7 @@ void EncoderMotor::stopSynchronization(){
 
 void EncoderMotor::waitToEnd(){
     while(! pTArea->ftX1in.motor_ex_reached[pin]){        
-        usleep(10000);
+        msleep(1);
     }
 }
 
@@ -343,25 +378,11 @@ uint16_t EncoderMotor::counter(){
 void EncoderMotor::reset(){
     //stoppen und warten bis Motor steht
     stop();
-    uint16_t first;
-    uint16_t second = counter();
-    int i = 0;
-    do {
-        usleep(40000);
-        first = second;
-        second = counter();
-        i++;
-    } while(first != second && i < 5);
+    msleep(10);
     
     //resetten
     pTArea->ftX1out.cnt_reset_cmd_id[pin]++;
     pTArea->ftX1in.motor_ex_reached[pin] = 0;
-
-    //Es dauert einige Zeit bis der resetvorgang durchgeführt wurde, deshalb solange warten, max 0,1 s
-    i = 0;
-    while(counter() != 0 && i < 100){
-        usleep(1000);
-        i++;
-    }
+    msleep(10);
 }
 
