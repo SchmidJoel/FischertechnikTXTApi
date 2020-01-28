@@ -5,11 +5,9 @@ COMPILER = "arm-linux-gnueabihf-g++"
 BIN_DIR = "bin"
 SRC_DIR = FactoryLib/src/
 EXAMPLE_DIR = examples/
+FACTORY_DIR = factory/
 
 LIBS = -l"SDLWidgetsLib" \
-	-l"paho-mqtt3c" \
-	-l"paho-mqtt3a" \
-	-l"paho-mqttpp3" \
 	-l"jsoncpp" \
 	-l"pthread" \
 	-l"SDL" \
@@ -29,10 +27,15 @@ LIBS = -l"SDLWidgetsLib" \
 	-l"MotorIOLib" \
 	-l"KeLibTxt"
 
+	
+#	-l"paho-mqtt3c" \
+	-l"paho-mqtt3a" \
+	-l"paho-mqttpp3" \
+
 $(shell mkdir -p $(BIN_DIR))
 
-all: $(BIN_DIR)/Example.o $(BIN_DIR)/txtlowlevelapi.o $(BIN_DIR)/txthighlevelapi.o
-	$(COMPILER) $(LIB_PATH) -o $(BIN_DIR)/Example_compiled $^ $(LIBS)
+all: $(BIN_DIR)/main.o $(BIN_DIR)/txtlowlevelapi.o $(BIN_DIR)/txthighlevelapi.o $(BIN_DIR)/utils.o
+	$(COMPILER) $(LIB_PATH) -o $(BIN_DIR)/Main_compiled $^ $(LIBS)
 
 mqtt: $(BIN_DIR)/MqttTest.o $(BIN_DIR)/TxtMqttFactoryClient.o
 	$(COMPILER) $(LIB_PATH) -o $(BIN_DIR)/MqttTest_compiled $^ $(LIBS)
@@ -55,8 +58,17 @@ $(BIN_DIR)/txtlowlevelapi.o: $(SRC_DIR)TXT_lowlevel_API.cpp
 $(BIN_DIR)/txthighlevelapi.o: $(SRC_DIR)TXT_highlevel_API.cpp
 	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/txthighlevelapi.o $(SRC_DIR)TXT_highlevel_API.cpp
 
-$(BIN_DIR)/Example.o: $(EXAMPLE_DIR)Example.cpp
-	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/Example.o $(EXAMPLE_DIR)Example.cpp
+$(BIN_DIR)/utils.o: $(SRC_DIR)utils.cpp
+	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/utils.o $(SRC_DIR)utils.cpp
+
+$(BIN_DIR)/main.o: main.cpp
+	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/main.o main.cpp
+
+$(BIN_DIR)/highbay.o: $(FACTORY_DIR)HighBayWarehouse.hpp
+	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/highbay.o $(FACTORY_DIR)HighBayWarehouse.hpp
+
+$(BIN_DIR)/vacuum.o: $(FACTORY_DIR)VacuumRobot.hpp
+	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/vacuum.o $(FACTORY_DIR)VacuumRobot.hpp
 
 .PHONY: clean
 clean:
