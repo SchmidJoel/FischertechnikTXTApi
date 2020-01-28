@@ -21,13 +21,20 @@ AxisEM::AxisEM(TXT& txt, uint8_t motorpin, uint8_t refpin) :
 
 /*reference drive until ref is pressed*/
 void AxisEM::reference() {
-	 while(ButtonMode::CLOSER == mode && !ref.value() || ButtonMode::OPENER == mode && ref.value()){
-        em.left(speed);
+    std::ofstream file = std::ofstream("out2.txt");
+    file << "in reference" << std::endl;
+    em.left(speed);
+	while (ButtonMode::CLOSER == mode && !ref.value() || ButtonMode::OPENER == mode && ref.value()) {
+        //em.left(speed); // TODO ?
+        msleep(10);
     }
+    file << "in reference: after while" << std::endl;
     em.stop();
     pos = 0;
     em.reset();
     state = AxisState::READY;
+    file << "in reference: end" << std::endl;
+    file.close();
 }
 
 std::thread AxisEM::referenceAsync(){
@@ -136,6 +143,7 @@ uint16_t AxisXS::getPos() {
 void AxisXS::reference() {
 	while(ButtonMode::CLOSER == mode && !ref.value() || ButtonMode::OPENER == mode && ref.value()){
         m.left(speed);
+        msleep(10);
     }
     m.stop();
     pos = 0;
@@ -237,6 +245,7 @@ void NRefAxis::reference(){
     ButtonMode mode = postitions[0].second;
     while(ButtonMode::CLOSER == mode && !ref.value() || ButtonMode::OPENER == mode && ref.value()){
         m.left(speed);
+        msleep(10);
     }
     m.stop();
     state = AxisState::READY;
@@ -272,6 +281,7 @@ void NRefAxis::pos(uint8_t pos){
            m.left(speed);
            state = AxisState::LEFT;
        }
+       msleep(10);
     }
     m.stop();
     lastpos = pos;

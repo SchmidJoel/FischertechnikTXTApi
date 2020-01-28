@@ -104,9 +104,9 @@ public:
     NRefAxis(TXT &txt, uint8_t motorpin, std::vector<uint8_t>pos);
     void reference();
     std::thread referenceAsync();
-    bool isPos(uint8_t pin);
-    void pos(uint8_t pin);
-    std::thread posAsync(uint8_t pin);
+    bool isPos(uint8_t pos);
+    void pos(uint8_t pos);
+    std::thread posAsync(uint8_t pos);
     void setSpeed(uint16_t speed_);
     void setButtonMode(uint8_t, ButtonMode mode);
 };

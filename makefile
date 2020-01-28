@@ -34,8 +34,14 @@ LIBS = -l"SDLWidgetsLib" \
 
 $(shell mkdir -p $(BIN_DIR))
 
-all: $(BIN_DIR)/main.o $(BIN_DIR)/txtlowlevelapi.o $(BIN_DIR)/txthighlevelapi.o $(BIN_DIR)/utils.o
+main: $(BIN_DIR)/main.o $(BIN_DIR)/highbay.o $(BIN_DIR)/vacuum.o  $(BIN_DIR)/txtlowlevelapi.o $(BIN_DIR)/txthighlevelapi.o $(BIN_DIR)/utils.o
 	$(COMPILER) $(LIB_PATH) -o $(BIN_DIR)/Main_compiled $^ $(LIBS)
+
+sorting: $(BIN_DIR)/sorting_line_main.o  $(BIN_DIR)/txtlowlevelapi.o $(BIN_DIR)/txthighlevelapi.o $(BIN_DIR)/utils.o
+	$(COMPILER) $(LIB_PATH) -o $(BIN_DIR)/SortingMain_compiled $^ $(LIBS)
+
+processing: $(BIN_DIR)/processing_station_main.o  $(BIN_DIR)/txtlowlevelapi.o $(BIN_DIR)/txthighlevelapi.o $(BIN_DIR)/utils.o
+	$(COMPILER) $(LIB_PATH) -o $(BIN_DIR)/ProcessingMain_compiled $^ $(LIBS)
 
 mqtt: $(BIN_DIR)/MqttTest.o $(BIN_DIR)/TxtMqttFactoryClient.o
 	$(COMPILER) $(LIB_PATH) -o $(BIN_DIR)/MqttTest_compiled $^ $(LIBS)
@@ -61,14 +67,23 @@ $(BIN_DIR)/txthighlevelapi.o: $(SRC_DIR)TXT_highlevel_API.cpp
 $(BIN_DIR)/utils.o: $(SRC_DIR)utils.cpp
 	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/utils.o $(SRC_DIR)utils.cpp
 
-$(BIN_DIR)/main.o: main.cpp
-	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/main.o main.cpp
+#$(BIN_DIR)/main.o: main.cpp
+#	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/main.o main.cpp
 
-$(BIN_DIR)/highbay.o: $(FACTORY_DIR)HighBayWarehouse.hpp
-	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/highbay.o $(FACTORY_DIR)HighBayWarehouse.hpp
+$(BIN_DIR)/highbay.o: $(FACTORY_DIR)HighBayWarehouse.cpp
+	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/highbay.o $(FACTORY_DIR)HighBayWarehouse.cpp
 
-$(BIN_DIR)/vacuum.o: $(FACTORY_DIR)VacuumRobot.hpp
-	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/vacuum.o $(FACTORY_DIR)VacuumRobot.hpp
+$(BIN_DIR)/vacuum.o: $(FACTORY_DIR)VacuumRobot.cpp
+	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/vacuum.o $(FACTORY_DIR)VacuumRobot.cpp
+
+$(BIN_DIR)/processing_station_main.o: $(FACTORY_DIR)ProcessingStationMain.cpp
+	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/processing_station_main.o $(FACTORY_DIR)ProcessingStationMain.cpp
+
+$(BIN_DIR)/sorting_line_main.o: $(FACTORY_DIR)SortingLineMain.cpp
+	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/sorting_line_main.o $(FACTORY_DIR)SortingLineMain.cpp
+
+$(BIN_DIR)/main.o: $(FACTORY_DIR)main.cpp
+	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/main.o $(FACTORY_DIR)main.cpp
 
 .PHONY: clean
 clean:
