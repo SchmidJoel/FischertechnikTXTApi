@@ -112,7 +112,7 @@ public:
 };
 
 
-class TwoRefAxis : NRefAxis{
+class TwoRefAxis : public NRefAxis{
 public:
     TwoRefAxis(TXT& txt, uint8_t motorpin, uint8_t refpin1, uint8_t refpin2, ButtonMode mode1, ButtonMode mode2);
     TwoRefAxis(TXT& txt, uint8_t motorpin, uint8_t refpin1, uint8_t refpin2);

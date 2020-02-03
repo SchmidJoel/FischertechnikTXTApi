@@ -13,7 +13,10 @@
 
 #define OUTPUT_MAX_LEVEL 512
 
-
+enum DigitalState{
+    HIGH,
+    LOW
+};
 
 /* Output: O1-O8
 */
@@ -29,7 +32,7 @@ class Output{
     uint8_t getPin();    
 };
 
-/* DigitalInput for e.g. Taster, Fototransistor or reedcontact: I1-I8
+/* DigitalInput for e.g. Button, Fototransistor or reedcontact: I1-I8
 */
 class DigitalInput{
     private:
@@ -38,6 +41,7 @@ class DigitalInput{
     public:
     DigitalInput(FISH_X1_TRANSFER*, uint8_t pin);
     bool value();
+    void waitFor(DigitalState);
     uint8_t getPin();    
 };
 

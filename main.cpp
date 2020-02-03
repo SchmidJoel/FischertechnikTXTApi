@@ -1,10 +1,47 @@
 #include "TXT_lowlevel_API.h"
 #include "TXT_highlevel_API.h"
 
+#include <fstream>
 
 int main(void) {
 	TXT txt = TXT();
 
+    //TwoRefAxis axis = TwoRefAxis{txt, 1, 1, 6};
+    AxisEM axis = AxisEM{txt, 1, 1};
+    axis.reference();
+    axis.moveAbsolut(500);
+    axis.reference();
+    
+    /*
+    std::ofstream out = std::ofstream("settings.txt");
+    
+    out << txt.getArea()->ftX1out.cnt_reset_cmd_id[0] << std::endl;
+    out << txt.getArea()->ftX1out.distance[0] << std::endl;
+    out << txt.getArea()->ftX1in.motor_ex_reached[0] << std::endl;
+    out << txt.getArea()->ftX1out.motor_ex_cmd_id[0] << std::endl;
+
+    auto em = txt.encoderMotor(1);
+
+    em.left(512);
+    txt.digitalInput(1).waitFor(DigitalState::HIGH);
+    em.stop();
+
+    //sleep(1);
+
+    em.distanceRight(500, 512);
+    em.waitToEnd();    
+    em.stop();
+
+
+    //sleep(1);
+
+    em.left(512);
+    txt.digitalInput(1).waitFor(DigitalState::HIGH);
+    em.stop();
+
+    //sleep(1);
+    out.close();
+    */
 	return 0;
 }
 

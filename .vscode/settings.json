@@ -77,6 +77,8 @@
         "set": "cpp",
         "stack": "cpp",
         "xtree": "cpp",
-        "*.rh": "cpp"
+        "*.rh": "cpp",
+        "xthread": "cpp",
+        "xmemory0": "cpp"
     }
 }

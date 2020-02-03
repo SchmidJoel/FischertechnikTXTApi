@@ -21,6 +21,10 @@ void VacuumRobot::reference() {
     file.close();
 }
 
+std::thread VacuumRobot::referenceAsync(){
+    return std::thread(&VacuumRobot::reference, this);
+}
+
 void VacuumRobot::suck(){
     compressor.on();
     sleep(1);

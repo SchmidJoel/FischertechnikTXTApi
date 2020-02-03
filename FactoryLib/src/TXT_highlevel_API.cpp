@@ -306,17 +306,19 @@ void NRefAxis::setButtonMode(uint8_t pos, ButtonMode mode){
 }
 
 
+
 /*axis with two endbutton, based on NRefAxis*/
 TwoRefAxis::TwoRefAxis(TXT& txt, uint8_t motorpin, uint8_t refpin1, uint8_t refpin2, ButtonMode mode1, ButtonMode mode2) : 
             NRefAxis(txt, motorpin, std::vector<uint8_t>{refpin1, refpin2}) {
     setButtonMode(0, mode1);
     setButtonMode(1, mode2);
-    state = AxisState::READY;
+    state = AxisState::UNREFERENCED;
     lastpos = 0;
 }
 
 TwoRefAxis::TwoRefAxis(TXT& txt, uint8_t motorpin, uint8_t refpin1, uint8_t refpin2) : 
             TwoRefAxis(txt, motorpin, refpin1, refpin2, ButtonMode::CLOSER, ButtonMode::CLOSER) {}
+
 
 /*move to pos 1*/
 void TwoRefAxis::pos1(){

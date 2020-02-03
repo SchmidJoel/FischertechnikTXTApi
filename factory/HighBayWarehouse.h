@@ -13,6 +13,7 @@ private:
 public:
     HighbayWarehouse(TXT &txt);
     void reference();
+    std::thread referenceAsync();
     void drive(uint8_t x, uint8_t y);
     void pull();
     void put();

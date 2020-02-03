@@ -9,11 +9,15 @@ HighbayWarehouse::HighbayWarehouse(TXT &txt) :
         zaxis(TwoRefAxis{txt, 3, 6, 7}) {}
 
 void HighbayWarehouse::reference(){
-    zaxis.pos1();
+    zaxis.reference();
     std::thread xt = xaxis.referenceAsync();
     std::thread yt = yaxis.referenceAsync();
     xt.join();
     yt.join();
+}
+
+std::thread HighbayWarehouse::referenceAsync(){
+    return std::thread(&HighbayWarehouse::reference, this);
 }
 
 void HighbayWarehouse::drive(uint8_t x, uint8_t y){

@@ -30,6 +30,7 @@ private:
 public:
     VacuumRobot(TXT &txt);
     void reference();
+    std::thread referenceAsync();
     void drive(uint16_t x, uint16_t y, uint16_t z);
     void suck();
     void release();

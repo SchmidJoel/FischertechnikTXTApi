@@ -184,6 +184,12 @@ bool DigitalInput::value(){
     return pTArea->ftX1in.uni[pin];
 }
 
+void DigitalInput::waitFor(DigitalState state){
+    while(value() && state == DigitalState::LOW || !value() && state == DigitalState::HIGH){
+        msleep(10);
+    }
+}
+
 uint8_t DigitalInput::getPin(){
     return pin+1;
 }
@@ -322,6 +328,8 @@ Motor::Motor(FISH_X1_TRANSFER* pTArea, uint8_t pin): pin(pin), pTArea(pTArea){}
 
 
 void Motor::left(uint16_t level){
+    pTArea->ftX1out.cnt_reset_cmd_id[pin] = 0;
+    pTArea->ftX1out.motor_ex_cmd_id[pin] = 0;
     pTArea->ftX1out.duty[pin*2] = level;
     pTArea->ftX1out.duty[pin*2+1] = 0;
 }
@@ -369,6 +377,7 @@ void EncoderMotor::waitToEnd(){
     while(! pTArea->ftX1in.motor_ex_reached[pin]){        
         msleep(1);
     }
+    stop();
 }
 
 uint16_t EncoderMotor::counter(){
@@ -382,7 +391,10 @@ void EncoderMotor::reset(){
     
     //resetten
     pTArea->ftX1out.cnt_reset_cmd_id[pin]++;
+    pTArea->ftX1out.distance[pin] = 0;
     pTArea->ftX1in.motor_ex_reached[pin] = 0;
+    pTArea->ftX1out.motor_ex_cmd_id[pin]++;
+
     msleep(10);
 }
 
