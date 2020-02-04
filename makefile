@@ -69,8 +69,8 @@ $(BIN_DIR)/utils.o: $(SRC_DIR)utils.cpp
 
 
 
-$(BIN_DIR)/main.o: main.cpp
-	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/main.o main.cpp
+#$(BIN_DIR)/main.o: main.cpp
+#	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/main.o main.cpp
 
 #factory
 $(BIN_DIR)/highbay.o: $(FACTORY_DIR)HighBayWarehouse.cpp
@@ -85,8 +85,8 @@ $(BIN_DIR)/processing_station_main.o: $(FACTORY_DIR)ProcessingStationMain.cpp
 $(BIN_DIR)/sorting_line_main.o: $(FACTORY_DIR)SortingLineMain.cpp
 	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/sorting_line_main.o $(FACTORY_DIR)SortingLineMain.cpp
 
-#$(BIN_DIR)/main.o: $(FACTORY_DIR)main.cpp
-#	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/main.o $(FACTORY_DIR)main.cpp
+$(BIN_DIR)/main.o: $(FACTORY_DIR)main.cpp
+	$(COMPILER) $(INCLUDE_PATH) -o $(BIN_DIR)/main.o $(FACTORY_DIR)main.cpp
 
 .PHONY: clean
 clean:

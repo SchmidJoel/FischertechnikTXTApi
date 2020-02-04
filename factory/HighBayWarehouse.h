@@ -2,7 +2,7 @@
 #define HIGHBAYWAREHOUSE
 #include "TXT_highlevel_API.h"
 
-#define REL_MOVE 50  //move to pull/put workpiece
+#define REL_MOVE 60  //move to pull/put workpiece
 
 class HighbayWarehouse {
 private:

@@ -9,16 +9,11 @@ VacuumRobot::VacuumRobot(TXT &txt) :
         ventil(txt.output(15)) {}
 
 void VacuumRobot::reference() {
-    std::ofstream file = std::ofstream("out.txt");
-    file << "before reference" << std::endl;
     yaxis.reference();
-    file << "after reference" << std::endl;
     std::thread xt = xaxis.referenceAsync();
     std::thread zt = zaxis.referenceAsync();
     xt.join();
     zt.join();
-    file << "after reference total" << std::endl;
-    file.close();
 }
 
 std::thread VacuumRobot::referenceAsync(){

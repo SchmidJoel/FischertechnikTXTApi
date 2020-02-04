@@ -22,8 +22,8 @@ void ProcessWorkpiece();
 
 int main(void)
 {
-    std::thread thread1 = oven.pos1Async();
-    std::thread thread2 = vacuum_roboter.pos1Async();
+    std::thread thread1 = oven.referenceAsync();
+    std::thread thread2 = vacuum_roboter.referenceAsync();
     std::thread thread3 = table.referenceAsync();
 
     thread1.join();
