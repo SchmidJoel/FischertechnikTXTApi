@@ -22,7 +22,7 @@ std::thread VacuumRobot::referenceAsync(){
 
 void VacuumRobot::suck(){
     compressor.on();
-    sleep(1);
+    sleep(1s);
     ventil.on();
 }
 

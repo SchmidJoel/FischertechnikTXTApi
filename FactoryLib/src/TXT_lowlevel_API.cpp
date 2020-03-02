@@ -2,6 +2,8 @@
 #include <stdexcept>
 #include "math.h"
 #include <fstream>
+#include "utils.h"
+#include <chrono>
 
 // needed for some debugging stuff of the ft-Libraries ("KeLibTxtDl.h", "FtShmem.h")
 unsigned int DebugFlags;
@@ -136,7 +138,7 @@ void TXT::playSoundAndWait(uint8_t index, uint8_t repeats){
     pTArea->sTxtOutputs.u16SoundRepeat = repeats;
     pTArea->sTxtOutputs.u16SoundCmdId++;
     while(pTArea->sTxtInputs.u16SoundCmdId == 0){
-        msleep(1);
+        sleep(1ms);
     }
 }
 
@@ -186,7 +188,7 @@ bool DigitalInput::value(){
 
 void DigitalInput::waitFor(DigitalState state){
     while(value() && state == DigitalState::LOW || !value() && state == DigitalState::HIGH){
-        msleep(10);
+        sleep(10ms);
     }
 }
 
@@ -209,13 +211,13 @@ void Counter::waitSteps(uint16_t steps){
     while(steps){
         auto val = pTArea->ftX1in.cnt_in[pin];
         while(val == pTArea->ftX1in.cnt_in[pin]){
-            usleep(100);
+            sleep(100us);
         }
         steps--;        
     }
     pTArea->ftX1out.cnt_reset_cmd_id[pin]++;
     pTArea->ftX1in.motor_ex_reached[pin] = 0;
-    msleep(1);
+    sleep(1ms);
 }
 
 
@@ -375,7 +377,7 @@ void EncoderMotor::stopSynchronization(){
 
 void EncoderMotor::waitToEnd(){
     while(! pTArea->ftX1in.motor_ex_reached[pin]){        
-        msleep(1);
+        sleep(1ms);
     }
     stop();
 }
@@ -387,7 +389,7 @@ uint16_t EncoderMotor::counter(){
 void EncoderMotor::reset(){
     //stoppen und warten bis Motor steht
     stop();
-    msleep(10);
+    sleep(10ms);
     
     //resetten
     pTArea->ftX1out.cnt_reset_cmd_id[pin]++;
@@ -395,6 +397,6 @@ void EncoderMotor::reset(){
     pTArea->ftX1in.motor_ex_reached[pin] = 0;
     pTArea->ftX1out.motor_ex_cmd_id[pin]++;
 
-    msleep(10);
+    sleep(10ms);
 }
 

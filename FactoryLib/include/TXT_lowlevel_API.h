@@ -3,12 +3,6 @@
 
 #include "KeLibTxtDl.h"
 #include "FtShmem.h"
-
-/*  This is a lowlevel API for Programming the fischertechnik TXT controller
-    To compile programms you need the arm cross-compiler:
-    https://releases.linaro.org/components/toolchain/binaries/7.2-2017.11/arm-linux-gnueabihf/gcc-linaro-7.2.1-2017.11-i686-mingw32_arm-linux-gnueabihf.tar.xz
-*/
-
 #include "utils.h"
 
 #define OUTPUT_MAX_LEVEL 512

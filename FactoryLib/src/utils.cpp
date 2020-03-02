@@ -1,15 +1,8 @@
 #include "utils.h"
+#include <chrono>
 
-void sleep(uint32_t seconds){
-    std::this_thread::sleep_for(std::chrono::seconds(seconds));
-}
-
-void msleep(uint32_t millis){
-    std::this_thread::sleep_for(std::chrono::milliseconds(millis));
-}
-
-void usleep(uint32_t micros){
-    std::this_thread::sleep_for(std::chrono::microseconds(micros));
+void sleep(std::chrono::microseconds micros){
+    std::this_thread::sleep_for(micros);
 }
 
 Color convertToColor(uint16_t value){

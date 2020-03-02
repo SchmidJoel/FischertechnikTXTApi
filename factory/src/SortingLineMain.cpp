@@ -1,5 +1,4 @@
 #include "TXT_highlevel_API.h"
-#include <queue>
 #include <thread>
 
 enum SortingLineState{
@@ -18,17 +17,15 @@ Output comp = txt.output(8);
 Output white = txt.output(5);
 Output red = txt.output(6);
 Output blue = txt.output(7);
-std::queue<Color> color_queue;
 
 SortingLineState colorDetectionUnit = SortingLineState::WAITING;
 SortingLineState sortingUnit = SortingLineState::WAITING;
 
-void SortWorkpiece();
+void SortWorkpiece(Color color);
 
 int main(void)
 {
     std::thread(ColorDetection);
-    std::thread(SortWorkpiece);
 
     while (true)
     {
@@ -52,26 +49,26 @@ void ColorDetection(){
         int min = color_sensor.value();
         while (light_sensor_end.value())
         {
-            msleep(10);
+            sleep(10ms);
             if (color_sensor.value() < min)
             {
                 min = color_sensor.value();
             }
         }
-        color_queue.push(convertToColor(min));
+        
+        std::thread sort = std::thread(SortWorkpiece, convertToColor(min));
+        sort.detach();
         colorDetectionUnit = SortingLineState::WAITING;
     }    
 }
 
-void SortWorkpiece()
+void SortWorkpiece(Color color)
 {
     while(true){
-        while(color_queue.size());
-        while(!light_sensor_end.value());
         sortingUnit = SortingLineState::WORKING;
         
         comp.on();
-        switch (color_queue.front())
+        switch (color)
         {
         case Color::WHITE:
             counter.waitSteps(6);
@@ -86,7 +83,7 @@ void SortWorkpiece()
             blue.on();
             break;
         }
-        msleep(100);
+        sleep(100ms);
         white.off();
         red.off();
         blue.off();

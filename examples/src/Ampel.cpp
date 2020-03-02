@@ -1,5 +1,4 @@
 #include "TXT_lowlevel_API.h"
-#include "unistd.h"
 
 
 int main(void) {
@@ -9,16 +8,16 @@ int main(void) {
     Output green = txt.output(3);
     while(true){
         red.on();
-        sleep(3);
+        sleep(3s);
         yellow.on();
-        sleep(1);
+        sleep(1s);
         red.off();
         yellow.off();
         green.on();
-        sleep(3);
+        sleep(3s);
         green.off();
         yellow.on();
-        sleep(1);
+        sleep(1s);
         yellow.off();
     }
 	return 0;

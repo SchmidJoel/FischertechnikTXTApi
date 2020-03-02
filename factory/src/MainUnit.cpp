@@ -33,7 +33,7 @@ int main()
 void Run()
 {
     robot.drive(WHITE_PICK_UP_X, PICK_UP_Y, WHITE_PICK_UP_Z);
-    msleep(50);
+    sleep(50ms);
     robot.suck();
     robot.drive(WHITE_PICK_UP_X, PICK_UP_Y - 200, WHITE_PICK_UP_Z);
     robot.drive(WHITE_PICK_UP_X, 0, 0);
@@ -41,13 +41,13 @@ void Run()
     robot.drive(WAREHOUSE_X, 0, WAREHOUSE_Z);
     robot.drive(WAREHOUSE_X, WAREHOUSE_Y, WAREHOUSE_Z);
 
-    msleep(100);
+    sleep(100ms);
     robot.release();
-    msleep(100);
+    sleep(100ms);
     robot.drive(WAREHOUSE_X, 0, 0);
 
     belt.left(OUTPUT_MAX_LEVEL);
-    while (light_sensor_warehouse.value());
+    light_sensor_warehouse.waitFor(DigitalState::LOW);
     belt.stop();
 
     warehouse.drive(3, 3);
@@ -63,15 +63,15 @@ void Run()
     warehouse.put();
 
     belt.right(OUTPUT_MAX_LEVEL);
-    while (light_sensor_vacuum_robot.value());
+    light_sensor_vacuum_robot.waitFor(DigitalState::LOW);
     belt.stop();
 
     robot.drive(WAREHOUSE_X, WAREHOUSE_Y, WAREHOUSE_Z);
     robot.suck();
-    msleep(100);
+    sleep(100ms);
     robot.drive(WAREHOUSE_X, 0, 0);
     robot.drive(PROCESS_STATION_X, PROCESS_STATION_Y, PROCESS_STATION_Z);
-    msleep(100);
+    sleep(100ms);
     robot.release();
     robot.drive(PROCESS_STATION_X, PROCESS_STATION_Y - 100, PROCESS_STATION_Z);
     robot.reference();

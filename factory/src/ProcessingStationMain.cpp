@@ -40,20 +40,20 @@ int main(void)
 
 void ProcessWorkpiece()
 {
-    while (oven_light_sensor.value());
+    oven_light_sensor.waitFor(DigitalState::LOW);
     comp.on();
-    sleep(2);
+    sleep(2s);
     std::thread thread2 = vacuum_roboter.pos2Async();
     oven_gate.on();
     oven.pos2();
     oven_gate.off();
-    msleep(100);
+    sleep(100ms);
     for (int i = 0; i < 14; i++)
     {
         oven_light.on();
-        msleep(200);
+        sleep(200ms);
         oven_light.off();
-        msleep(200);
+        sleep(200ms);
     }
     oven_gate.on();
     oven.pos1();
@@ -61,33 +61,33 @@ void ProcessWorkpiece()
     thread2.join();
     ventil_roboter.on();
 
-    msleep(500);
+    sleep(500ms);
     ventil_vacuum.on();
-    msleep(500);
+    sleep(500ms);
 
     ventil_roboter.off();
     vacuum_roboter.pos1();
     ventil_roboter.on();
 
-    msleep(500);
+    sleep(500ms);
     ventil_vacuum.off();
-    msleep(500);
+    sleep(500ms);
 
     ventil_roboter.off();
-    msleep(100);
+    sleep(100ms);
     table.pos(1);
     saw.right(OUTPUT_MAX_LEVEL);
-    sleep(3);
+    sleep(3s);
     saw.stop();
     table.pos(2);
 
     belt.right(OUTPUT_MAX_LEVEL);
     table_ventil.on();
-    msleep(100);
+    sleep(100ms);
     table_ventil.off();
     comp.off();
 
-    while (belt_light_sensor.value());
-    sleep(1);
+    belt_light_sensor.waitFor(DigitalState::LOW);
+    sleep(1s);
     belt.stop();
 }

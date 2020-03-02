@@ -4,6 +4,8 @@
 #include <chrono>
 #include <thread>
 
+using namespace std::chrono;
+
 /*Colors for the ColorSensor
 */
 enum Color{
@@ -12,9 +14,7 @@ enum Color{
     RED
 };
 
-void sleep(uint32_t);
-void msleep(uint32_t);
-void usleep(uint32_t);
+void sleep(std::chrono::microseconds);
 
 Color convertToColor(uint16_t);
 
