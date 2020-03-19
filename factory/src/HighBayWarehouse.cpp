@@ -1,6 +1,6 @@
 #include "HighBayWarehouse.h"
 
-uint16_t HIGHBAY_X[4] = {760, 1380, 1980, 11};      //0-2: highbay, 3: delivery
+uint16_t HIGHBAY_X[4] = {760, 1375, 1980, 15};      //0-2: highbay, 3: delivery
 uint16_t HIGHBAY_Y[4] = {85, 450, 850, 740};      //0-2: highbay, 3: delivery
 
 HighbayWarehouse::HighbayWarehouse(TXT &txt) : 

@@ -1,7 +1,8 @@
 #include "TXT_highlevel_API.h"
 #include <thread>
 
-enum SortingLineState{
+enum SortingLineState
+{
     WAITING,
     WORKING
 };
@@ -22,29 +23,34 @@ SortingLineState colorDetectionUnit = SortingLineState::WAITING;
 SortingLineState sortingUnit = SortingLineState::WAITING;
 
 void SortWorkpiece(Color color);
+void ColorDetection();
 
 int main(void)
 {
-    std::thread(ColorDetection);
+    std::thread detection = std::thread(ColorDetection);
 
     while (true)
     {
-        if(colorDetectionUnit == SortingLineState::WORKING || sortingUnit == SortingLineState::WORKING){
+        if (colorDetectionUnit == SortingLineState::WORKING || sortingUnit == SortingLineState::WORKING)
+        {
             belt.right(512);
         }
-        else{
+        else
+        {
             belt.stop();
         }
+        sleep(10ms);
     }
 
     return 0;
 }
 
-void ColorDetection(){
-    while(true){
+void ColorDetection()
+{
+    while (true)
+    {
         light_sensor_start.waitFor(DigitalState::LOW);
         colorDetectionUnit = SortingLineState::WORKING;
-        belt.right(512);
 
         int min = color_sensor.value();
         while (light_sensor_end.value())
@@ -55,39 +61,37 @@ void ColorDetection(){
                 min = color_sensor.value();
             }
         }
-        
+
         std::thread sort = std::thread(SortWorkpiece, convertToColor(min));
         sort.detach();
         colorDetectionUnit = SortingLineState::WAITING;
-    }    
+    }
 }
 
 void SortWorkpiece(Color color)
 {
-    while(true){
-        sortingUnit = SortingLineState::WORKING;
-        
-        comp.on();
-        switch (color)
-        {
-        case Color::WHITE:
-            counter.waitSteps(6);
-            white.on();
-            break;
-        case Color::RED:
-            counter.waitSteps(16);
-            red.on();
-            break;
-        case Color::BLUE:
-            counter.waitSteps(26);
-            blue.on();
-            break;
-        }
-        sleep(100ms);
-        white.off();
-        red.off();
-        blue.off();
-        comp.off();
-        sortingUnit = SortingLineState::WAITING;
+    sortingUnit = SortingLineState::WORKING;
+
+    comp.on();
+    switch (color)
+    {
+    case Color::WHITE:
+        counter.waitSteps(6);
+        white.on();
+        break;
+    case Color::RED:
+        counter.waitSteps(16);
+        red.on();
+        break;
+    case Color::BLUE:
+        counter.waitSteps(26);
+        blue.on();
+        break;
     }
+    sleep(100ms);
+    white.off();
+    red.off();
+    blue.off();
+    comp.off();
+    sortingUnit = SortingLineState::WAITING;
 }

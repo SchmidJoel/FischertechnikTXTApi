@@ -15,13 +15,16 @@ Output comp = txt.output(8);
 Output oven_light = txt.output(16);
 Output table_ventil = txt.output(7);
 
-DigitalInput oven_light_sensor = txt.digitalInput(14);
+DigitalInput oven_light_sensor = txt.digitalInput(13);
 DigitalInput belt_light_sensor = txt.digitalInput(4);
 
 void ProcessWorkpiece();
 
 int main(void)
 {
+    comp.on();
+    oven_gate.on();
+    sleep(10ms);
     std::thread thread1 = oven.referenceAsync();
     std::thread thread2 = vacuum_roboter.referenceAsync();
     std::thread thread3 = table.referenceAsync();
@@ -29,6 +32,8 @@ int main(void)
     thread1.join();
     thread2.join();
     thread3.join();
+
+    comp.off();
 
     while (true)
     {
@@ -86,8 +91,10 @@ void ProcessWorkpiece()
     sleep(100ms);
     table_ventil.off();
     comp.off();
+    std::thread table_thread = table.posAsync(0);
+    table_thread.detach();
 
     belt_light_sensor.waitFor(DigitalState::LOW);
-    sleep(1s);
+    sleep(5s);
     belt.stop();
 }

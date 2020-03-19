@@ -1,12 +1,16 @@
 #include "VacuumRobot.h"
 #include <fstream>
 
+#define YAXIS_OFFSET 100
+
+
+
 VacuumRobot::VacuumRobot(TXT &txt) : 
         xaxis(AxisEM{txt, 5, 9}),
         yaxis(AxisEM{txt, 6, 10}),
         zaxis(AxisEM{txt, 7, 11}),
-        compressor(txt.output(16)),
-        ventil(txt.output(15)) {}
+        compressor(txt.output(15)),
+        ventil(txt.output(16)) {}
 
 void VacuumRobot::reference() {
     yaxis.reference();
@@ -22,7 +26,7 @@ std::thread VacuumRobot::referenceAsync(){
 
 void VacuumRobot::suck(){
     compressor.on();
-    sleep(1s);
+    sleep(100ms);
     ventil.on();
 }
 

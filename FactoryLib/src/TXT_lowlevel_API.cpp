@@ -187,7 +187,7 @@ bool DigitalInput::value(){
 }
 
 void DigitalInput::waitFor(DigitalState state){
-    while(value() && state == DigitalState::LOW || !value() && state == DigitalState::HIGH){
+    while((value() && state == DigitalState::LOW) || (!value() && state == DigitalState::HIGH)) {
         sleep(10ms);
     }
 }
