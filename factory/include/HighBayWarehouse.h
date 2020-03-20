@@ -1,6 +1,7 @@
 #ifndef HIGHBAYWAREHOUSE
 #define HIGHBAYWAREHOUSE
 #include "TXT_highlevel_API.h"
+#include "Storage.h"
 
 #define REL_MOVE 60  //move to pull/put workpiece
 
@@ -26,7 +27,7 @@ public:
     void pull();
     void put();
     HighBayState state = HighBayState::H_UNREFERENCED;
-    int8_t storage[9];
+    FileStorage storage;
 };
 
 #endif

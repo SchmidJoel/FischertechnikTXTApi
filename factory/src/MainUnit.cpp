@@ -26,7 +26,7 @@ void storeWorkpieceHighBay(uint8_t,uint8_t,int);
 void getWorkpieceHighBay(uint8_t,uint8_t);
 void checkAvailableWorkpieces();
 void getEmptyBox(Color);
-void storeBox(int);
+void storeBox(WarehouseContent);
 void getFullBox();
 
 
@@ -74,7 +74,7 @@ void checkAvailableWorkpieces(){
             });
             driveToWarehouse(Color::WHITE);            
             wait.join();
-            storeBox(Color::WHITE+1);
+            storeBox(WarehouseContent::WHITE);
         }
         else if(!red_available.value()){
             std::thread wait = std::thread([]{
@@ -85,7 +85,7 @@ void checkAvailableWorkpieces(){
             });
             driveToWarehouse(Color::RED);
             wait.join();
-            storeBox(Color::RED+1);
+            storeBox(WarehouseContent::RED);
         }
         else if(!blue_available.value()){
             std::thread wait = std::thread([]{
@@ -96,7 +96,7 @@ void checkAvailableWorkpieces(){
             });
             driveToWarehouse(Color::BLUE);
             wait.join();
-            storeBox(Color::BLUE+1);
+            storeBox(WarehouseContent::BLUE);
         }
         else {
             getFullBox();
@@ -108,7 +108,7 @@ void checkAvailableWorkpieces(){
             while(beltstate != BeltState::AT_WAREHOUSE){
                 sleep(10ms);
             }
-            storeBox(0);
+            storeBox(WarehouseContent::EMPTY_BOX);
             processing.join();
         }
     }
@@ -153,7 +153,7 @@ void driveToProcessing(){
     xaxis.join();
 }
 
-void storeWorkpieceHighBay(uint8_t x, uint8_t y, int color){    
+void storeWorkpieceHighBay(uint8_t x, uint8_t y, WarehouseContent content){    
     warehouse.state = HighBayState::H_STORE_WORKIECE;
     beltstate = BeltState::WAREHOUSE;
     warehouse.drive(3, 3);
@@ -163,41 +163,33 @@ void storeWorkpieceHighBay(uint8_t x, uint8_t y, int color){
     warehouse.pull();
     warehouse.drive(x, y);
     warehouse.put();
-    warehouse.storage[y*3+x] = color;
+    warehouse.storage.setWorkpieceAt(y*3+x, content);
     warehouse.state = HighBayState::H_READY;
 }
 
 void getEmptyBox(Color color){
-    int x = 0;
-    int y = 0;
-    for(int i = 0; i < sizeof(warehouse.storage); i++){
-        if(warehouse.storage[i] == 0){
-            x = i % 3;
-            y = i / 3;
-            break;
-        }
+    int pos = warehouse.storage.getPositionOf(WarehouseContent::EMPTY_BOX);
+    if(pos != -1){
+        int x = pos % 3;
+        int y = pos / 3;
+        getWorkpieceHighBay(x,y);
     }
-    getWorkpieceHighBay(x,y);
 }
 
-void storeBox(int boxstate){
-    int x = 0;
-    int y = 0;
-    for(int i = 0; i < sizeof(warehouse.storage); i++){
-        if(warehouse.storage[i] == -1){
-            x = i % 3;
-            y = i / 3;
-            break;
-        }
+void storeBox(WarehouseContent content){
+    int pos = warehouse.storage.getPositionOf(WarehouseContent::NO_BOX);
+    if(pos != -1){
+        int x = pos % 3;
+        int y = pos / 3;
+        storeWorkpieceHighBay(x,y,content);
     }
-    storeWorkpieceHighBay(x,y,boxstate);
 }
 
 void getWorkpieceHighBay(uint8_t x, uint8_t y){
     warehouse.state = HighBayState::H_PROVIDE_WORKPIECE;
     warehouse.drive(x, y);
     warehouse.pull();
-    warehouse.storage[y*3+x] = -1;
+    warehouse.storage.setWorkpieceAt(y*3+x, WarehouseContent::NO_BOX);
     warehouse.drive(3, 3);
     warehouse.put();
     warehouse.state = HighBayState::H_READY;
@@ -207,8 +199,8 @@ void getWorkpieceHighBay(uint8_t x, uint8_t y){
 void getFullBox(){
     int x = 0;
     int y = 0;
-    for(int i = 0; i < sizeof(warehouse.storage); i++){
-        if(warehouse.storage[i] > 0){
+    for(int i = 0; i < STORAGE_SIZE; i++){
+        if((int)warehouse.storage.getWorkpieceAt(i) > 0){
             x = i % 3;
             y = i / 3;
             break;
