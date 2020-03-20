@@ -1,0 +1,470 @@
+[
+    {
+        "id": "3ab18b33.80e8fc",
+        "type": "tab",
+        "label": "fischertechnik Factory",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "7af6645.2185b9c",
+        "type": "mqtt in",
+        "z": "3ab18b33.80e8fc",
+        "name": "Temperature",
+        "topic": "/i/motor/temp",
+        "qos": "1",
+        "datatype": "auto",
+        "broker": "c3bf2db5.246d6",
+        "x": 310,
+        "y": 220,
+        "wires": [
+            [
+                "16f01f06.442f59",
+                "1bafd609.8ab1ba"
+            ]
+        ]
+    },
+    {
+        "id": "16f01f06.442f59",
+        "type": "ui_chart",
+        "z": "3ab18b33.80e8fc",
+        "name": "",
+        "group": "7bcaaa81.f278cc",
+        "order": 0,
+        "width": "0",
+        "height": "0",
+        "label": "temperature",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 590,
+        "y": 220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1bafd609.8ab1ba",
+        "type": "debug",
+        "z": "3ab18b33.80e8fc",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 600,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "674f2834.fe5208",
+        "type": "mqtt in",
+        "z": "3ab18b33.80e8fc",
+        "name": "Warehouse",
+        "topic": "/i/wh/stock",
+        "qos": "1",
+        "datatype": "auto",
+        "broker": "c3bf2db5.246d6",
+        "x": 310,
+        "y": 600,
+        "wires": [
+            [
+                "1358ae91.264569",
+                "6b6df3a4.066644",
+                "b0981a85.34c1a",
+                "1b1a0492.230a7b",
+                "7dd884ab.df336c"
+            ]
+        ]
+    },
+    {
+        "id": "a3665f4.035e62",
+        "type": "function",
+        "z": "3ab18b33.80e8fc",
+        "name": "",
+        "func": "msg.payload = new Date(msg.payload).toLocaleString('de-DE');\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 490,
+        "y": 120,
+        "wires": [
+            [
+                "81f0cb9c.050c4"
+            ]
+        ]
+    },
+    {
+        "id": "81f0cb9c.050c4",
+        "type": "ui_text",
+        "z": "3ab18b33.80e8fc",
+        "group": "9759233.684136",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "Time",
+        "label": "Time",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 630,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "813dc846.0629",
+        "type": "ui_template",
+        "z": "3ab18b33.80e8fc",
+        "group": "33203872.f72e78",
+        "name": "warehouse",
+        "order": 1,
+        "width": "8",
+        "height": "6",
+        "format": "<style>\n    .circle {\n        width: 5rem;\n        height: 5rem;\n        display: inline-block;\n        -webkit-border-radius: 100%;\n        -moz-border-radius: 100%;\n        border-radius: 100%;\n        border-color: transparent;\n        background-color: gray;\n        border-width: 1px;\n        border-style: solid;\n        margin: 2px;\n    }\n    \n    .white {\n        border-color: black;\n        background-color: white;\n    }\n    \n    .red {\n        border-color: black;\n        background-color: red;\n    }\n    \n    .blue {\n        border-color: black;\n        background-color: blue;\n    }\n</style>\n<div ng-bind-html=\"msg.payload\"></div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "templateScope": "local",
+        "x": 810,
+        "y": 480,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "339486f4.50583a",
+        "type": "inject",
+        "z": "3ab18b33.80e8fc",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 330,
+        "y": 120,
+        "wires": [
+            [
+                "a3665f4.035e62"
+            ]
+        ]
+    },
+    {
+        "id": "1358ae91.264569",
+        "type": "function",
+        "z": "3ab18b33.80e8fc",
+        "name": "generate Data",
+        "func": "let list = JSON.parse(msg.payload);\nlet payload = \"\";\n\nfor (let row = 0; row < 3; row++) {\n    payload = payload + \"<div>\";\n    for (let column = 0; column < 3; column++) {\n        payload = payload + \"<span class=\\\"circle \";\n        switch (list[row * 3 + column]) {\n            case 1:\n                payload = payload + \"white\";\n                break;\n            case 2:\n                payload = payload + \"red\";\n                break;\n            case 3:\n                payload = payload + \"blue\";\n                break;\n            default:\n                break;\n        }\n        payload = payload + \"\\\"></span>\";\n    }\n    payload = payload + \"</div>\";\n}\n\nmsg.payload = payload;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 560,
+        "y": 480,
+        "wires": [
+            [
+                "813dc846.0629"
+            ]
+        ]
+    },
+    {
+        "id": "57914b17.dfd354",
+        "type": "ui_gauge",
+        "z": "3ab18b33.80e8fc",
+        "name": "",
+        "group": "33203872.f72e78",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "occupancy",
+        "label": "units",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "9",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "x": 810,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "6b6df3a4.066644",
+        "type": "function",
+        "z": "3ab18b33.80e8fc",
+        "name": "get amount",
+        "func": "let list = JSON.parse(msg.payload);\nlet amount = 0;\nfor (let i = 0; i < list.length; i++) {\n    if (list[i] > 0) {\n        amount = amount + 1;\n    }\n}\nmsg.payload = amount;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 550,
+        "y": 540,
+        "wires": [
+            [
+                "57914b17.dfd354"
+            ]
+        ]
+    },
+    {
+        "id": "3a46fa3e.8bcb9e",
+        "type": "ui_text",
+        "z": "3ab18b33.80e8fc",
+        "group": "33203872.f72e78",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "white amount",
+        "label": "white",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "x": 810,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "b0981a85.34c1a",
+        "type": "function",
+        "z": "3ab18b33.80e8fc",
+        "name": "white",
+        "func": "let list = JSON.parse(msg.payload);\nlet amount = 0;\nfor (let i = 0; i < list.length; i++) {\n    if (list[i] === 1) {\n        amount = amount + 1;\n    }\n}\nmsg.payload = amount;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 530,
+        "y": 600,
+        "wires": [
+            [
+                "3a46fa3e.8bcb9e"
+            ]
+        ]
+    },
+    {
+        "id": "9d529b2.e61dbe8",
+        "type": "ui_text",
+        "z": "3ab18b33.80e8fc",
+        "group": "33203872.f72e78",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "red amount",
+        "label": "red",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "x": 810,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "1b1a0492.230a7b",
+        "type": "function",
+        "z": "3ab18b33.80e8fc",
+        "name": "red",
+        "func": "let list = JSON.parse(msg.payload);\nlet amount = 0;\nfor (let i = 0; i < list.length; i++) {\n    if (list[i] === 2) {\n        amount = amount + 1;\n    }\n}\nmsg.payload = amount;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 530,
+        "y": 660,
+        "wires": [
+            [
+                "9d529b2.e61dbe8"
+            ]
+        ]
+    },
+    {
+        "id": "a8c38d6e.65aab8",
+        "type": "ui_text",
+        "z": "3ab18b33.80e8fc",
+        "group": "33203872.f72e78",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "blue amount",
+        "label": "blue",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "x": 810,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "7dd884ab.df336c",
+        "type": "function",
+        "z": "3ab18b33.80e8fc",
+        "name": "blue",
+        "func": "let list = JSON.parse(msg.payload);\nlet amount = 0;\nfor (let i = 0; i < list.length; i++) {\n    if (list[i] === 3) {\n        amount = amount + 1;\n    }\n}\nmsg.payload = amount;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 530,
+        "y": 720,
+        "wires": [
+            [
+                "a8c38d6e.65aab8"
+            ]
+        ]
+    },
+    {
+        "id": "a32a5acd.b21d88",
+        "type": "mqtt in",
+        "z": "3ab18b33.80e8fc",
+        "name": "SortingLineState",
+        "topic": "/i/sl/state",
+        "qos": "1",
+        "datatype": "auto",
+        "broker": "c3bf2db5.246d6",
+        "x": 320,
+        "y": 920,
+        "wires": [
+            [
+                "c1a8a02c.f69918"
+            ]
+        ]
+    },
+    {
+        "id": "c1a8a02c.f69918",
+        "type": "ui_text",
+        "z": "3ab18b33.80e8fc",
+        "group": "d10cd46c.1244d8",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "Sorting Line",
+        "label": "Sorting Line",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 810,
+        "y": 920,
+        "wires": []
+    },
+    {
+        "id": "edefaa9b.1867c",
+        "type": "mqtt in",
+        "z": "3ab18b33.80e8fc",
+        "name": "ProcessingStationState",
+        "topic": "/i/ps/state",
+        "qos": "1",
+        "datatype": "auto",
+        "broker": "c3bf2db5.246d6",
+        "x": 340,
+        "y": 1020,
+        "wires": [
+            [
+                "65d182a7.96bc74"
+            ]
+        ]
+    },
+    {
+        "id": "65d182a7.96bc74",
+        "type": "ui_text",
+        "z": "3ab18b33.80e8fc",
+        "group": "d10cd46c.1244d8",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "Processing Station",
+        "label": "Processing Station",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 790,
+        "y": 1020,
+        "wires": []
+    },
+    {
+        "id": "c3bf2db5.246d6",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "local",
+        "broker": "192.168.178.66",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": false,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "7bcaaa81.f278cc",
+        "type": "ui_group",
+        "z": "",
+        "name": "Motor",
+        "tab": "13f1be34.7f0552",
+        "order": 3,
+        "disp": true,
+        "width": "12",
+        "collapse": false
+    },
+    {
+        "id": "9759233.684136",
+        "type": "ui_group",
+        "z": "",
+        "name": "System",
+        "tab": "13f1be34.7f0552",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "33203872.f72e78",
+        "type": "ui_group",
+        "z": "",
+        "name": "Warehouse",
+        "tab": "13f1be34.7f0552",
+        "order": 2,
+        "disp": true,
+        "width": "12",
+        "collapse": false
+    },
+    {
+        "id": "d10cd46c.1244d8",
+        "type": "ui_group",
+        "z": "",
+        "name": "States",
+        "tab": "13f1be34.7f0552",
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "13f1be34.7f0552",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Dashboard",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    }
+]

@@ -1,5 +1,8 @@
 #include "TXT_highlevel_API.h"
+#include "TxtMqttFactoryClient.h"
+
 TXT txt;
+TxtMqttFactoryClient mqttClient("ProcessingStation", "192.168.178.66", "", "");
 
 TwoRefAxis oven = TwoRefAxis{txt, 5, 10, 9};
 TwoRefAxis vacuum_roboter = TwoRefAxis{txt, 6, 5, 11};
@@ -22,6 +25,8 @@ void ProcessWorkpiece();
 
 int main(void)
 {
+    mqttClient.connect(1000);
+
     comp.on();
     oven_gate.on();
     sleep(10ms);
@@ -46,9 +51,11 @@ int main(void)
 void ProcessWorkpiece()
 {
     oven_light_sensor.waitFor(DigitalState::LOW);
+    mqttClient.publishMessage(TOPIC_INPUT_PROCESSINGSTATION_STATE, "start processing");
     comp.on();
     sleep(2s);
     std::thread thread2 = vacuum_roboter.pos2Async();
+    mqttClient.publishMessage(TOPIC_INPUT_PROCESSINGSTATION_STATE, "harden workpiece");
     oven_gate.on();
     oven.pos2();
     oven_gate.off();
@@ -68,6 +75,7 @@ void ProcessWorkpiece()
 
     sleep(500ms);
     ventil_vacuum.on();
+    mqttClient.publishMessage(TOPIC_INPUT_PROCESSINGSTATION_STATE, "transport workpiece");
     sleep(500ms);
 
     ventil_roboter.off();
@@ -81,11 +89,13 @@ void ProcessWorkpiece()
     ventil_roboter.off();
     sleep(100ms);
     table.pos(1);
+    mqttClient.publishMessage(TOPIC_INPUT_PROCESSINGSTATION_STATE, "cut workpiece");
     saw.right(OUTPUT_MAX_LEVEL);
     sleep(3s);
     saw.stop();
     table.pos(2);
 
+    mqttClient.publishMessage(TOPIC_INPUT_PROCESSINGSTATION_STATE, "finished workpiece");
     belt.right(OUTPUT_MAX_LEVEL);
     table_ventil.on();
     sleep(100ms);
@@ -97,4 +107,5 @@ void ProcessWorkpiece()
     belt_light_sensor.waitFor(DigitalState::LOW);
     sleep(5s);
     belt.stop();
+    mqttClient.publishMessage(TOPIC_INPUT_PROCESSINGSTATION_STATE, "idle");
 }

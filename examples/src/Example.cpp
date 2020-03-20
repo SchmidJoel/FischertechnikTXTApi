@@ -3,8 +3,8 @@
 #include <iostream>
 #include <fstream>
 
-
-int main(void) {
+int main(void)
+{
 	TXT txt = TXT();
 	return 0;
 }

@@ -8,7 +8,8 @@ using namespace std::chrono;
 
 /*Colors for the ColorSensor
 */
-enum Color{
+enum Color
+{
     BLUE,
     WHITE,
     RED

@@ -1,4 +1,5 @@
 #include "TXT_highlevel_API.h"
+#include "TxtMqttFactoryClient.h"
 #include <thread>
 
 enum SortingLineState
@@ -8,6 +9,7 @@ enum SortingLineState
 };
 
 TXT txt;
+TxtMqttFactoryClient mqttClient("SortingLine", "192.168.178.66", "", "");
 
 DigitalInput light_sensor_start = txt.digitalInput(1);
 DigitalInput light_sensor_end = txt.digitalInput(3);
@@ -27,6 +29,8 @@ void ColorDetection();
 
 int main(void)
 {
+    mqttClient.connect(1000);
+
     std::thread detection = std::thread(ColorDetection);
 
     while (true)
@@ -38,6 +42,7 @@ int main(void)
         else
         {
             belt.stop();
+            mqttClient.publishMessage(TOPIC_INPUT_SORTINGLINE_STATE, "idle");
         }
         sleep(10ms);
     }
@@ -51,6 +56,7 @@ void ColorDetection()
     {
         light_sensor_start.waitFor(DigitalState::LOW);
         colorDetectionUnit = SortingLineState::WORKING;
+        mqttClient.publishMessage(TOPIC_INPUT_SORTINGLINE_STATE, "Color detection");
 
         int min = color_sensor.value();
         while (light_sensor_end.value())
@@ -71,6 +77,7 @@ void ColorDetection()
 void SortWorkpiece(Color color)
 {
     sortingUnit = SortingLineState::WORKING;
+    mqttClient.publishMessage(TOPIC_INPUT_SORTINGLINE_STATE, "sorting workpiece");
 
     comp.on();
     switch (color)

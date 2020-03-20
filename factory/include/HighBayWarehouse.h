@@ -2,9 +2,10 @@
 #define HIGHBAYWAREHOUSE
 #include "TXT_highlevel_API.h"
 
-#define REL_MOVE 60  //move to pull/put workpiece
+#define REL_MOVE 60 //move to pull/put workpiece
 
-enum HighBayState {
+enum HighBayState
+{
     H_UNREFERENCED,
     H_REFERENCING,
     H_STORE_WORKIECE,
@@ -12,7 +13,8 @@ enum HighBayState {
     H_READY
 };
 
-class HighbayWarehouse {
+class HighbayWarehouse
+{
 private:
     AxisEM xaxis;
     AxisEM yaxis;

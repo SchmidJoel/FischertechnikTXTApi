@@ -13,384 +13,459 @@ FILE *DebugFile;
 #define ERR_4_PIN "pin must be between 1 and 4 for master and 5 and 8 for extension"
 #define ERR_SAME_TXT "both pins must be on the same TXT"
 
-
-TXT::TXT(){
-    if(StartTxtDownloadProg() == KELIB_ERROR_NONE){
+TXT::TXT()
+{
+    if (StartTxtDownloadProg() == KELIB_ERROR_NONE)
+    {
         pTArea = GetKeLibTransferAreaMainAddress();
     }
-    else{
+    else
+    {
         throw std::runtime_error("KELIB_ERROR");
     }
 }
 
-TXT::TXT(FISH_X1_TRANSFER* pTArea, bool extension): pTArea(pTArea),_extension(extension){}
+TXT::TXT(FISH_X1_TRANSFER *pTArea, bool extension) : pTArea(pTArea), _extension(extension) {}
 
-TXT::~TXT(){
+TXT::~TXT()
+{
     StopTxtDownloadProg();
 }
 
-DigitalInput TXT::digitalInput(uint8_t pin){
+DigitalInput TXT::digitalInput(uint8_t pin)
+{
     pin--;
-    if(pin > 15){
+    if (pin > 15)
+    {
         throw std::invalid_argument(ERR_8_PIN);
     }
-    return DigitalInput{(pTArea+(pin>>3)),pin&7};
+    return DigitalInput{(pTArea + (pin >> 3)), pin & 7};
 }
 
-Counter TXT::counter(uint8_t pin){
+Counter TXT::counter(uint8_t pin)
+{
     pin--;
-    if(pin > 8){
+    if (pin > 8)
+    {
         throw std::invalid_argument(ERR_4_PIN);
     }
-    return Counter{(pTArea+(pin>>2)),pin&3};
+    return Counter{(pTArea + (pin >> 2)), pin & 3};
 }
 
-AnalogInput TXT::analogInput(uint8_t pin){
+AnalogInput TXT::analogInput(uint8_t pin)
+{
     pin--;
-    if(pin > 15){
+    if (pin > 15)
+    {
         throw std::invalid_argument(ERR_8_PIN);
     }
-    return AnalogInput{(pTArea+(pin>>3)),pin&7};
+    return AnalogInput{(pTArea + (pin >> 3)), pin & 7};
 }
 
-NTC TXT::ntc(uint8_t pin){
+NTC TXT::ntc(uint8_t pin)
+{
     pin--;
-    if(pin > 15){
+    if (pin > 15)
+    {
         throw std::invalid_argument(ERR_8_PIN);
     }
-    return NTC{(pTArea+(pin>>3)),pin&7};
+    return NTC{(pTArea + (pin >> 3)), pin & 7};
 }
 
-Ultrasonic TXT::ultrasonic(uint8_t pin){
+Ultrasonic TXT::ultrasonic(uint8_t pin)
+{
     pin--;
-    if(pin > 15){
+    if (pin > 15)
+    {
         throw std::invalid_argument(ERR_8_PIN);
     }
-    return Ultrasonic{(pTArea+(pin>>3)),pin&7};
+    return Ultrasonic{(pTArea + (pin >> 3)), pin & 7};
 }
 
-Voltage TXT::voltage(uint8_t pin){
+Voltage TXT::voltage(uint8_t pin)
+{
     pin--;
-    if(pin > 15){
+    if (pin > 15)
+    {
         throw std::invalid_argument(ERR_8_PIN);
     }
-    return Voltage{(pTArea+(pin>>3)),pin&7};
+    return Voltage{(pTArea + (pin >> 3)), pin & 7};
 }
 
-ColorSensor TXT::colorSensor(uint8_t pin){
+ColorSensor TXT::colorSensor(uint8_t pin)
+{
     pin--;
-    if(pin > 15){
+    if (pin > 15)
+    {
         throw std::invalid_argument(ERR_8_PIN);
     }
-    return ColorSensor{(pTArea+(pin>>3)),pin&7};
+    return ColorSensor{(pTArea + (pin >> 3)), pin & 7};
 }
 
-Output TXT::output(uint8_t pin){
+Output TXT::output(uint8_t pin)
+{
     pin--;
-    if(pin > 15){
+    if (pin > 15)
+    {
         throw std::invalid_argument(ERR_8_PIN);
     }
-    return Output{(pTArea+(pin>>3)),pin&7};
+    return Output{(pTArea + (pin >> 3)), pin & 7};
 }
 
-TrackSensor TXT::trackSensor(uint8_t left, uint8_t right){
+TrackSensor TXT::trackSensor(uint8_t left, uint8_t right)
+{
     left--;
     right--;
-    if(left > 15 || right > 15){
+    if (left > 15 || right > 15)
+    {
         throw std::invalid_argument(ERR_8_PIN);
     }
-    else if((left>>3) != (right>>3)){
+    else if ((left >> 3) != (right >> 3))
+    {
         throw std::invalid_argument(ERR_SAME_TXT);
     }
-    return TrackSensor{(pTArea+(left>>3)),left&7, right&7};
+    return TrackSensor{(pTArea + (left >> 3)), left & 7, right & 7};
 }
 
-Motor TXT::motor(uint8_t pin){
+Motor TXT::motor(uint8_t pin)
+{
     pin--;
-    if(pin > 8){
+    if (pin > 8)
+    {
         throw std::invalid_argument(ERR_4_PIN);
     }
-    return Motor{(pTArea+(pin>>2)),pin&3};
+    return Motor{(pTArea + (pin >> 2)), pin & 3};
 }
 
-EncoderMotor TXT::encoderMotor(uint8_t pin){
+EncoderMotor TXT::encoderMotor(uint8_t pin)
+{
     pin--;
-    if(pin > 8){
+    if (pin > 8)
+    {
         throw std::invalid_argument(ERR_4_PIN);
     }
-    return EncoderMotor{(pTArea+(pin>>2)),pin&3};
+    return EncoderMotor{(pTArea + (pin >> 2)), pin & 3};
 }
 
-FISH_X1_TRANSFER* TXT::getArea(){
+FISH_X1_TRANSFER *TXT::getArea()
+{
     return pTArea;
 }
 
-void TXT::playSound(uint8_t index, uint8_t repeats){
+void TXT::playSound(uint8_t index, uint8_t repeats)
+{
     pTArea->sTxtOutputs.u16SoundCmdId = 0;
     pTArea->sTxtOutputs.u16SoundIndex = index;
     pTArea->sTxtOutputs.u16SoundRepeat = repeats;
     pTArea->sTxtOutputs.u16SoundCmdId++;
 }
 
-void TXT::playSoundAndWait(uint8_t index, uint8_t repeats){
+void TXT::playSoundAndWait(uint8_t index, uint8_t repeats)
+{
     pTArea->sTxtOutputs.u16SoundCmdId = 0;
     pTArea->sTxtOutputs.u16SoundIndex = index;
     pTArea->sTxtOutputs.u16SoundRepeat = repeats;
     pTArea->sTxtOutputs.u16SoundCmdId++;
-    while(pTArea->sTxtInputs.u16SoundCmdId == 0){
+    while (pTArea->sTxtInputs.u16SoundCmdId == 0)
+    {
         sleep(1ms);
     }
 }
 
-TXT TXT::extension(){
-    if(_extension){
-       throw std::runtime_error ("a extension cannot have another extension");
+TXT TXT::extension()
+{
+    if (_extension)
+    {
+        throw std::runtime_error("a extension cannot have another extension");
     }
-    return TXT{pTArea+1,true};
+    return TXT{pTArea + 1, true};
 }
 
-uint16_t TXT::getTXTVoltage(){
+uint16_t TXT::getTXTVoltage()
+{
     return pTArea->sTxtInputs.u16TxtPower;
 }
 
-
-
 //Output
-Output::Output(FISH_X1_TRANSFER* pTArea,uint8_t pin): pin(pin), pTArea(pTArea){}
+Output::Output(FISH_X1_TRANSFER *pTArea, uint8_t pin) : pin(pin), pTArea(pTArea) {}
 
-void Output::on(){
+void Output::on()
+{
     pTArea->ftX1out.duty[pin] = 512;
 }
 
-void Output::off(){
+void Output::off()
+{
     pTArea->ftX1out.duty[pin] = 0;
 }
 
-void Output::setLevel(uint16_t level){
+void Output::setLevel(uint16_t level)
+{
     pTArea->ftX1out.duty[pin] = level;
 }
 
-uint8_t Output::getPin(){
-    return pin+1;
+uint8_t Output::getPin()
+{
+    return pin + 1;
 }
-
 
 //DigitalInput
-DigitalInput::DigitalInput(FISH_X1_TRANSFER* pTArea,uint8_t pin): pin(pin), pTArea(pTArea){
-    pTArea->ftX1config.uni[pin].mode = MODE_R; 	    //  resistor
-    pTArea->ftX1config.uni[pin].digital = 1;        //  digital Input
-    pTArea->ftX1state.config_id ++; 
+DigitalInput::DigitalInput(FISH_X1_TRANSFER *pTArea, uint8_t pin) : pin(pin), pTArea(pTArea)
+{
+    pTArea->ftX1config.uni[pin].mode = MODE_R; //  resistor
+    pTArea->ftX1config.uni[pin].digital = 1;   //  digital Input
+    pTArea->ftX1state.config_id++;
 }
 
-bool DigitalInput::value(){
+bool DigitalInput::value()
+{
     return pTArea->ftX1in.uni[pin];
 }
 
-void DigitalInput::waitFor(DigitalState state){
-    while((value() && state == DigitalState::LOW) || (!value() && state == DigitalState::HIGH)) {
+void DigitalInput::waitFor(DigitalState state)
+{
+    while ((value() && state == DigitalState::LOW) || (!value() && state == DigitalState::HIGH))
+    {
         sleep(10ms);
     }
 }
 
-uint8_t DigitalInput::getPin(){
-    return pin+1;
+uint8_t DigitalInput::getPin()
+{
+    return pin + 1;
 }
 
 //Counter C1-C4
-Counter::Counter(FISH_X1_TRANSFER* pTArea,uint8_t pin): pin(pin), pTArea(pTArea){}
+Counter::Counter(FISH_X1_TRANSFER *pTArea, uint8_t pin) : pin(pin), pTArea(pTArea) {}
 
-bool Counter::value(){
+bool Counter::value()
+{
     return pTArea->ftX1in.cnt_in[pin];
 }
 
-uint8_t Counter::getPin(){
-    return pin+1;
+uint8_t Counter::getPin()
+{
+    return pin + 1;
 }
 
-void Counter::waitSteps(uint16_t steps){
-    while(steps){
+void Counter::waitSteps(uint16_t steps)
+{
+    while (steps)
+    {
         auto val = pTArea->ftX1in.cnt_in[pin];
-        while(val == pTArea->ftX1in.cnt_in[pin]){
+        while (val == pTArea->ftX1in.cnt_in[pin])
+        {
             sleep(100us);
         }
-        steps--;        
+        steps--;
     }
     pTArea->ftX1out.cnt_reset_cmd_id[pin]++;
     pTArea->ftX1in.motor_ex_reached[pin] = 0;
     sleep(1ms);
 }
 
-
 //AnalogInput (Widerstandsmessung)
-AnalogInput::AnalogInput(FISH_X1_TRANSFER* pTArea,uint8_t pin): pin(pin), pTArea(pTArea){
-    pTArea->ftX1config.uni[pin].mode = MODE_R; 	    //  resistor
-    pTArea->ftX1config.uni[pin].digital = 0;        //  analog Input
-    pTArea->ftX1state.config_id ++; 
+AnalogInput::AnalogInput(FISH_X1_TRANSFER *pTArea, uint8_t pin) : pin(pin), pTArea(pTArea)
+{
+    pTArea->ftX1config.uni[pin].mode = MODE_R; //  resistor
+    pTArea->ftX1config.uni[pin].digital = 0;   //  analog Input
+    pTArea->ftX1state.config_id++;
 }
 
-uint16_t AnalogInput::value(){
+uint16_t AnalogInput::value()
+{
     return pTArea->ftX1in.uni[pin];
 }
 
-uint8_t AnalogInput::getPin(){
-    return pin+1;
+uint8_t AnalogInput::getPin()
+{
+    return pin + 1;
 }
 
 //NTC
-NTC::NTC(FISH_X1_TRANSFER* pTArea,uint8_t pin): AnalogInput(pTArea,pin){}
+NTC::NTC(FISH_X1_TRANSFER *pTArea, uint8_t pin) : AnalogInput(pTArea, pin) {}
 
-double NTC::getTemperature(){    
+double NTC::getTemperature()
+{
     return log(value()) * log(value()) * 1.3932 + log(value()) * -43.942 + 271.87;
 }
 
 //Farbsensor
-ColorSensor::ColorSensor(FISH_X1_TRANSFER* pTArea,uint8_t pin): pin(pin), pTArea(pTArea){
-    pTArea->ftX1config.uni[pin].mode = MODE_U; 	//	Spannung
-    pTArea->ftX1config.uni[pin].digital = 0;    //  analog Input
-    pTArea->ftX1state.config_id ++; 
+ColorSensor::ColorSensor(FISH_X1_TRANSFER *pTArea, uint8_t pin) : pin(pin), pTArea(pTArea)
+{
+    pTArea->ftX1config.uni[pin].mode = MODE_U; //	Spannung
+    pTArea->ftX1config.uni[pin].digital = 0;   //  analog Input
+    pTArea->ftX1state.config_id++;
 }
 
-uint16_t ColorSensor::value(){
+uint16_t ColorSensor::value()
+{
     return pTArea->ftX1in.uni[pin];
 }
 
-Color ColorSensor::color(){
-    if(value() < 500){
+Color ColorSensor::color()
+{
+    if (value() < 500)
+    {
         return Color::WHITE;
     }
-    else if(value() < 1300){
+    else if (value() < 1300)
+    {
         return Color::RED;
     }
-    else {
+    else
+    {
         return Color::BLUE;
     }
 }
 
-uint8_t ColorSensor::getPin(){
-    return pin+1;
+uint8_t ColorSensor::getPin()
+{
+    return pin + 1;
 }
 
 //Spannungsmessung
-Voltage::Voltage(FISH_X1_TRANSFER* pTArea,uint8_t pin): pin(pin), pTArea(pTArea){
-    pTArea->ftX1config.uni[pin].mode = MODE_U; 	//	Spannung
-    pTArea->ftX1config.uni[pin].digital = 0;    //  analog Input
-    pTArea->ftX1state.config_id ++; 
+Voltage::Voltage(FISH_X1_TRANSFER *pTArea, uint8_t pin) : pin(pin), pTArea(pTArea)
+{
+    pTArea->ftX1config.uni[pin].mode = MODE_U; //	Spannung
+    pTArea->ftX1config.uni[pin].digital = 0;   //  analog Input
+    pTArea->ftX1state.config_id++;
 }
 
-uint16_t Voltage::value(){
+uint16_t Voltage::value()
+{
     return pTArea->ftX1in.uni[pin];
 }
 
-uint8_t Voltage::getPin(){
-    return pin+1;
+uint8_t Voltage::getPin()
+{
+    return pin + 1;
 }
 
 //Ultraschallsensor für Abstand
-Ultrasonic::Ultrasonic(FISH_X1_TRANSFER* pTArea,uint8_t pin): pin(pin), pTArea(pTArea){
-    pTArea->ftX1config.uni[pin].mode = MODE_ULTRASONIC; 
-    pTArea->ftX1state.config_id ++; 
+Ultrasonic::Ultrasonic(FISH_X1_TRANSFER *pTArea, uint8_t pin) : pin(pin), pTArea(pTArea)
+{
+    pTArea->ftX1config.uni[pin].mode = MODE_ULTRASONIC;
+    pTArea->ftX1state.config_id++;
 }
 
-uint16_t Ultrasonic::value(){
+uint16_t Ultrasonic::value()
+{
     return pTArea->ftX1in.uni[pin];
 }
 
-uint8_t Ultrasonic::getPin(){
-    return pin+1;
+uint8_t Ultrasonic::getPin()
+{
+    return pin + 1;
 }
 
 //Spurensensor
-TrackSensor::TrackSensor(FISH_X1_TRANSFER* pTArea,uint8_t left, uint8_t right): left(left), right(right), pTArea(pTArea){
-    pTArea->ftX1config.uni[left].mode = MODE_U; 
-    pTArea->ftX1config.uni[left].digital = 1;  
-    pTArea->ftX1config.uni[right].mode = MODE_U; 
-    pTArea->ftX1config.uni[right].digital = 1;  
-    pTArea->ftX1state.config_id ++; 
+TrackSensor::TrackSensor(FISH_X1_TRANSFER *pTArea, uint8_t left, uint8_t right) : left(left), right(right), pTArea(pTArea)
+{
+    pTArea->ftX1config.uni[left].mode = MODE_U;
+    pTArea->ftX1config.uni[left].digital = 1;
+    pTArea->ftX1config.uni[right].mode = MODE_U;
+    pTArea->ftX1config.uni[right].digital = 1;
+    pTArea->ftX1state.config_id++;
 }
 
-bool TrackSensor::valueLeft(){
+bool TrackSensor::valueLeft()
+{
     return pTArea->ftX1in.uni[left];
 }
 
-bool TrackSensor::valueRight(){
+bool TrackSensor::valueRight()
+{
     return pTArea->ftX1in.uni[right];
 }
 
-uint8_t TrackSensor::getPinLeft(){
-    return left+1;
+uint8_t TrackSensor::getPinLeft()
+{
+    return left + 1;
 }
 
-uint8_t TrackSensor::getPinRight(){
-    return right+1;
+uint8_t TrackSensor::getPinRight()
+{
+    return right + 1;
 }
-
 
 //Motor
-Motor::Motor(FISH_X1_TRANSFER* pTArea, uint8_t pin): pin(pin), pTArea(pTArea){}
+Motor::Motor(FISH_X1_TRANSFER *pTArea, uint8_t pin) : pin(pin), pTArea(pTArea) {}
 
-
-void Motor::left(uint16_t level){
+void Motor::left(uint16_t level)
+{
     pTArea->ftX1out.cnt_reset_cmd_id[pin] = 0;
     pTArea->ftX1out.motor_ex_cmd_id[pin] = 0;
-    pTArea->ftX1out.duty[pin*2] = level;
-    pTArea->ftX1out.duty[pin*2+1] = 0;
+    pTArea->ftX1out.duty[pin * 2] = level;
+    pTArea->ftX1out.duty[pin * 2 + 1] = 0;
 }
 
-void Motor::right(uint16_t level){
-    pTArea->ftX1out.duty[pin*2] = 0;
-    pTArea->ftX1out.duty[pin*2+1] = level;
+void Motor::right(uint16_t level)
+{
+    pTArea->ftX1out.duty[pin * 2] = 0;
+    pTArea->ftX1out.duty[pin * 2 + 1] = level;
 }
 
-void Motor::stop(){
-    pTArea->ftX1out.duty[pin*2] = 0;
-    pTArea->ftX1out.duty[pin*2+1] = 0;
+void Motor::stop()
+{
+    pTArea->ftX1out.duty[pin * 2] = 0;
+    pTArea->ftX1out.duty[pin * 2 + 1] = 0;
 }
 
-uint8_t Motor::getPin(){
-    return pin+1;
+uint8_t Motor::getPin()
+{
+    return pin + 1;
 }
 
 //EncoderMotor
-EncoderMotor::EncoderMotor(FISH_X1_TRANSFER* pTArea,uint8_t pin) : Motor(pTArea,pin) {}
+EncoderMotor::EncoderMotor(FISH_X1_TRANSFER *pTArea, uint8_t pin) : Motor(pTArea, pin) {}
 
-void EncoderMotor::distanceLeft(uint16_t steps, uint16_t level){
+void EncoderMotor::distanceLeft(uint16_t steps, uint16_t level)
+{
     reset();
-    pTArea->ftX1out.distance[pin] = steps;  // Distance to drive 
-	pTArea->ftX1out.motor_ex_cmd_id[pin]++; // Set new Distance Value 
+    pTArea->ftX1out.distance[pin] = steps;  // Distance to drive
+    pTArea->ftX1out.motor_ex_cmd_id[pin]++; // Set new Distance Value
     left(level);
 }
 
-void EncoderMotor::distanceRight(uint16_t steps, uint16_t level){
+void EncoderMotor::distanceRight(uint16_t steps, uint16_t level)
+{
     reset();
     pTArea->ftX1out.distance[pin] = steps;  // Distance to drive
-	pTArea->ftX1out.motor_ex_cmd_id[pin]++; // Set new Distance Value 
+    pTArea->ftX1out.motor_ex_cmd_id[pin]++; // Set new Distance Value
     right(level);
 }
 
-void EncoderMotor::synchronizeTo(EncoderMotor& other){
-    pTArea->ftX1out.master[pin] = other.getPin()-1;
+void EncoderMotor::synchronizeTo(EncoderMotor &other)
+{
+    pTArea->ftX1out.master[pin] = other.getPin() - 1;
 }
 
-void EncoderMotor::stopSynchronization(){
+void EncoderMotor::stopSynchronization()
+{
     pTArea->ftX1out.master[pin] = 0;
 }
 
-void EncoderMotor::waitToEnd(){
-    while(! pTArea->ftX1in.motor_ex_reached[pin]){        
+void EncoderMotor::waitToEnd()
+{
+    while (!pTArea->ftX1in.motor_ex_reached[pin])
+    {
         sleep(1ms);
     }
     stop();
 }
 
-uint16_t EncoderMotor::counter(){
+uint16_t EncoderMotor::counter()
+{
     return pTArea->ftX1in.counter[pin];
 }
 
-void EncoderMotor::reset(){
+void EncoderMotor::reset()
+{
     //stoppen und warten bis Motor steht
     stop();
     sleep(10ms);
-    
+
     //resetten
     pTArea->ftX1out.cnt_reset_cmd_id[pin]++;
     pTArea->ftX1out.distance[pin] = 0;
@@ -399,4 +474,3 @@ void EncoderMotor::reset(){
 
     sleep(10ms);
 }
-
