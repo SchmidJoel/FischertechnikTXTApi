@@ -1,5 +1,11 @@
 # Fischertechnik Fabrik Anleitung
 
+## API
+
+![Lowlevel API](./low-level-api.png)
+
+![Highlevel API](./high-level-api.png)
+
 ## MQTT
 
 Topic | Wert | Beschreibung
