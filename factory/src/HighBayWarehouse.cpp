@@ -27,15 +27,19 @@ void HighbayWarehouse::drive(uint8_t x, uint8_t y){
     yt.join();
 }
 
-void HighbayWarehouse::pull(){
+void HighbayWarehouse::pull(bool waitFront){
     zaxis.pos2();
     yaxis.moveRelative(-REL_MOVE);
+    if(waitFront)
+        return;
     zaxis.pos1();
 }
 
-void HighbayWarehouse::put(){
+void HighbayWarehouse::put(bool waitFront){
     yaxis.moveRelative(-REL_MOVE);
     zaxis.pos2();
     yaxis.moveRelative(REL_MOVE);
+    if(waitFront)
+        return;
     zaxis.pos1();
 }

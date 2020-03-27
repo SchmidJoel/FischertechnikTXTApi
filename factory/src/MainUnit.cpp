@@ -191,7 +191,7 @@ void getWorkpieceHighBay(uint8_t x, uint8_t y){
     warehouse.pull();
     warehouse.storage.setWorkpieceAt(y*3+x, WarehouseContent::NO_BOX);
     warehouse.drive(3, 3);
-    warehouse.put();
+    warehouse.put(true);
     warehouse.state = HighBayState::H_READY;
     beltstate = BeltState::VACUUM_ROBOT;
 }
