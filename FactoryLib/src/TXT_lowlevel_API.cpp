@@ -438,7 +438,7 @@ void EncoderMotor::distanceRight(uint16_t steps, uint16_t level)
 
 void EncoderMotor::synchronizeTo(EncoderMotor &other)
 {
-    pTArea->ftX1out.master[pin] = other.getPin() - 1;
+    pTArea->ftX1out.master[pin] = other.getPin();
 }
 
 void EncoderMotor::stopSynchronization()

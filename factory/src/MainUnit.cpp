@@ -12,7 +12,6 @@ enum BeltState
 
 TXT txt;
 TxtMqttFactoryClient mqttClient("MainUnit", "192.168.178.66", "", "");
-Json::FastWriter writer;
 
 VacuumRobot robot = VacuumRobot(txt);
 HighbayWarehouse warehouse = HighbayWarehouse(txt);
@@ -35,7 +34,7 @@ void storeWorkpieceHighBay(uint8_t, uint8_t, int);
 void getWorkpieceHighBay(uint8_t, uint8_t);
 void checkAvailableWorkpieces();
 void getEmptyBox(Color);
-void storeBox(int);
+void storeBox(WarehouseContent);
 void getFullBox();
 
 int main()
@@ -45,11 +44,7 @@ int main()
     std::thread thread_vacuum = robot.referenceAsync();
     std::thread thread_warehouse = warehouse.referenceAsync();
 
-    Json::Value msg;
-    for (int i = 0; i < sizeof(warehouse.storage); i++) {
-        msg.append(warehouse.storage[i]);
-    }
-    mqttClient.publishMessageAsync(TOPIC_INPUT_STOCK, writer.write(msg));
+    mqttClient.publishMessageAsync(TOPIC_INPUT_STOCK, warehouse.storage.getAsJson());
     mqttClient.publishMessageAsync(TOPIC_INPUT_VACUUMROBOT_STATE, "referenzieren");
     mqttClient.publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "referenzieren");
 
@@ -101,7 +96,7 @@ void checkAvailableWorkpieces()
             });
             driveToWarehouse(Color::WHITE);
             wait.join();
-            storeBox(Color::WHITE + 1);
+            storeBox(WarehouseContent::WHITE);
         }
         else if (!red_available.value())
         {
@@ -114,7 +109,7 @@ void checkAvailableWorkpieces()
             });
             driveToWarehouse(Color::RED);
             wait.join();
-            storeBox(Color::RED + 1);
+            storeBox(WarehouseContent::RED);
         }
         else if (!blue_available.value())
         {
@@ -127,7 +122,7 @@ void checkAvailableWorkpieces()
             });
             driveToWarehouse(Color::BLUE);
             wait.join();
-            storeBox(Color::BLUE + 1);
+            storeBox(WarehouseContent::BLUE);
         }
         else
         {
@@ -141,7 +136,7 @@ void checkAvailableWorkpieces()
             {
                 sleep(10ms);
             }
-            storeBox(0);
+            storeBox(WarehouseContent::EMPTY_BOX);
             processing.join();
         }
     }
@@ -195,7 +190,7 @@ void driveToProcessing()
     mqttClient.publishMessageAsync(TOPIC_INPUT_VACUUMROBOT_STATE, "bereit");
 }
 
-void storeWorkpieceHighBay(uint8_t x, uint8_t y, int color)
+void storeWorkpieceHighBay(uint8_t x, uint8_t y, WarehouseContent content)
 {
     mqttClient.publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "einlagern");
     warehouse.state = HighBayState::H_STORE_WORKIECE;
@@ -208,13 +203,9 @@ void storeWorkpieceHighBay(uint8_t x, uint8_t y, int color)
     warehouse.pull();
     warehouse.drive(x, y);
     warehouse.put();
-    warehouse.storage[y * 3 + x] = color;
+    warehouse.storage.setWorkpieceAt(y * 3 + x, content);
 
-    Json::Value msg;
-    for (int i = 0; i < sizeof(warehouse.storage); i++) {
-        msg.append(warehouse.storage[i]);
-    }
-    mqttClient.publishMessageAsync(TOPIC_INPUT_STOCK, writer.write(msg));
+    mqttClient.publishMessageAsync(TOPIC_INPUT_STOCK, warehouse.storage.getAsJson());
 
     warehouse.state = HighBayState::H_READY;
     mqttClient.publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "bereit");
@@ -222,34 +213,24 @@ void storeWorkpieceHighBay(uint8_t x, uint8_t y, int color)
 
 void getEmptyBox(Color color)
 {
-    int x = 0;
-    int y = 0;
-    for (int i = 0; i < sizeof(warehouse.storage); i++)
+    int pos = warehouse.storage.getPositionOf(WarehouseContent::EMPTY_BOX);
+    if (pos != -1)
     {
-        if (warehouse.storage[i] == 0)
-        {
-            x = i % 3;
-            y = i / 3;
-            break;
-        }
+        int x = pos % 3;
+        int y = pos / 3;
+        getWorkpieceHighBay(x, y);
     }
-    getWorkpieceHighBay(x, y);
 }
 
-void storeBox(int boxstate)
+void storeBox(WarehouseContent content)
 {
-    int x = 0;
-    int y = 0;
-    for (int i = 0; i < sizeof(warehouse.storage); i++)
+    int pos = warehouse.storage.getPositionOf(WarehouseContent::NO_BOX);
+    if (pos != -1)
     {
-        if (warehouse.storage[i] == -1)
-        {
-            x = i % 3;
-            y = i / 3;
-            break;
-        }
+        int x = pos % 3;
+        int y = pos / 3;
+        storeWorkpieceHighBay(x, y, content);
     }
-    storeWorkpieceHighBay(x, y, boxstate);
 }
 
 void getWorkpieceHighBay(uint8_t x, uint8_t y)
@@ -258,16 +239,12 @@ void getWorkpieceHighBay(uint8_t x, uint8_t y)
     warehouse.state = HighBayState::H_PROVIDE_WORKPIECE;
     warehouse.drive(x, y);
     warehouse.pull();
-    warehouse.storage[y * 3 + x] = -1;
+    warehouse.storage.setWorkpieceAt(y * 3 + x, WarehouseContent::NO_BOX);
 
-    Json::Value msg;
-    for (int i = 0; i < sizeof(warehouse.storage); i++) {
-        msg.append(warehouse.storage[i]);
-    }
-    mqttClient.publishMessageAsync(TOPIC_INPUT_STOCK, writer.write(msg));
+    mqttClient.publishMessageAsync(TOPIC_INPUT_STOCK, warehouse.storage.getAsJson());
 
     warehouse.drive(3, 3);
-    warehouse.put();
+    warehouse.put(true);
     warehouse.state = HighBayState::H_READY;
     beltstate = BeltState::VACUUM_ROBOT;
     mqttClient.publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "bereit");
@@ -277,9 +254,9 @@ void getFullBox()
 {
     int x = 0;
     int y = 0;
-    for (int i = 0; i < sizeof(warehouse.storage); i++)
+    for (int i = 0; i < STORAGE_SIZE; i++)
     {
-        if (warehouse.storage[i] > 0)
+        if ((int)warehouse.storage.getWorkpieceAt(i) > 0)
         {
             x = i % 3;
             y = i / 3;

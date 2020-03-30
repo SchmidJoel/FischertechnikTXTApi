@@ -2,8 +2,6 @@
 #define TxtMqttFactoryClient_H_
 
 #include "mqtt/async_client.h"
-#include "json/json.h"
-#include <any>
 #include <unordered_map>
 
 #define DFLT_TIMEOUT_MS_PUBLISH 1000

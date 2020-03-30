@@ -40,6 +40,9 @@ all: SortingLineMain ProcessingStationMain MainUnit
 VacuumRobot.o : src/VacuumRobot.cpp
 	$(CXX) $(CXXFLAGS) $^ -o obj/$@
 
+Storage.o : src/Storage.cpp
+	$(CXX) $(CXXFLAGS) $^ -o obj/$@
+
 HighBayWarehouse.o : src/HighBayWarehouse.cpp
 	$(CXX) $(CXXFLAGS) $^ -o obj/$@
 
@@ -52,8 +55,8 @@ ProcessingStationMain.o: src/ProcessingStationMain.cpp
 SortingLineMain.o: src/SortingLineMain.cpp
 	$(CXX) $(CXXFLAGS) $^ -o obj/$@
 
-MainUnit: MainUnit.o HighBayWarehouse.o VacuumRobot.o
-	$(CXX) $(LFLAGS) $(LIBPATH) obj/MainUnit.o obj/HighBayWarehouse.o obj/VacuumRobot.o $(LIBS) -o bin/$@
+MainUnit: MainUnit.o HighBayWarehouse.o VacuumRobot.o Storage.o
+	$(CXX) $(LFLAGS) $(LIBPATH) obj/MainUnit.o obj/HighBayWarehouse.o obj/VacuumRobot.o obj/Storage.o $(LIBS) -o bin/$@
 
 ProcessingStationMain: ProcessingStationMain.o
 	$(CXX) $(LFLAGS) $(LIBPATH) obj/$^ $(LIBS) -o bin/$@
