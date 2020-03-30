@@ -64,9 +64,9 @@ int FileStorage::getPositionOf(WarehouseContent content)
 std::string FileStorage::getAsJson()
 {
     Json::Value msg;
-    for (int i = 0; i < sizeof(warehouse.storage); i++)
+    for (int i = 0; i < sizeof(values); i++)
     {
-        msg.append(warehouse.storage[i]);
+        msg.append(values[i]);
     }
 
     return writer.write(msg);
