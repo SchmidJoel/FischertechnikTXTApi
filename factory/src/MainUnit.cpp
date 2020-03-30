@@ -197,6 +197,10 @@ void storeWorkpieceHighBay(uint8_t x, uint8_t y, int color)
     warehouse.drive(x, y);
     warehouse.put();
     warehouse.storage[y * 3 + x] = color;
+
+    Json::Value msg = warehouse.storage;
+    mqttClient.publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STORAGE, msg.asString());
+
     warehouse.state = HighBayState::H_READY;
     mqttClient.publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "bereit");
 }

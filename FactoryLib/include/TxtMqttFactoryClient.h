@@ -2,6 +2,8 @@
 #define TxtMqttFactoryClient_H_
 
 #include "mqtt/async_client.h"
+#include "json/json.h"
+#include <any>
 #include <unordered_map>
 
 #define DFLT_TIMEOUT_MS_PUBLISH 1000
@@ -20,6 +22,7 @@
 #define TOPIC_INPUT_SORTINGLINE_RAW_LAST_COLOR "/i/sl/rawlastcolor"
 #define TOPIC_INPUT_VACUUMROBOT_STATE "/i/vr/state"
 #define TOPIC_INPUT_WAREHOUSE_STATE "/i/wh/state"
+#define TOPIC_INPUT_WAREHOUSE_STORAGE "/i/wh/storage"
 #define TOPIC_INPUT_PROCESSINGSTATION_STATE "/i/ps/state"
 
 class callback : public virtual mqtt::callback
