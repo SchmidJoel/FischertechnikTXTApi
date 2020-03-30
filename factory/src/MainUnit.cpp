@@ -12,6 +12,7 @@ enum BeltState
 
 TXT txt;
 TxtMqttFactoryClient mqttClient("MainUnit", "192.168.178.66", "", "");
+Json::FastWriter writer;
 
 VacuumRobot robot = VacuumRobot(txt);
 HighbayWarehouse warehouse = HighbayWarehouse(txt);
@@ -44,10 +45,21 @@ int main()
     std::thread thread_vacuum = robot.referenceAsync();
     std::thread thread_warehouse = warehouse.referenceAsync();
 
+    Json::Value msg;
+    for (int i = 0; i < sizeof(warehouse.storage); i++) {
+        msg.append(warehouse.storage[i]);
+    }
+    mqttClient.publishMessageAsync(TOPIC_INPUT_STOCK, writer.write(msg));
+    mqttClient.publishMessageAsync(TOPIC_INPUT_VACUUMROBOT_STATE, "referenzieren");
+    mqttClient.publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "referenzieren");
+
     thread_vacuum.join();
     thread_warehouse.join();
     warehouse.state = HighBayState::H_READY;
     robot.state = VacuumRobotState::V_READY;
+
+    mqttClient.publishMessageAsync(TOPIC_INPUT_VACUUMROBOT_STATE, "bereit");
+    mqttClient.publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "bereit");
 
     std::thread run = std::thread(checkAvailableWorkpieces);
     run.detach();
@@ -198,8 +210,11 @@ void storeWorkpieceHighBay(uint8_t x, uint8_t y, int color)
     warehouse.put();
     warehouse.storage[y * 3 + x] = color;
 
-    Json::Value msg = warehouse.storage;
-    mqttClient.publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STORAGE, msg.asString());
+    Json::Value msg;
+    for (int i = 0; i < sizeof(warehouse.storage); i++) {
+        msg.append(warehouse.storage[i]);
+    }
+    mqttClient.publishMessageAsync(TOPIC_INPUT_STOCK, writer.write(msg));
 
     warehouse.state = HighBayState::H_READY;
     mqttClient.publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "bereit");
@@ -244,6 +259,13 @@ void getWorkpieceHighBay(uint8_t x, uint8_t y)
     warehouse.drive(x, y);
     warehouse.pull();
     warehouse.storage[y * 3 + x] = -1;
+
+    Json::Value msg;
+    for (int i = 0; i < sizeof(warehouse.storage); i++) {
+        msg.append(warehouse.storage[i]);
+    }
+    mqttClient.publishMessageAsync(TOPIC_INPUT_STOCK, writer.write(msg));
+
     warehouse.drive(3, 3);
     warehouse.put();
     warehouse.state = HighBayState::H_READY;

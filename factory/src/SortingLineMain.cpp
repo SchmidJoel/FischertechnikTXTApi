@@ -32,6 +32,8 @@ int main(void)
     mqttClient.connect(1000);
 
     std::thread detection = std::thread(ColorDetection);
+    mqttClient.publishMessageAsync(TOPIC_INPUT_SORTINGLINE_LAST_COLOR, "");
+    mqttClient.publishMessageAsync(TOPIC_INPUT_SORTINGLINE_RAW_LAST_COLOR, "");
 
     while (true)
     {

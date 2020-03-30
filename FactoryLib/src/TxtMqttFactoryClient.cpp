@@ -47,7 +47,7 @@ void TxtMqttFactoryClient::disconnect(long timeout)
 bool TxtMqttFactoryClient::publishMessageSync(const std::string &topicFilter, const std::string &message, long timeout, int qos, bool retained)
 {
 	if (!cli.is_connected()) {
-		return;
+		return false;
 	}
 
 	mqtt::delivery_token_ptr pubtok = cli.publish(topicFilter, message, qos, retained);
@@ -66,7 +66,7 @@ void TxtMqttFactoryClient::publishMessageAsync(const std::string &topicFilter, c
 bool TxtMqttFactoryClient::subTopicAsync(const std::string &topicFilter, void (*func)(const std::string &message), int qos, long timeout)
 {
 	if (!cli.is_connected()) {
-		return;
+		return false;
 	}
 
 	mqtt::token_ptr subtok = cli.subscribe(topicFilter, qos);
@@ -82,7 +82,7 @@ bool TxtMqttFactoryClient::subTopicAsync(const std::string &topicFilter, void (*
 bool TxtMqttFactoryClient::subTopicSync(const std::string &topicFilter, int qos, long timeout)
 {
 	if (!cli.is_connected()) {
-		return;
+		return false;
 	}
 
 	mqtt::token_ptr subtok = cli.subscribe(topicFilter, qos);
@@ -92,7 +92,7 @@ bool TxtMqttFactoryClient::subTopicSync(const std::string &topicFilter, int qos,
 bool TxtMqttFactoryClient::unsubTopic(const std::string &topicFilter, long timeout)
 {
 	if (!cli.is_connected()) {
-		return;
+		return false;
 	}
 
 	mqtt::token_ptr unsubtok = cli.unsubscribe(topicFilter);
@@ -106,7 +106,7 @@ bool TxtMqttFactoryClient::unsubTopic(const std::string &topicFilter, long timeo
 std::string TxtMqttFactoryClient::consume_topic(const std::string &topicFilter)
 {
 	if (!cli.is_connected()) {
-		return;
+		return "";
 	}
 
 	std::string message;

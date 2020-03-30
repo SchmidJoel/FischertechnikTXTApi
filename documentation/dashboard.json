@@ -28,12 +28,12 @@
         "id": "16f01f06.442f59",
         "type": "ui_chart",
         "z": "3ab18b33.80e8fc",
-        "name": "",
+        "name": "temperature",
         "group": "7bcaaa81.f278cc",
         "order": 0,
         "width": "0",
         "height": "0",
-        "label": "temperature",
+        "label": "Temperatur",
         "chartType": "line",
         "legend": "false",
         "xformat": "HH:mm:ss",
@@ -97,7 +97,8 @@
                 "6b6df3a4.066644",
                 "b0981a85.34c1a",
                 "1b1a0492.230a7b",
-                "7dd884ab.df336c"
+                "7dd884ab.df336c",
+                "82d43184.4baa1"
             ]
         ]
     },
@@ -126,7 +127,7 @@
         "width": 0,
         "height": 0,
         "name": "Time",
-        "label": "Time",
+        "label": "Zeit",
         "format": "{{msg.payload}}",
         "layout": "row-spread",
         "x": 630,
@@ -177,7 +178,7 @@
         "type": "function",
         "z": "3ab18b33.80e8fc",
         "name": "generate Data",
-        "func": "let list = JSON.parse(msg.payload);\nlet payload = \"\";\n\nfor (let row = 0; row < 3; row++) {\n    payload = payload + \"<div>\";\n    for (let column = 0; column < 3; column++) {\n        payload = payload + \"<span class=\\\"circle \";\n        switch (list[row * 3 + column]) {\n            case 1:\n                payload = payload + \"white\";\n                break;\n            case 2:\n                payload = payload + \"red\";\n                break;\n            case 3:\n                payload = payload + \"blue\";\n                break;\n            default:\n                break;\n        }\n        payload = payload + \"\\\"></span>\";\n    }\n    payload = payload + \"</div>\";\n}\n\nmsg.payload = payload;\nreturn msg;",
+        "func": "let list = JSON.parse(msg.payload);\nlet payload = \"\";\n\nfor (let row = 0; row < 3; row++) {\n    payload = payload + \"<div>\";\n    for (let column = 2; column >= 0; column--) {\n        payload = payload + \"<span class=\\\"circle \";\n        switch (list[row * 3 + column]) {\n            case 1:\n                payload = payload + \"white\";\n                break;\n            case 2:\n                payload = payload + \"red\";\n                break;\n            case 3:\n                payload = payload + \"blue\";\n                break;\n            default:\n                break;\n        }\n        payload = payload + \"\\\"></span>\";\n    }\n    payload = payload + \"</div>\";\n}\n\nmsg.payload = payload;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "x": 560,
@@ -192,13 +193,13 @@
         "id": "57914b17.dfd354",
         "type": "ui_gauge",
         "z": "3ab18b33.80e8fc",
-        "name": "",
+        "name": "storage",
         "group": "33203872.f72e78",
         "order": 3,
         "width": 0,
         "height": 0,
         "gtype": "gage",
-        "title": "occupancy",
+        "title": "Belegung",
         "label": "units",
         "format": "{{value}}",
         "min": 0,
@@ -210,7 +211,7 @@
         ],
         "seg1": "",
         "seg2": "",
-        "x": 810,
+        "x": 800,
         "y": 540,
         "wires": []
     },
@@ -239,7 +240,7 @@
         "width": 0,
         "height": 0,
         "name": "white amount",
-        "label": "white",
+        "label": "weiß",
         "format": "{{msg.payload}}",
         "layout": "row-left",
         "x": 810,
@@ -271,7 +272,7 @@
         "width": 0,
         "height": 0,
         "name": "red amount",
-        "label": "red",
+        "label": "rot",
         "format": "{{msg.payload}}",
         "layout": "row-left",
         "x": 810,
@@ -303,7 +304,7 @@
         "width": 0,
         "height": 0,
         "name": "blue amount",
-        "label": "blue",
+        "label": "blau",
         "format": "{{msg.payload}}",
         "layout": "row-left",
         "x": 810,
@@ -352,10 +353,10 @@
         "width": 0,
         "height": 0,
         "name": "Sorting Line",
-        "label": "Sorting Line",
+        "label": "Sortierstrecke",
         "format": "{{msg.payload}}",
         "layout": "row-spread",
-        "x": 810,
+        "x": 630,
         "y": 920,
         "wires": []
     },
@@ -385,12 +386,174 @@
         "width": 0,
         "height": 0,
         "name": "Processing Station",
-        "label": "Processing Station",
+        "label": "Bearbeitungs-Station",
         "format": "{{msg.payload}}",
         "layout": "row-spread",
-        "x": 790,
+        "x": 610,
         "y": 1020,
         "wires": []
+    },
+    {
+        "id": "2096a78a.ee0578",
+        "type": "mqtt in",
+        "z": "3ab18b33.80e8fc",
+        "name": "VacuumRobotState",
+        "topic": "/i/vr/state",
+        "qos": "1",
+        "datatype": "auto",
+        "broker": "c3bf2db5.246d6",
+        "x": 330,
+        "y": 1120,
+        "wires": [
+            [
+                "6bd4d4e4.204554"
+            ]
+        ]
+    },
+    {
+        "id": "6bd4d4e4.204554",
+        "type": "ui_text",
+        "z": "3ab18b33.80e8fc",
+        "group": "d10cd46c.1244d8",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "Vacuumrobot",
+        "label": "Vakuumroboter",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 630,
+        "y": 1120,
+        "wires": []
+    },
+    {
+        "id": "796a629.93f8f1c",
+        "type": "mqtt in",
+        "z": "3ab18b33.80e8fc",
+        "name": "WarehouseState",
+        "topic": "/i/wh/state",
+        "qos": "1",
+        "datatype": "auto",
+        "broker": "c3bf2db5.246d6",
+        "x": 320,
+        "y": 1200,
+        "wires": [
+            [
+                "61409ab5.be68f4"
+            ]
+        ]
+    },
+    {
+        "id": "61409ab5.be68f4",
+        "type": "ui_text",
+        "z": "3ab18b33.80e8fc",
+        "group": "d10cd46c.1244d8",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "Warehouse",
+        "label": "Hochregallager",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 630,
+        "y": 1200,
+        "wires": []
+    },
+    {
+        "id": "a23788ae.de8fe8",
+        "type": "mqtt in",
+        "z": "3ab18b33.80e8fc",
+        "name": "Last color",
+        "topic": "/i/sl/lastcolor",
+        "qos": "1",
+        "datatype": "auto",
+        "broker": "c3bf2db5.246d6",
+        "x": 300,
+        "y": 1280,
+        "wires": [
+            [
+                "84127229.09d75"
+            ]
+        ]
+    },
+    {
+        "id": "1f97e04e.16f5a",
+        "type": "ui_text",
+        "z": "3ab18b33.80e8fc",
+        "group": "d10cd46c.1244d8",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "color detection",
+        "label": "erkannte Farbe",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 720,
+        "y": 1280,
+        "wires": []
+    },
+    {
+        "id": "dbf2aa82.d4a3a",
+        "type": "mqtt in",
+        "z": "3ab18b33.80e8fc",
+        "name": "Last color raw",
+        "topic": "/i/sl/rawlastcolor",
+        "qos": "1",
+        "datatype": "auto",
+        "broker": "c3bf2db5.246d6",
+        "x": 310,
+        "y": 1360,
+        "wires": [
+            [
+                "d8197021.5f32f8"
+            ]
+        ]
+    },
+    {
+        "id": "d8197021.5f32f8",
+        "type": "ui_text",
+        "z": "3ab18b33.80e8fc",
+        "group": "d10cd46c.1244d8",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "raw color detection",
+        "label": "erkannter Farbwert",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 610,
+        "y": 1360,
+        "wires": []
+    },
+    {
+        "id": "82d43184.4baa1",
+        "type": "debug",
+        "z": "3ab18b33.80e8fc",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 540,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "84127229.09d75",
+        "type": "function",
+        "z": "3ab18b33.80e8fc",
+        "name": "convert",
+        "func": "switch (msg.payload) {\n    case \"0\":\n        msg.payload = \"weiß\";\n        break;\n    case \"1\":\n        msg.payload = \"rot\";\n        break;\n    case \"2\":\n        msg.payload = \"blau\";\n        break;\n    default:\n        msg.payload = \"leer\"\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 500,
+        "y": 1280,
+        "wires": [
+            [
+                "1f97e04e.16f5a"
+            ]
+        ]
     },
     {
         "id": "c3bf2db5.246d6",
@@ -440,7 +603,7 @@
         "id": "33203872.f72e78",
         "type": "ui_group",
         "z": "",
-        "name": "Warehouse",
+        "name": "Hochregallager",
         "tab": "13f1be34.7f0552",
         "order": 2,
         "disp": true,
@@ -451,7 +614,7 @@
         "id": "d10cd46c.1244d8",
         "type": "ui_group",
         "z": "",
-        "name": "States",
+        "name": "Status",
         "tab": "13f1be34.7f0552",
         "disp": true,
         "width": "6",
