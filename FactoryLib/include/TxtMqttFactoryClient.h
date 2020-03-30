@@ -16,6 +16,8 @@
 #define TOPIC_INPUT_STOCK "/i/wh/stock"
 #define TOPIC_INPUT_TEMPERATURE "/i/motor/temp"
 #define TOPIC_INPUT_SORTINGLINE_STATE "/i/sl/state"
+#define TOPIC_INPUT_SORTINGLINE_LAST_COLOR "/i/sl/lastcolor"
+#define TOPIC_INPUT_SORTINGLINE_RAW_LAST_COLOR "/i/sl/rawlastcolor"
 #define TOPIC_INPUT_VACUUMROBOT_STATE "/i/vr/state"
 #define TOPIC_INPUT_WAREHOUSE_STATE "/i/wh/state"
 #define TOPIC_INPUT_PROCESSINGSTATION_STATE "/i/ps/state"
@@ -64,10 +66,11 @@ public:
 	bool connect(long timeout);
 	void disconnect(long timeout);
 
-	void publishMessage(const std::string &topicFilter, const std::string &message, long timeout = DFLT_TIMEOUT_MS_PUBLISH, int qos = DFLT_QUALITY_OF_SERVICE, bool retained = DFLT_MESSAGE_RETAIN);
-	void subTopicAsync(const std::string &topicFilter, void (*func)(const std::string &message), int qos = DFLT_QUALITY_OF_SERVICE, long timeout = DFLT_TIMEOUT_MS_PUBLISH);
-	void subTopicSync(const std::string &topicFilter, int qos = DFLT_QUALITY_OF_SERVICE, long timeout = DFLT_TIMEOUT_MS_PUBLISH);
-	void unsubTopic(const std::string &topicFilter, long timeout = DFLT_TIMEOUT_MS_PUBLISH);
+	bool publishMessageSync(const std::string &topicFilter, const std::string &message, long timeout = DFLT_TIMEOUT_MS_PUBLISH, int qos = DFLT_QUALITY_OF_SERVICE, bool retained = DFLT_MESSAGE_RETAIN);
+	void publishMessageAsync(const std::string &topicFilter, const std::string &message, int qos = DFLT_QUALITY_OF_SERVICE, bool retained = DFLT_MESSAGE_RETAIN);
+	bool subTopicAsync(const std::string &topicFilter, void (*func)(const std::string &message), int qos = DFLT_QUALITY_OF_SERVICE, long timeout = DFLT_TIMEOUT_MS_PUBLISH);
+	bool subTopicSync(const std::string &topicFilter, int qos = DFLT_QUALITY_OF_SERVICE, long timeout = DFLT_TIMEOUT_MS_PUBLISH);
+	bool unsubTopic(const std::string &topicFilter, long timeout = DFLT_TIMEOUT_MS_PUBLISH);
 	std::string consume_topic(const std::string &topicFilter);
 
 protected:

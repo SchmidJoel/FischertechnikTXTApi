@@ -234,8 +234,8 @@ class TwoRefAxis {
     +isPos2(): bool
 }
 
-PosAxis -0)- AxisEM
-PosAxis -0)- AxisXS
+PosAxis -(0- AxisEM
+PosAxis -(0- AxisXS
 NRefAxis <|-- TwoRefAxis
 ButtonMode <-- NRefAxis
 AxisState <-- NRefAxis

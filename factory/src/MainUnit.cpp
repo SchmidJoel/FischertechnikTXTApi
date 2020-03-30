@@ -1,5 +1,6 @@
 #include "VacuumRobot.h"
 #include "HighBayWarehouse.h"
+#include "TxtMqttFactoryClient.h"
 
 enum BeltState
 {
@@ -10,6 +11,7 @@ enum BeltState
 };
 
 TXT txt;
+TxtMqttFactoryClient mqttClient("MainUnit", "192.168.178.66", "", "");
 
 VacuumRobot robot = VacuumRobot(txt);
 HighbayWarehouse warehouse = HighbayWarehouse(txt);
@@ -37,6 +39,8 @@ void getFullBox();
 
 int main()
 {
+    mqttClient.connect(1000);
+
     std::thread thread_vacuum = robot.referenceAsync();
     std::thread thread_warehouse = warehouse.referenceAsync();
 
@@ -133,6 +137,7 @@ void checkAvailableWorkpieces()
 
 void driveToWarehouse(Color color)
 {
+    mqttClient.publishMessageAsync(TOPIC_INPUT_VACUUMROBOT_STATE, "holen");
     robot.yaxis.moveAbsolut(0);
     if (color == Color::WHITE)
     {
@@ -157,10 +162,12 @@ void driveToWarehouse(Color color)
     robot.yaxis.moveAbsolut(WAREHOUSE_Y);
     robot.release();
     robot.yaxis.moveAbsolut(0);
+    mqttClient.publishMessageAsync(TOPIC_INPUT_VACUUMROBOT_STATE, "bereit");
 }
 
 void driveToProcessing()
 {
+    mqttClient.publishMessageAsync(TOPIC_INPUT_VACUUMROBOT_STATE, "abliefern");
     robot.yaxis.moveAbsolut(0);
     robot.drive(WAREHOUSE_X, WAREHOUSE_Y, WAREHOUSE_Z);
     robot.suck();
@@ -173,10 +180,12 @@ void driveToProcessing()
     std::thread xaxis = robot.yaxis.moveAbsolutAsync(0);
     robot.zaxis.moveAbsolut(0);
     xaxis.join();
+    mqttClient.publishMessageAsync(TOPIC_INPUT_VACUUMROBOT_STATE, "bereit");
 }
 
 void storeWorkpieceHighBay(uint8_t x, uint8_t y, int color)
 {
+    mqttClient.publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "einlagern");
     warehouse.state = HighBayState::H_STORE_WORKIECE;
     beltstate = BeltState::WAREHOUSE;
     warehouse.drive(3, 3);
@@ -189,6 +198,7 @@ void storeWorkpieceHighBay(uint8_t x, uint8_t y, int color)
     warehouse.put();
     warehouse.storage[y * 3 + x] = color;
     warehouse.state = HighBayState::H_READY;
+    mqttClient.publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "bereit");
 }
 
 void getEmptyBox(Color color)
@@ -225,6 +235,7 @@ void storeBox(int boxstate)
 
 void getWorkpieceHighBay(uint8_t x, uint8_t y)
 {
+    mqttClient.publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "auslagern");
     warehouse.state = HighBayState::H_PROVIDE_WORKPIECE;
     warehouse.drive(x, y);
     warehouse.pull();
@@ -233,6 +244,7 @@ void getWorkpieceHighBay(uint8_t x, uint8_t y)
     warehouse.put();
     warehouse.state = HighBayState::H_READY;
     beltstate = BeltState::VACUUM_ROBOT;
+    mqttClient.publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "bereit");
 }
 
 void getFullBox()

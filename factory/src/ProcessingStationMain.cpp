@@ -27,6 +27,7 @@ int main(void)
 {
     mqttClient.connect(1000);
 
+    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "referenzieren");
     comp.on();
     oven_gate.on();
     sleep(10ms);
@@ -40,6 +41,7 @@ int main(void)
 
     comp.off();
 
+    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "bereit");
     while (true)
     {
         ProcessWorkpiece();
@@ -51,11 +53,11 @@ int main(void)
 void ProcessWorkpiece()
 {
     oven_light_sensor.waitFor(DigitalState::LOW);
-    mqttClient.publishMessage(TOPIC_INPUT_PROCESSINGSTATION_STATE, "start processing");
+    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "starte...");
     comp.on();
     sleep(2s);
     std::thread thread2 = vacuum_roboter.pos2Async();
-    mqttClient.publishMessage(TOPIC_INPUT_PROCESSINGSTATION_STATE, "harden workpiece");
+    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "brennen");
     oven_gate.on();
     oven.pos2();
     oven_gate.off();
@@ -75,7 +77,7 @@ void ProcessWorkpiece()
 
     sleep(500ms);
     ventil_vacuum.on();
-    mqttClient.publishMessage(TOPIC_INPUT_PROCESSINGSTATION_STATE, "transport workpiece");
+    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "transportieren");
     sleep(500ms);
 
     ventil_roboter.off();
@@ -89,13 +91,13 @@ void ProcessWorkpiece()
     ventil_roboter.off();
     sleep(100ms);
     table.pos(1);
-    mqttClient.publishMessage(TOPIC_INPUT_PROCESSINGSTATION_STATE, "cut workpiece");
+    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "sägen");
     saw.right(OUTPUT_MAX_LEVEL);
     sleep(3s);
     saw.stop();
     table.pos(2);
 
-    mqttClient.publishMessage(TOPIC_INPUT_PROCESSINGSTATION_STATE, "finished workpiece");
+    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "fertig");
     belt.right(OUTPUT_MAX_LEVEL);
     table_ventil.on();
     sleep(100ms);
@@ -107,5 +109,5 @@ void ProcessWorkpiece()
     belt_light_sensor.waitFor(DigitalState::LOW);
     sleep(5s);
     belt.stop();
-    mqttClient.publishMessage(TOPIC_INPUT_PROCESSINGSTATION_STATE, "idle");
+    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "bereit");
 }
