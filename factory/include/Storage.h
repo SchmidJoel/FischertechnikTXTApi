@@ -7,7 +7,8 @@
 #include <fstream>
 #include <map>
 
-enum class WarehouseContent{
+enum class WarehouseContent
+{
     NO_BOX = -1,
     EMPTY_BOX = 0,
     WHITE = 1,
@@ -15,7 +16,8 @@ enum class WarehouseContent{
     BLUE = 3
 };
 
-class IStorage{
+class IStorage
+{
 public:
     virtual WarehouseContent getWorkpieceAt(uint8_t) = 0;
     virtual void setWorkpieceAt(uint8_t, WarehouseContent) = 0;
@@ -23,9 +25,11 @@ public:
     virtual std::string getAsJson() = 0;
 };
 
-class FileStorage : public IStorage{
+class FileStorage : public IStorage
+{
     WarehouseContent values[STORAGE_SIZE];
-    public:
+
+public:
     FileStorage();
     WarehouseContent getWorkpieceAt(uint8_t) override;
     void setWorkpieceAt(uint8_t, WarehouseContent) override;

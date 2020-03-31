@@ -1,8 +1,7 @@
 #include "Storage.h"
-#include <iostream>
 #include "json/json.h"
 
-Json::FastWriter writer;
+Json::StreamWriterBuilder writer;
 
 FileStorage::FileStorage()
 {
@@ -64,10 +63,10 @@ int FileStorage::getPositionOf(WarehouseContent content)
 std::string FileStorage::getAsJson()
 {
     Json::Value msg;
-    for (int i = 0; i < sizeof(values); i++)
+    for (uint32_t i = 0; i < STORAGE_SIZE; i++)
     {
-        msg.append(values[i]);
+        msg.append((int)values[i]);
     }
 
-    return writer.write(msg);
+    return Json::writeString(writer, msg);
 }
