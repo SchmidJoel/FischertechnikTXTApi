@@ -3,8 +3,8 @@
 #include <iostream>
 #include <fstream>
 
-
-int main(void) {
+int main(void)
+{
 	TXT txt = TXT();
 	EncoderMotor em1 = txt.encoderMotor(1);
 	EncoderMotor em2 = txt.encoderMotor(2);

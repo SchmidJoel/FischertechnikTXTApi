@@ -18,7 +18,8 @@
 #define PROCESS_STATION_Y 550
 #define PROCESS_STATION_Z 880
 
-enum VacuumRobotState {
+enum VacuumRobotState
+{
     V_UNREFERENCED,
     V_REFERENCING,
     V_MOVE_TO_SORTINGLINE,
@@ -29,13 +30,14 @@ enum VacuumRobotState {
     V_READY
 };
 
-class VacuumRobot {
+class VacuumRobot
+{
 private:
     Output compressor;
     Output ventil;
 
 public:
-    VacuumRobot(TXT &txt);    
+    VacuumRobot(TXT &txt);
     AxisEM xaxis;
     AxisEM yaxis;
     AxisEM zaxis;
@@ -45,7 +47,6 @@ public:
     void suck();
     void release();
     VacuumRobotState state;
-
 };
 
 #endif

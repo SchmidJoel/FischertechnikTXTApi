@@ -6,6 +6,9 @@ LFLAGS = -Wall
 LIBPATH = -L"..\deps\lib" -L"..\FactoryLib\obj" 
 
 LIBS = -l"SDLWidgetsLib" \
+	-l"paho-mqtt3c" \
+	-l"paho-mqtt3a" \
+	-l"paho-mqttpp3" \
 	-l"jsoncpp" \
 	-l"pthread" \
 	-l"SDL" \
@@ -26,10 +29,11 @@ LIBS = -l"SDLWidgetsLib" \
 	-l"KeLibTxt"\
 	-l"txtlowlevelapi"\
 	-l"txthighlevelapi"\
-	-l"utils"
+	-l"utils"\
+	-l"mqttclient"
 
-$(shell mkdir bin)
-$(shell mkdir obj)
+$(shell mkdir -p "bin")
+$(shell mkdir -p "obj")
 
 all: SortingLineMain ProcessingStationMain MainUnit
 

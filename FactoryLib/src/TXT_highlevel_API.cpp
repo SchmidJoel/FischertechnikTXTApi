@@ -5,23 +5,24 @@
 #include <thread>
 
 /*Axis with encodermotor, referenceswitch (opener) and maxpos*/
-AxisEM::AxisEM(TXT& txt, uint8_t motorpin, uint8_t refpin, ButtonMode refButtonMode, uint16_t max) : 
-            em(txt.encoderMotor(motorpin)), 
-            ref(txt.digitalInput(refpin)), 
-            maxPos(max), 
-            mode(refButtonMode) {
+AxisEM::AxisEM(TXT &txt, uint8_t motorpin, uint8_t refpin, ButtonMode refButtonMode, uint16_t max) : em(txt.encoderMotor(motorpin)),
+                                                                                                     ref(txt.digitalInput(refpin)),
+                                                                                                     maxPos(max),
+                                                                                                     mode(refButtonMode)
+{
     speed = 512;
     state = AxisState::UNREFERENCED;
 }
 
 /*Axis with encodermotor and referenceswitch (opener) - maxpos = maxvalue(uint16_t)*/
-AxisEM::AxisEM(TXT& txt, uint8_t motorpin, uint8_t refpin) : 
-            AxisEM(txt, motorpin, refpin, ButtonMode::CLOSER, std::numeric_limits<uint16_t>::max()){}
+AxisEM::AxisEM(TXT &txt, uint8_t motorpin, uint8_t refpin) : AxisEM(txt, motorpin, refpin, ButtonMode::CLOSER, std::numeric_limits<uint16_t>::max()) {}
 
 /*reference drive until ref is pressed*/
-void AxisEM::reference() {
+void AxisEM::reference()
+{
     em.left(speed);
-	while (ButtonMode::CLOSER == mode && !ref.value() || ButtonMode::OPENER == mode && ref.value()) {
+    while (ButtonMode::CLOSER == mode && !ref.value() || ButtonMode::OPENER == mode && ref.value())
+    {
         //em.left(speed); // TODO ?
         sleep(10ms);
     }
@@ -31,23 +32,28 @@ void AxisEM::reference() {
     state = AxisState::READY;
 }
 
-std::thread AxisEM::referenceAsync(){
-    return std::thread (&AxisEM::reference, this);
+std::thread AxisEM::referenceAsync()
+{
+    return std::thread(&AxisEM::reference, this);
 }
 
 /*stop the axis*/
-void AxisEM::stop() {
+void AxisEM::stop()
+{
     em.stop();
 }
 
 /*get current position*/
-uint16_t AxisEM::getPos() {
+uint16_t AxisEM::getPos()
+{
     return pos + em.counter();
 }
 
 /*move for a absolute value, return false if maxpos would exceed*/
-bool AxisEM::moveAbsolut(uint16_t pos) {
-    if(pos > maxPos || pos < 0 || state != AxisState::READY){
+bool AxisEM::moveAbsolut(uint16_t pos)
+{
+    if (pos > maxPos || pos < 0 || state != AxisState::READY)
+    {
         return false;
     }
     dest = pos;
@@ -55,28 +61,36 @@ bool AxisEM::moveAbsolut(uint16_t pos) {
     return true;
 }
 
-std::thread AxisEM::moveAbsolutAsync(uint16_t pos){
-    return std::thread (&AxisEM::moveAbsolut, this, pos);
+std::thread AxisEM::moveAbsolutAsync(uint16_t pos)
+{
+    return std::thread(&AxisEM::moveAbsolut, this, pos);
 }
 
-void AxisEM::setSpeed(uint16_t speed_){
-    if(speed_ <= 512 && speed_ >= 0){
+void AxisEM::setSpeed(uint16_t speed_)
+{
+    if (speed_ <= 512 && speed_ >= 0)
+    {
         speed = speed_;
     }
-    if(state == AxisState::LEFT){
+    if (state == AxisState::LEFT)
+    {
         em.left(speed);
     }
-    else if(state == AxisState::RIGHT){
+    else if (state == AxisState::RIGHT)
+    {
         em.right(speed);
     }
 }
 
-void AxisEM::drive(){
-    if(pos > dest){
+void AxisEM::drive()
+{
+    if (pos > dest)
+    {
         state = AxisState::LEFT;
         em.distanceLeft(pos - dest, speed);
     }
-    else if(pos < dest){
+    else if (pos < dest)
+    {
         state = AxisState::RIGHT;
         em.distanceRight(dest - pos, speed);
     }
@@ -86,8 +100,10 @@ void AxisEM::drive(){
 }
 
 /*move for a relative value, return false if maxpos would exceed*/
-bool AxisEM::moveRelative(int16_t distance) {
-    if(pos + distance > maxPos || pos + distance < 0 || state != AxisState::READY){
+bool AxisEM::moveRelative(int16_t distance)
+{
+    if (pos + distance > maxPos || pos + distance < 0 || state != AxisState::READY)
+    {
         return false;
     }
     dest = pos + distance;
@@ -95,47 +111,51 @@ bool AxisEM::moveRelative(int16_t distance) {
     return true;
 }
 
-std::thread AxisEM::moveRelativeAsync(int16_t pos){
-    return std::thread (&AxisEM::moveRelative, this, pos);
+std::thread AxisEM::moveRelativeAsync(int16_t pos)
+{
+    return std::thread(&AxisEM::moveRelative, this, pos);
 }
 
-AxisState AxisEM::getState(){
+AxisState AxisEM::getState()
+{
     return state;
 }
 
-ButtonMode AxisEM::getRefButtonMode(){
+ButtonMode AxisEM::getRefButtonMode()
+{
     return mode;
 }
 
-void AxisEM::setRefButtonMode(ButtonMode _mode){
+void AxisEM::setRefButtonMode(ButtonMode _mode)
+{
     mode = _mode;
 }
 
-
-
 /*Axis with normal motor and stepper, referenceswitch (opener), stepperpin and maxpos*/
-AxisXS::AxisXS(TXT& txt, uint8_t motorpin, uint8_t refpin, uint8_t countpin, ButtonMode refButtonMode, uint16_t max) : 
-            m(txt.encoderMotor(motorpin)), 
-            ref(txt.digitalInput(refpin)), 
-            counter(txt.digitalInput(countpin)), 
-            maxPos(max), 
-            mode(refButtonMode) {
+AxisXS::AxisXS(TXT &txt, uint8_t motorpin, uint8_t refpin, uint8_t countpin, ButtonMode refButtonMode, uint16_t max) : m(txt.encoderMotor(motorpin)),
+                                                                                                                       ref(txt.digitalInput(refpin)),
+                                                                                                                       counter(txt.digitalInput(countpin)),
+                                                                                                                       maxPos(max),
+                                                                                                                       mode(refButtonMode)
+{
     state = AxisState::UNREFERENCED;
     speed = 512;
 }
 
 /*Axis with normal motor and stepper, referenceswitch (opener), stepperpin - maxpos = maxvalue(uint16_t)*/
-AxisXS::AxisXS(TXT& txt, uint8_t motorpin, uint8_t refpin, uint8_t countpin) : 
-            AxisXS(txt, motorpin, countpin, refpin, ButtonMode::CLOSER, std::numeric_limits<uint16_t>::max()){}
+AxisXS::AxisXS(TXT &txt, uint8_t motorpin, uint8_t refpin, uint8_t countpin) : AxisXS(txt, motorpin, countpin, refpin, ButtonMode::CLOSER, std::numeric_limits<uint16_t>::max()) {}
 
 /*get current position*/
-uint16_t AxisXS::getPos() {
+uint16_t AxisXS::getPos()
+{
     return pos;
 }
 
 /*referencedrive until ref is pressed*/
-void AxisXS::reference() {
-	while(ButtonMode::CLOSER == mode && !ref.value() || ButtonMode::OPENER == mode && ref.value()){
+void AxisXS::reference()
+{
+    while (ButtonMode::CLOSER == mode && !ref.value() || ButtonMode::OPENER == mode && ref.value())
+    {
         m.left(speed);
         sleep(10ms);
     }
@@ -144,31 +164,40 @@ void AxisXS::reference() {
     state = AxisState::READY;
 }
 
-std::thread AxisXS::referenceAsync(){
-    return std::thread (&AxisXS::reference, this);
+std::thread AxisXS::referenceAsync()
+{
+    return std::thread(&AxisXS::reference, this);
 }
 
 /*stop the axis*/
-void AxisXS::stop(){
+void AxisXS::stop()
+{
     m.stop();
 }
 
-void AxisXS::drive(){
-    if(pos > dest){
+void AxisXS::drive()
+{
+    if (pos > dest)
+    {
         state = AxisState::LEFT;
         m.left(speed);
     }
-    else if(pos < dest){
+    else if (pos < dest)
+    {
         state = AxisState::RIGHT;
         m.right(speed);
     }
-    while(pos != dest){
+    while (pos != dest)
+    {
         auto val = counter.value();
-        while(val == counter.value());
-        if(state == AxisState::LEFT){
+        while (val == counter.value())
+            ;
+        if (state == AxisState::LEFT)
+        {
             pos--;
         }
-        else if(state == AxisState::RIGHT){
+        else if (state == AxisState::RIGHT)
+        {
             pos++;
         }
     }
@@ -177,8 +206,10 @@ void AxisXS::drive(){
 }
 
 /*move for a absolute value, return false if maxpos would exceed*/
-bool AxisXS::moveAbsolut(uint16_t destination) {
-    if(pos > maxPos || pos < 0 || state != AxisState::READY){
+bool AxisXS::moveAbsolut(uint16_t destination)
+{
+    if (pos > maxPos || pos < 0 || state != AxisState::READY)
+    {
         return false;
     }
     dest = pos;
@@ -186,13 +217,16 @@ bool AxisXS::moveAbsolut(uint16_t destination) {
     return true;
 }
 
-std::thread AxisXS::moveAbsolutAsync(uint16_t pos){
-    return std::thread (&AxisXS::moveAbsolut, this, pos);
+std::thread AxisXS::moveAbsolutAsync(uint16_t pos)
+{
+    return std::thread(&AxisXS::moveAbsolut, this, pos);
 }
 
 /*move for a relative value, return false if maxpos would exceed*/
-bool AxisXS::moveRelative(int16_t distance) {
-    if(pos + distance > maxPos || pos + distance < 0 || state != AxisState::READY){
+bool AxisXS::moveRelative(int16_t distance)
+{
+    if (pos + distance > maxPos || pos + distance < 0 || state != AxisState::READY)
+    {
         return false;
     }
     dest = pos + distance;
@@ -200,44 +234,51 @@ bool AxisXS::moveRelative(int16_t distance) {
     return true;
 }
 
-std::thread AxisXS::moveRelativeAsync(int16_t pos){
-    return std::thread (&AxisXS::moveRelative, this, pos);
+std::thread AxisXS::moveRelativeAsync(int16_t pos)
+{
+    return std::thread(&AxisXS::moveRelative, this, pos);
 }
 
-void AxisXS::setSpeed(uint16_t speed_){
-    if(speed_ <= 512 && speed_ >= 0){
+void AxisXS::setSpeed(uint16_t speed_)
+{
+    if (speed_ <= 512 && speed_ >= 0)
+    {
         speed = speed_;
     }
 }
 
-AxisState AxisXS::getState(){
+AxisState AxisXS::getState()
+{
     return state;
 }
 
-ButtonMode AxisXS::getRefButtonMode(){
+ButtonMode AxisXS::getRefButtonMode()
+{
     return mode;
 }
 
-void AxisXS::setRefButtonMode(ButtonMode _mode){
+void AxisXS::setRefButtonMode(ButtonMode _mode)
+{
     mode = _mode;
 }
 
-
-
-NRefAxis::NRefAxis(TXT &txt, uint8_t motorpin, std::vector<uint8_t> pos) :
-            m(txt.motor(motorpin)),
-            speed(512) {
-    for(int i : pos){
+NRefAxis::NRefAxis(TXT &txt, uint8_t motorpin, std::vector<uint8_t> pos) : m(txt.motor(motorpin)),
+                                                                           speed(512)
+{
+    for (int i : pos)
+    {
         auto ref = txt.digitalInput(i);
-        postitions.push_back(std::pair<DigitalInput,ButtonMode>(ref, ButtonMode::CLOSER));
+        postitions.push_back(std::pair<DigitalInput, ButtonMode>(ref, ButtonMode::CLOSER));
     }
     state = AxisState::UNREFERENCED;
 }
 
-void NRefAxis::reference(){
+void NRefAxis::reference()
+{
     auto ref = postitions[0].first;
     ButtonMode mode = postitions[0].second;
-    while(ButtonMode::CLOSER == mode && !ref.value() || ButtonMode::OPENER == mode && ref.value()){
+    while (ButtonMode::CLOSER == mode && !ref.value() || ButtonMode::OPENER == mode && ref.value())
+    {
         m.left(speed);
         sleep(10ms);
     }
@@ -246,98 +287,112 @@ void NRefAxis::reference(){
     lastpos = 0;
 }
 
-std::thread NRefAxis::referenceAsync(){
-    return std::thread (&NRefAxis::reference, this);
+std::thread NRefAxis::referenceAsync()
+{
+    return std::thread(&NRefAxis::reference, this);
 }
 
-bool NRefAxis::isPos(uint8_t pos){
-    if(pos >= postitions.size()){
+bool NRefAxis::isPos(uint8_t pos)
+{
+    if (pos >= postitions.size())
+    {
         return false;
-    }    
+    }
     auto btn = postitions[pos].first;
     ButtonMode mode = postitions[pos].second;
     return ButtonMode::CLOSER == mode && !btn.value() || ButtonMode::OPENER == mode && btn.value();
 }
 
-void NRefAxis::pos(uint8_t pos){
-    if(pos >= postitions.size() || state != AxisState::READY){
+void NRefAxis::pos(uint8_t pos)
+{
+    if (pos >= postitions.size() || state != AxisState::READY)
+    {
         return;
     }
     auto btn = postitions[pos].first;
     auto mode = postitions[pos].second;
     while (ButtonMode::CLOSER == mode && !btn.value() || ButtonMode::OPENER == mode && btn.value())
     {
-       if(pos > lastpos){
-           m.right(speed);
-           state = AxisState::RIGHT;
-       }
-       else{
-           m.left(speed);
-           state = AxisState::LEFT;
-       }
-       sleep(1ms);
+        if (pos > lastpos)
+        {
+            m.right(speed);
+            state = AxisState::RIGHT;
+        }
+        else
+        {
+            m.left(speed);
+            state = AxisState::LEFT;
+        }
+        sleep(1ms);
     }
     m.stop();
     lastpos = pos;
     state = AxisState::READY;
 }
 
-std::thread NRefAxis::posAsync(uint8_t pos){
-    return std::thread (&NRefAxis::pos, this, pos);
+std::thread NRefAxis::posAsync(uint8_t pos)
+{
+    return std::thread(&NRefAxis::pos, this, pos);
 }
 
-void NRefAxis::setSpeed(uint16_t speed_){
-    if(speed_ <= 512 && speed_ >= 0){
+void NRefAxis::setSpeed(uint16_t speed_)
+{
+    if (speed_ <= 512 && speed_ >= 0)
+    {
         speed = speed_;
     }
 }
 
-void NRefAxis::setButtonMode(uint8_t pos, ButtonMode mode){
-    if(pos >= postitions.size()){
+void NRefAxis::setButtonMode(uint8_t pos, ButtonMode mode)
+{
+    if (pos >= postitions.size())
+    {
         return;
     }
     postitions[pos].second = mode;
 }
 
-
-
 /*axis with two endbutton, based on NRefAxis*/
-TwoRefAxis::TwoRefAxis(TXT& txt, uint8_t motorpin, uint8_t refpin1, uint8_t refpin2, ButtonMode mode1, ButtonMode mode2) : 
-            NRefAxis(txt, motorpin, std::vector<uint8_t>{refpin1, refpin2}) {
+TwoRefAxis::TwoRefAxis(TXT &txt, uint8_t motorpin, uint8_t refpin1, uint8_t refpin2, ButtonMode mode1, ButtonMode mode2) : NRefAxis(txt, motorpin, std::vector<uint8_t>{refpin1, refpin2})
+{
     setButtonMode(0, mode1);
     setButtonMode(1, mode2);
     state = AxisState::UNREFERENCED;
     lastpos = 0;
 }
 
-TwoRefAxis::TwoRefAxis(TXT& txt, uint8_t motorpin, uint8_t refpin1, uint8_t refpin2) : 
-            TwoRefAxis(txt, motorpin, refpin1, refpin2, ButtonMode::CLOSER, ButtonMode::CLOSER) {}
-
+TwoRefAxis::TwoRefAxis(TXT &txt, uint8_t motorpin, uint8_t refpin1, uint8_t refpin2) : TwoRefAxis(txt, motorpin, refpin1, refpin2, ButtonMode::CLOSER, ButtonMode::CLOSER) {}
 
 /*move to pos 1*/
-void TwoRefAxis::pos1(){
+void TwoRefAxis::pos1()
+{
     pos(0);
 }
 
 /*move to pos 2*/
-void TwoRefAxis::pos2(){
+void TwoRefAxis::pos2()
+{
     pos(1);
 }
 
-std::thread TwoRefAxis::pos1Async(){
-    return std::thread (&TwoRefAxis::pos1, this);
+std::thread TwoRefAxis::pos1Async()
+{
+    return std::thread(&TwoRefAxis::pos1, this);
 }
 
-std::thread TwoRefAxis::pos2Async(){
-    return std::thread (&TwoRefAxis::pos2, this);
+std::thread TwoRefAxis::pos2Async()
+{
+    return std::thread(&TwoRefAxis::pos2, this);
 }
 
 /*is Axis at pos1*/
-bool TwoRefAxis::isPos1(){
+bool TwoRefAxis::isPos1()
+{
     return isPos(0);
 }
 
 /*is axis at pos2*/
-bool TwoRefAxis::isPos2(){
+bool TwoRefAxis::isPos2()
+{
     return isPos(1);
 }

@@ -8,10 +8,11 @@ using namespace std::chrono;
 
 /*Colors for the ColorSensor
 */
-enum Color{
-    BLUE,
+enum Color
+{
     WHITE,
-    RED
+    RED,
+    BLUE
 };
 
 void sleep(std::chrono::microseconds);

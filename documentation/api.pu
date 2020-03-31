@@ -1,0 +1,244 @@
+@startuml low-level-api
+class Output {
+    -pin: uint8_t
+    -pTArea: *FISH_X1_TRANSFER
+
+    +on()
+    +off()
+    +setLevel()
+    +getPin(): uint8_t
+}
+
+class DigitalInput {
+    -pin: uint8_t
+    -pTArea: *FISH_X1_TRANSFER
+
+    +value(): bool
+    +waitFor(DigitalState)
+    +getPin(): uint8_t
+}
+
+class Counter {
+    -pin: uint8_t
+    -pTArea: *FISH_X1_TRANSFER
+
+    +value(): bool
+    +waitSteps(uint16_t)
+    +getPin(): uint8_t
+}
+
+class AnalogInput {
+    -pin: uint8_t
+    -pTArea: *FISH_X1_TRANSFER
+
+    +value(): uint16_t
+    +getPin(): uint8_t
+}
+
+class NTC {
+    +getTemperature(): double
+}
+
+class Ultrasonic {
+    -pin: uint8_t
+    -pTArea: *FISH_X1_TRANSFER
+
+    +value(): uint16_t
+    +getPin(): uint8_t
+}
+
+class ColorSensor {
+    -pin: uint8_t
+    -pTArea: *FISH_X1_TRANSFER
+
+    +value(): uint16_t
+    +getPin(): uint8_t
+    +color(): Color
+}
+
+class Voltage {
+    -pin: uint8_t
+    -pTArea: *FISH_X1_TRANSFER
+
+    +value(): uint16_t
+    +getPin(): uint8_t
+}
+
+class TrackSensor {
+    -left: uint8_t
+    -right: uint8_t
+    -pTArea: *FISH_X1_TRANSFER
+
+    +valueLeft(): bool
+    +valueRight(): bool
+    +getPinLeft(): uint8_t
+    +getPinRight(): uint8_t
+}
+
+class Motor {
+    -pin: uint8_t
+    -pTArea: *FISH_X1_TRANSFER
+
+    +left(uint16_t level)
+    +right(uint16_t level)
+    +stop()
+    +getPin(): uint8_t
+}
+
+class EncoderMotor {
+    +distanceLeft(uint16_t steps, uint16_t level)
+    +distanceRight(uint16_t steps, uint16_t level)
+    +synchronizeTo(EncoderMotor &other)
+    +stopSynchronization()
+    +waitToEnd()
+    +counter(): uint16_t
+    +reset()
+}
+
+class TXT {
+    -pTArea: *FISH_X1_TRANSFER
+    -_extension: bool
+
+    isExtension(): bool
+    getArea(): *FISH_X1_TRANSFER
+    output(uint8_t pin): Output
+    motor(uint8_t pin): Motor
+    encoderMotor(uint8_t pin): EncoderMotor
+    analogInput(uint8_t pin): AnalogInput
+    ntc(uint8_t pin): NTC
+    digitalInput(uint8_t pin): DigitalInput
+    counter(uint8_t pin): Counter
+    ultrasonic(uint8_t pin): Ultrasonic
+    voltage(uint8_t pin): Voltage
+    colorSensor(uint8_t pin): ColorSensor
+    trackSensor(uint8_t left, uint8_t right): TrackSensor
+    extension(): TXT
+    playSound(uint8_t index, uint8_t repeats)
+    playSoundAndWait(uint8_t index, uint8_t repeats)
+    getTXTVoltage(): uint16_t
+}
+
+enum Color {
+    BLUE
+    WHITE
+    RED
+}
+
+enum DigitalState {
+    HIGH
+    LOW
+}
+
+AnalogInput <|-- NTC
+Motor <|-- EncoderMotor
+
+ColorSensor --> Color
+DigitalInput --> DigitalState
+
+Voltage -[hidden]-> AnalogInput
+TrackSensor -[hidden]-> ColorSensor
+Counter -[hidden]-> DigitalInput
+Ultrasonic -[hidden]-> Motor
+Output -[hidden]-> TXT
+Counter -[hidden]> TrackSensor
+@enduml
+
+TXT --> Output
+TXT --> Motor
+TXT --> EncoderMotor
+TXT --> AnalogInput
+TXT --> NTC
+TXT --> DigitalInput
+TXT --> Counter
+TXT --> Ultrasonic
+TXT --> Voltage
+TXT --> ColorSensor
+TXT --> TrackSensor
+
+@startuml high-level-api
+enum AxisState {
+    UNREFERENCED
+    READY
+    LEFT
+    RIGHT
+}
+
+enum ButtonMode {
+    CLOSER
+    OPENER
+}
+
+abstract PosAxis {
+    +getPos(): uint16_t
+    +reference()
+    +referenceAsync(): std::thread
+    +moveAbsolut(uint16_t destination): bool
+    +moveAbsolutAsync(uint16_t destination): std::thread
+    +moveRelative(int16_t distance): bool
+    +moveRelativeAsync(int16_t distance): std::thread
+    +stop()
+    +setSpeed(uint16_t speed)
+    +getState(): AxisState
+    +getRefButtonMode(): ButtonMode
+    +setRefButtonMode(ButtonMode mode)
+}
+
+class AxisEM {
+    -em: EncoderMotor
+    -ref: DigitalInput
+    -pos: uint16_t
+    -dest: uint16_t
+    -maxPos: uint16_t
+    -speed: uint16_t
+    -state: AxisState
+    -mode: ButtonMode
+    -drive()
+}
+
+class AxisXS {
+    -m: Motor
+    -ref: DigitalInput
+    -counter: DigitalInput
+    -pos: uint16_t
+    -dest: uint16_t
+    -maxPos: uint16_t
+    -speed: uint16_t
+    -state: AxisState
+    -mode: ButtonMode
+    -drive()
+}
+
+class NRefAxis
+{
+    #m: Motor
+    #speed: uint16_t
+    #postitions: std::vector<std::pair<DigitalInput, ButtonMode>>
+    #state: AxisState
+    #lastpos: uint8_t
+
+    +reference()
+    +referenceAsync(): std::thread
+    +isPos(uint8_t pos): bool
+    +pos(uint8_t pos)
+    +posAsync(uint8_t pos): std::thread
+    +setSpeed(uint16_t speed_)
+    +setButtonMode(uint8_t, ButtonMode mode)
+}
+
+class TwoRefAxis {
+    +pos1()
+    +pos2()
+    +pos1Async(): std::thread
+    +pos2Async(): std::thread
+    +isPos1(): bool
+    +isPos2(): bool
+}
+
+PosAxis -(0- AxisEM
+PosAxis -(0- AxisXS
+NRefAxis <|-- TwoRefAxis
+ButtonMode <-- NRefAxis
+AxisState <-- NRefAxis
+AxisState <-- PosAxis
+ButtonMode <-- PosAxis
+@enduml

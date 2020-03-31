@@ -1,12 +1,13 @@
 #include "TXT_lowlevel_API.h"
 
-
-int main(void) {
-	TXT txt = TXT();
-	Output red = txt.output(1);
+int main(void)
+{
+    TXT txt = TXT();
+    Output red = txt.output(1);
     Output yellow = txt.output(2);
     Output green = txt.output(3);
-    while(true){
+    while (true)
+    {
         red.on();
         sleep(3s);
         yellow.on();
@@ -20,5 +21,5 @@ int main(void) {
         sleep(1s);
         yellow.off();
     }
-	return 0;
+    return 0;
 }
