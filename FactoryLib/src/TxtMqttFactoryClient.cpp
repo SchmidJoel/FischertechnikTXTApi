@@ -1,11 +1,11 @@
 #include "TxtMqttFactoryClient.h"
 
 TxtMqttFactoryClient::TxtMqttFactoryClient(std::string clientname, std::string host,
-		std::string mqtt_user, mqtt::binary_ref mqtt_pass, std::string port)
-      : clientname(clientname), host(host), port(port), mqtt_user(mqtt_user), mqtt_pass(mqtt_pass),
-		cli("tcp://" + host + ":" + port, clientname)
+										   std::string mqtt_user, mqtt::binary_ref mqtt_pass, std::string port)
+	: clientname(clientname), host(host), port(port), mqtt_user(mqtt_user), mqtt_pass(mqtt_pass),
+	  cli("tcp://" + host + ":" + port, clientname)
 {
-    connOpts.set_connect_timeout(DFLT_TIMEOUT_CONNECT);
+	connOpts.set_connect_timeout(DFLT_TIMEOUT_CONNECT);
 	connOpts.set_keep_alive_interval(DFLT_KEEPALIVE_INTERVAL);
 	connOpts.set_clean_session(DFLT_CLEAN_SESSION);
 	connOpts.set_automatic_reconnect(DFLT_AUTOMATIC_RECONNECT);
@@ -17,62 +17,109 @@ TxtMqttFactoryClient::TxtMqttFactoryClient(std::string clientname, std::string h
 	// TODO will message
 }
 
-TxtMqttFactoryClient::~TxtMqttFactoryClient() {
+TxtMqttFactoryClient::~TxtMqttFactoryClient()
+{
 	disconnect(1000);
 }
 
-bool TxtMqttFactoryClient::connect(long timeout) {
-	try {
+bool TxtMqttFactoryClient::connect(long timeout)
+{
+	try
+	{
 		mqtt::token_ptr conntok = cli.connect(connOpts);
 		return conntok->wait_for(timeout);
 	}
-	catch (const mqtt::exception& exc) {
+	catch (const mqtt::exception &exc)
+	{
 		std::cout << "connect: " << exc.what() << " " << exc.get_reason_code() << std::endl;
 	}
 	return false;
 }
 
-void TxtMqttFactoryClient::disconnect(long timeout) {
+void TxtMqttFactoryClient::disconnect(long timeout)
+{
 	// auto toks = cli.get_pending_delivery_tokens();
 	// TODO wait for pending tokens
-	// TODO unsub? 
+	// TODO unsub?
 	cli.disconnect(timeout);
 }
 
-void TxtMqttFactoryClient::publishMessage(const std::string& topicFilter, const std::string& message, long timeout, int qos, bool retained) {
+bool TxtMqttFactoryClient::publishMessageSync(const std::string &topicFilter, const std::string &message, long timeout, int qos, bool retained)
+{
+	if (!cli.is_connected()) {
+		return false;
+	}
+
 	mqtt::delivery_token_ptr pubtok = cli.publish(topicFilter, message, qos, retained);
-	pubtok->wait_for(timeout);
+	return pubtok->wait_for(timeout);
 }
 
-void TxtMqttFactoryClient::subTopicAsync(const std::string& topicFilter, void(*func)(const std::string& message), int qos, long timeout) {
+void TxtMqttFactoryClient::publishMessageAsync(const std::string &topicFilter, const std::string &message, int qos, bool retained)
+{
+	if (!cli.is_connected()) {
+		return;
+	}
+
+	mqtt::delivery_token_ptr pubtok = cli.publish(topicFilter, message, qos, retained);
+}
+
+bool TxtMqttFactoryClient::subTopicAsync(const std::string &topicFilter, void (*func)(const std::string &message), int qos, long timeout)
+{
+	if (!cli.is_connected()) {
+		return false;
+	}
+
 	mqtt::token_ptr subtok = cli.subscribe(topicFilter, qos);
-	subtok->wait_for(timeout);
+	bool r = subtok->wait_for(timeout);
 
-	cb.register_topic(topicFilter, func);
+	if (r) {
+		cb.register_topic(topicFilter, func);
+	}
+	
+	return r;
 }
 
-void TxtMqttFactoryClient::subTopicSync(const std::string& topicFilter, int qos, long timeout) {
+bool TxtMqttFactoryClient::subTopicSync(const std::string &topicFilter, int qos, long timeout)
+{
+	if (!cli.is_connected()) {
+		return false;
+	}
+
 	mqtt::token_ptr subtok = cli.subscribe(topicFilter, qos);
-	subtok->wait_for(timeout);
+	return subtok->wait_for(timeout);
 }
 
-void TxtMqttFactoryClient::unsubTopic(const std::string& topicFilter, long timeout) {
+bool TxtMqttFactoryClient::unsubTopic(const std::string &topicFilter, long timeout)
+{
+	if (!cli.is_connected()) {
+		return false;
+	}
+
 	mqtt::token_ptr unsubtok = cli.unsubscribe(topicFilter);
 	bool r = unsubtok->wait_for(timeout);
 
 	cb.remove_topic(topicFilter);
+
+	return r;
 }
 
-std::string TxtMqttFactoryClient::consume_topic(const std::string& topicFilter) {
+std::string TxtMqttFactoryClient::consume_topic(const std::string &topicFilter)
+{
+	if (!cli.is_connected()) {
+		return "";
+	}
+
 	std::string message;
 
 	cli.start_consuming();
 
-	while (true) {
+	while (true)
+	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
 		auto msg = cli.consume_message();
-		if ((msg->get_topic().compare(topicFilter)) == 0) {
+		if ((msg->get_topic().compare(topicFilter)) == 0)
+		{
 			message = msg->get_payload_str();
 			break;
 		}

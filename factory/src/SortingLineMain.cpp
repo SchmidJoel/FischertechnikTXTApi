@@ -1,4 +1,5 @@
 #include "TXT_highlevel_API.h"
+#include "TxtMqttFactoryClient.h"
 #include <thread>
 
 enum SortingLineState
@@ -8,6 +9,7 @@ enum SortingLineState
 };
 
 TXT txt;
+TxtMqttFactoryClient mqttClient("SortingLine", "192.168.178.66", "", "");
 
 DigitalInput light_sensor_start = txt.digitalInput(1);
 DigitalInput light_sensor_end = txt.digitalInput(3);
@@ -27,7 +29,11 @@ void ColorDetection();
 
 int main(void)
 {
+    mqttClient.connect(1000);
+
     std::thread detection = std::thread(ColorDetection);
+    mqttClient.publishMessageAsync(TOPIC_INPUT_SORTINGLINE_LAST_COLOR, "");
+    mqttClient.publishMessageAsync(TOPIC_INPUT_SORTINGLINE_RAW_LAST_COLOR, "");
 
     while (true)
     {
@@ -38,8 +44,9 @@ int main(void)
         else
         {
             belt.stop();
+            mqttClient.publishMessageAsync(TOPIC_INPUT_SORTINGLINE_STATE, "bereit");
         }
-        sleep(10ms);
+        sleep(50ms);
     }
 
     return 0;
@@ -51,6 +58,7 @@ void ColorDetection()
     {
         light_sensor_start.waitFor(DigitalState::LOW);
         colorDetectionUnit = SortingLineState::WORKING;
+        mqttClient.publishMessageAsync(TOPIC_INPUT_SORTINGLINE_STATE, "Farbe erkennen");
 
         int min = color_sensor.value();
         while (light_sensor_end.value())
@@ -62,6 +70,9 @@ void ColorDetection()
             }
         }
 
+        mqttClient.publishMessageAsync(TOPIC_INPUT_SORTINGLINE_LAST_COLOR, std::to_string(convertToColor(min)));
+        mqttClient.publishMessageAsync(TOPIC_INPUT_SORTINGLINE_RAW_LAST_COLOR, std::to_string(min));
+
         std::thread sort = std::thread(SortWorkpiece, convertToColor(min));
         sort.detach();
         colorDetectionUnit = SortingLineState::WAITING;
@@ -71,6 +82,7 @@ void ColorDetection()
 void SortWorkpiece(Color color)
 {
     sortingUnit = SortingLineState::WORKING;
+    mqttClient.publishMessageAsync(TOPIC_INPUT_SORTINGLINE_STATE, "Werkstück sortieren");
 
     comp.on();
     switch (color)

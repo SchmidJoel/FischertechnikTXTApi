@@ -1,17 +1,15 @@
 #include "TxtMqttFactoryClient.h"
 
-unsigned int DebugFlags;
-FILE *DebugFile;
-
 bool end = false;
 
-void test(const std::string& message) {
+void test(const std::string &message)
+{
 	end = true;
 }
 
 int main(void)
 {
-    TxtMqttFactoryClient mqttClient("TestClient", "192.168.178.69", "", "");
+	TxtMqttFactoryClient mqttClient("TestClient", "192.168.178.69", "", "");
 
 	mqttClient.connect(1000);
 
@@ -23,7 +21,6 @@ int main(void)
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
-	
-	
-    return 0;
+
+	return 0;
 }
