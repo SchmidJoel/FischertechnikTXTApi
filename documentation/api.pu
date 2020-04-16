@@ -5,7 +5,7 @@ class Output {
 
     +on()
     +off()
-    +setLevel()
+    +setLevel(uint16_t)
     +getPin(): uint8_t
 }
 
