@@ -180,7 +180,7 @@ public:
     TXT(FISH_X1_TRANSFER *, bool);
     ~TXT();
     bool isExtension();
-    FISH_X1_TRANSFER *getArea();
+    FISH_X1_TRANSFER *getTransferArea();
     Output output(uint8_t pin);
     Motor motor(uint8_t pin);
     EncoderMotor encoderMotor(uint8_t pin);

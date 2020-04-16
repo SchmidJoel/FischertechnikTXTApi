@@ -147,7 +147,7 @@ EncoderMotor TXT::encoderMotor(uint8_t pin)
     return EncoderMotor{(pTArea + (pin >> 2)), pin & 3};
 }
 
-FISH_X1_TRANSFER *TXT::getArea()
+FISH_X1_TRANSFER *TXT::getTransferArea()
 {
     return pTArea;
 }

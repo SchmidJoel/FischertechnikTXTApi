@@ -100,7 +100,7 @@ class TXT {
     -_extension: bool
 
     isExtension(): bool
-    getArea(): *FISH_X1_TRANSFER
+    getTransferArea(): *FISH_X1_TRANSFER
     output(uint8_t pin): Output
     motor(uint8_t pin): Motor
     encoderMotor(uint8_t pin): EncoderMotor
