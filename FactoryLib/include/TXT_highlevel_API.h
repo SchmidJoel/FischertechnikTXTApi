@@ -51,8 +51,10 @@ private:
     void drive();
 
 public:
-    AxisEM(TXT &txt, uint8_t motorpin, uint8_t refpin);
-    AxisEM(TXT &txt, uint8_t motorpin, uint8_t refpin, ButtonMode refButtonMode, uint16_t max);
+    //AxisEM(TXT &txt, uint8_t motorpin, uint8_t refpin);
+    
+    AxisEM(TXT &txt, uint8_t motorpin, uint8_t refpin, ButtonMode = ButtonMode::CLOSER, uint16_t = std::numeric_limits<uint16_t>::max());
+    //AxisEM(TXT &txt, uint8_t motorpin, uint8_t refpin, ButtonMode refButtonMode, uint16_t max);
     uint16_t getPos() override;
     void reference() override;
     std::thread referenceAsync() override;
@@ -72,7 +74,7 @@ class AxisXS : public PosAxis
 private:
     Motor m;
     DigitalInput ref;
-    DigitalInput counter;
+    Counter counter;
     uint16_t pos;
     uint16_t dest;
     uint16_t maxPos;
@@ -82,8 +84,7 @@ private:
     void drive();
 
 public:
-    AxisXS(TXT &txt, uint8_t motorpin, uint8_t refpin, uint8_t countpin);
-    AxisXS(TXT &txt, uint8_t motorpin, uint8_t refpin, uint8_t countpin, ButtonMode refButtonMode, uint16_t max);
+    AxisXS(TXT &txt, uint8_t motorpin, uint8_t refpin, uint8_t countpin, ButtonMode = ButtonMode::CLOSER, uint16_t = std::numeric_limits<uint16_t>::max());
     uint16_t getPos() override;
     void reference() override;
     std::thread referenceAsync() override;
@@ -121,8 +122,7 @@ public:
 class TwoRefAxis : public NRefAxis
 {
 public:
-    TwoRefAxis(TXT &txt, uint8_t motorpin, uint8_t refpin1, uint8_t refpin2, ButtonMode mode1, ButtonMode mode2);
-    TwoRefAxis(TXT &txt, uint8_t motorpin, uint8_t refpin1, uint8_t refpin2);
+    TwoRefAxis(TXT &txt, uint8_t motorpin, uint8_t refpin1, uint8_t refpin2, ButtonMode = ButtonMode::CLOSER, ButtonMode = ButtonMode::CLOSER);
     void pos1();
     void pos2();
     std::thread pos1Async();

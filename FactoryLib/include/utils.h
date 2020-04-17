@@ -19,4 +19,6 @@ void sleep(std::chrono::microseconds);
 
 Color convertToColor(uint16_t);
 
+double convertToTemperature(uint16_t);
+
 #endif

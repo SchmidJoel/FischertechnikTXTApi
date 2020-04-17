@@ -1,6 +1,5 @@
 #include "TXT_lowlevel_API.h"
 #include <stdexcept>
-#include "math.h"
 #include <fstream>
 #include "utils.h"
 #include <chrono>
@@ -12,6 +11,29 @@ FILE *DebugFile;
 #define ERR_8_PIN "pin must be between 1 and 8 for master and 9 and 16 for extension"
 #define ERR_4_PIN "pin must be between 1 and 4 for master and 5 and 8 for extension"
 #define ERR_SAME_TXT "both pins must be on the same TXT"
+
+IOPin::IOPin(FISH_X1_TRANSFER *pTArea, uint8_t pin, bool eight) {
+    if (pin > 16 && eight)
+    {
+        throw std::invalid_argument(ERR_8_PIN);
+    }
+    else if (pin > 8 && !eight){
+        throw std::invalid_argument(ERR_4_PIN);
+    }
+
+    if((pin > 8 && eight) || pin > 4){
+        (*this).pTArea = pTArea+1;
+
+    }
+    else{
+        (*this).pTArea = pTArea;
+    }      
+    (*this).pin = eight ? (pin-1)%7 : (pin-1)%3;
+}
+
+uint8_t IOPin::getPin(){
+    return pin + 1;
+}
 
 TXT::TXT()
 {
@@ -34,117 +56,57 @@ TXT::~TXT()
 
 DigitalInput TXT::digitalInput(uint8_t pin)
 {
-    pin--;
-    if (pin > 15)
-    {
-        throw std::invalid_argument(ERR_8_PIN);
-    }
-    return DigitalInput{(pTArea + (pin >> 3)), pin & 7};
+    return DigitalInput{pTArea, pin};
 }
 
 Counter TXT::counter(uint8_t pin)
 {
-    pin--;
-    if (pin > 8)
-    {
-        throw std::invalid_argument(ERR_4_PIN);
-    }
-    return Counter{(pTArea + (pin >> 2)), pin & 3};
+    return Counter{pTArea, pin};
 }
 
 AnalogInput TXT::analogInput(uint8_t pin)
 {
-    pin--;
-    if (pin > 15)
-    {
-        throw std::invalid_argument(ERR_8_PIN);
-    }
-    return AnalogInput{(pTArea + (pin >> 3)), pin & 7};
+    return AnalogInput{pTArea, pin};
 }
 
 NTC TXT::ntc(uint8_t pin)
 {
-    pin--;
-    if (pin > 15)
-    {
-        throw std::invalid_argument(ERR_8_PIN);
-    }
-    return NTC{(pTArea + (pin >> 3)), pin & 7};
+    return NTC{pTArea, pin};
 }
 
 Ultrasonic TXT::ultrasonic(uint8_t pin)
 {
-    pin--;
-    if (pin > 15)
-    {
-        throw std::invalid_argument(ERR_8_PIN);
-    }
-    return Ultrasonic{(pTArea + (pin >> 3)), pin & 7};
+    return Ultrasonic{pTArea, pin};
 }
 
 Voltage TXT::voltage(uint8_t pin)
 {
-    pin--;
-    if (pin > 15)
-    {
-        throw std::invalid_argument(ERR_8_PIN);
-    }
-    return Voltage{(pTArea + (pin >> 3)), pin & 7};
+    return Voltage{pTArea, pin};
 }
 
 ColorSensor TXT::colorSensor(uint8_t pin)
 {
-    pin--;
-    if (pin > 15)
-    {
-        throw std::invalid_argument(ERR_8_PIN);
-    }
-    return ColorSensor{(pTArea + (pin >> 3)), pin & 7};
+    return ColorSensor{pTArea, pin};
 }
 
 Output TXT::output(uint8_t pin)
 {
-    pin--;
-    if (pin > 15)
-    {
-        throw std::invalid_argument(ERR_8_PIN);
-    }
-    return Output{(pTArea + (pin >> 3)), pin & 7};
+    return Output{pTArea, pin};
 }
 
 TrackSensor TXT::trackSensor(uint8_t left, uint8_t right)
 {
-    left--;
-    right--;
-    if (left > 15 || right > 15)
-    {
-        throw std::invalid_argument(ERR_8_PIN);
-    }
-    else if ((left >> 3) != (right >> 3))
-    {
-        throw std::invalid_argument(ERR_SAME_TXT);
-    }
-    return TrackSensor{(pTArea + (left >> 3)), left & 7, right & 7};
+    return TrackSensor{pTArea, left, right};
 }
 
 Motor TXT::motor(uint8_t pin)
 {
-    pin--;
-    if (pin > 8)
-    {
-        throw std::invalid_argument(ERR_4_PIN);
-    }
-    return Motor{(pTArea + (pin >> 2)), pin & 3};
+    return Motor{pTArea, pin};
 }
 
 EncoderMotor TXT::encoderMotor(uint8_t pin)
 {
-    pin--;
-    if (pin > 8)
-    {
-        throw std::invalid_argument(ERR_4_PIN);
-    }
-    return EncoderMotor{(pTArea + (pin >> 2)), pin & 3};
+    return EncoderMotor{pTArea, pin};
 }
 
 FISH_X1_TRANSFER *TXT::getTransferArea()
@@ -187,7 +149,8 @@ uint16_t TXT::getTXTVoltage()
 }
 
 //Output
-Output::Output(FISH_X1_TRANSFER *pTArea, uint8_t pin) : pin(pin), pTArea(pTArea) {}
+Output::Output(FISH_X1_TRANSFER *pTArea, uint8_t pin) : IOPin(pTArea, pin, true){
+}
 
 void Output::on()
 {
@@ -204,14 +167,10 @@ void Output::setLevel(uint16_t level)
     pTArea->ftX1out.duty[pin] = level;
 }
 
-uint8_t Output::getPin()
-{
-    return pin + 1;
-}
-
 //DigitalInput
-DigitalInput::DigitalInput(FISH_X1_TRANSFER *pTArea, uint8_t pin) : pin(pin), pTArea(pTArea)
-{
+DigitalInput::DigitalInput(FISH_X1_TRANSFER *pTArea, uint8_t pin) : IOPin(pTArea, pin, true)
+{   
+    pin = (*this).pin;
     pTArea->ftX1config.uni[pin].mode = MODE_R; //  resistor
     pTArea->ftX1config.uni[pin].digital = 1;   //  digital Input
     pTArea->ftX1state.config_id++;
@@ -230,22 +189,12 @@ void DigitalInput::waitFor(DigitalState state)
     }
 }
 
-uint8_t DigitalInput::getPin()
-{
-    return pin + 1;
-}
-
 //Counter C1-C4
-Counter::Counter(FISH_X1_TRANSFER *pTArea, uint8_t pin) : pin(pin), pTArea(pTArea) {}
+Counter::Counter(FISH_X1_TRANSFER *pTArea, uint8_t pin) : IOPin(pTArea, pin, false) {}
 
 bool Counter::value()
 {
     return pTArea->ftX1in.cnt_in[pin];
-}
-
-uint8_t Counter::getPin()
-{
-    return pin + 1;
 }
 
 void Counter::waitSteps(uint16_t steps)
@@ -265,8 +214,9 @@ void Counter::waitSteps(uint16_t steps)
 }
 
 //AnalogInput (Widerstandsmessung)
-AnalogInput::AnalogInput(FISH_X1_TRANSFER *pTArea, uint8_t pin) : pin(pin), pTArea(pTArea)
+AnalogInput::AnalogInput(FISH_X1_TRANSFER *pTArea, uint8_t pin) : IOPin(pTArea, pin, true)
 {
+    pin = (*this).pin;
     pTArea->ftX1config.uni[pin].mode = MODE_R; //  resistor
     pTArea->ftX1config.uni[pin].digital = 0;   //  analog Input
     pTArea->ftX1state.config_id++;
@@ -277,22 +227,18 @@ uint16_t AnalogInput::value()
     return pTArea->ftX1in.uni[pin];
 }
 
-uint8_t AnalogInput::getPin()
-{
-    return pin + 1;
-}
-
 //NTC
 NTC::NTC(FISH_X1_TRANSFER *pTArea, uint8_t pin) : AnalogInput(pTArea, pin) {}
 
 double NTC::getTemperature()
 {
-    return log(value()) * log(value()) * 1.3932 + log(value()) * -43.942 + 271.87;
+    return convertToTemperature(value());
 }
 
 //Farbsensor
-ColorSensor::ColorSensor(FISH_X1_TRANSFER *pTArea, uint8_t pin) : pin(pin), pTArea(pTArea)
+ColorSensor::ColorSensor(FISH_X1_TRANSFER *pTArea, uint8_t pin) : IOPin(pTArea, pin, true)
 {
+    pin = (*this).pin;
     pTArea->ftX1config.uni[pin].mode = MODE_U; //	Spannung
     pTArea->ftX1config.uni[pin].digital = 0;   //  analog Input
     pTArea->ftX1state.config_id++;
@@ -305,28 +251,13 @@ uint16_t ColorSensor::value()
 
 Color ColorSensor::color()
 {
-    if (value() < 500)
-    {
-        return Color::WHITE;
-    }
-    else if (value() < 1300)
-    {
-        return Color::RED;
-    }
-    else
-    {
-        return Color::BLUE;
-    }
-}
-
-uint8_t ColorSensor::getPin()
-{
-    return pin + 1;
+    return convertToColor(value());
 }
 
 //Spannungsmessung
-Voltage::Voltage(FISH_X1_TRANSFER *pTArea, uint8_t pin) : pin(pin), pTArea(pTArea)
+Voltage::Voltage(FISH_X1_TRANSFER *pTArea, uint8_t pin) : IOPin(pTArea, pin, true)
 {
+    pin = (*this).pin;
     pTArea->ftX1config.uni[pin].mode = MODE_U; //	Spannung
     pTArea->ftX1config.uni[pin].digital = 0;   //  analog Input
     pTArea->ftX1state.config_id++;
@@ -337,14 +268,10 @@ uint16_t Voltage::value()
     return pTArea->ftX1in.uni[pin];
 }
 
-uint8_t Voltage::getPin()
-{
-    return pin + 1;
-}
-
 //Ultraschallsensor für Abstand
-Ultrasonic::Ultrasonic(FISH_X1_TRANSFER *pTArea, uint8_t pin) : pin(pin), pTArea(pTArea)
+Ultrasonic::Ultrasonic(FISH_X1_TRANSFER *pTArea, uint8_t pin) : IOPin(pTArea, pin, true)
 {
+    pin = (*this).pin;
     pTArea->ftX1config.uni[pin].mode = MODE_ULTRASONIC;
     pTArea->ftX1state.config_id++;
 }
@@ -354,14 +281,16 @@ uint16_t Ultrasonic::value()
     return pTArea->ftX1in.uni[pin];
 }
 
-uint8_t Ultrasonic::getPin()
-{
-    return pin + 1;
-}
-
 //Spurensensor
-TrackSensor::TrackSensor(FISH_X1_TRANSFER *pTArea, uint8_t left, uint8_t right) : left(left), right(right), pTArea(pTArea)
+TrackSensor::TrackSensor(FISH_X1_TRANSFER *pTArea, uint8_t left, uint8_t right) : IOPin(pTArea, left, true)
 {
+    if(left%7 != right%7){
+        throw std::invalid_argument(ERR_SAME_TXT);
+    }
+    left = (left-1)%7;
+    right = (right-1)%7;
+    (*this).left = left;
+    (*this).right = right;
     pTArea->ftX1config.uni[left].mode = MODE_U;
     pTArea->ftX1config.uni[left].digital = 1;
     pTArea->ftX1config.uni[right].mode = MODE_U;
@@ -390,7 +319,7 @@ uint8_t TrackSensor::getPinRight()
 }
 
 //Motor
-Motor::Motor(FISH_X1_TRANSFER *pTArea, uint8_t pin) : pin(pin), pTArea(pTArea) {}
+Motor::Motor(FISH_X1_TRANSFER *pTArea, uint8_t pin) : IOPin(pTArea, pin, false) {}
 
 void Motor::left(uint16_t level)
 {
@@ -410,11 +339,6 @@ void Motor::stop()
 {
     pTArea->ftX1out.duty[pin * 2] = 0;
     pTArea->ftX1out.duty[pin * 2 + 1] = 0;
-}
-
-uint8_t Motor::getPin()
-{
-    return pin + 1;
 }
 
 //EncoderMotor
