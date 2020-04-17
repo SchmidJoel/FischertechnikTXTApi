@@ -13,45 +13,42 @@ enum DigitalState
     LOW
 };
 
-/* Output: O1-O8
-*/
-class Output
+class IOPin
 {
-private:
+protected:
     uint8_t pin;
     FISH_X1_TRANSFER *pTArea;
+    IOPin(FISH_X1_TRANSFER *, uint8_t pin, bool eight);
+public:
+    uint8_t getPin();
+};
 
+
+/* Output: O1-O8
+*/
+class Output : public IOPin
+{
 public:
     Output(FISH_X1_TRANSFER *, uint8_t pin);
     void on();
     void off();
     void setLevel(uint16_t);
-    uint8_t getPin();
 };
 
 /* DigitalInput for e.g. Button, Fototransistor or reedcontact: I1-I8
 */
-class DigitalInput
+class DigitalInput : public IOPin
 {
-private:
-    uint8_t pin;
-    FISH_X1_TRANSFER *pTArea;
-
 public:
     DigitalInput(FISH_X1_TRANSFER *, uint8_t pin);
     bool value();
     void waitFor(DigitalState);
-    uint8_t getPin();
 };
 
 /*
 */
-class Counter
+class Counter : public IOPin
 {
-private:
-    uint8_t pin;
-    FISH_X1_TRANSFER *pTArea;
-
 public:
     Counter(FISH_X1_TRANSFER *, uint8_t pin);
     bool value();
@@ -61,16 +58,11 @@ public:
 
 /*AnalogInput for NTC-Resistor, Photo-Resistor: I1-I8
 */
-class AnalogInput
+class AnalogInput : public IOPin
 {
-private:
-    uint8_t pin;
-    FISH_X1_TRANSFER *pTArea;
-
 public:
     AnalogInput(FISH_X1_TRANSFER *, uint8_t pin);
     uint16_t value();
-    uint8_t getPin();
 };
 
 class NTC : public AnalogInput
@@ -82,55 +74,38 @@ public:
 
 /*Ultrasonic: I1-I8
 */
-class Ultrasonic
+class Ultrasonic : public IOPin
 {
-private:
-    uint8_t pin;
-    FISH_X1_TRANSFER *pTArea;
-
 public:
     Ultrasonic(FISH_X1_TRANSFER *, uint8_t pin);
     uint16_t value();
-    uint8_t getPin();
-};
-
-/*ColorSensor: I1-I8
-*/
-class ColorSensor
-{
-private:
-    uint8_t pin;
-    FISH_X1_TRANSFER *pTArea;
-
-public:
-    ColorSensor(FISH_X1_TRANSFER *, uint8_t pin);
-    uint16_t value();
-    Color color();
-    uint8_t getPin();
 };
 
 /*For measure the Voltage (same as the ColorSensor): I1-I8
 */
-class Voltage
+class Voltage : public IOPin
 {
-private:
-    uint8_t pin;
-    FISH_X1_TRANSFER *pTArea;
-
 public:
     Voltage(FISH_X1_TRANSFER *, uint8_t pin);
     uint16_t value();
-    uint8_t getPin();
+};
+
+/*ColorSensor: I1-I8
+*/
+class ColorSensor : public Voltage
+{
+public:
+    ColorSensor(FISH_X1_TRANSFER *, uint8_t pin);
+    Color color();
 };
 
 /*TrackSensor: I1-I8*/
 class TrackSensor
 {
 private:
+    FISH_X1_TRANSFER *pTArea;
     uint8_t left;
     uint8_t right;
-    FISH_X1_TRANSFER *pTArea;
-
 public:
     TrackSensor(FISH_X1_TRANSFER *, uint8_t left, uint8_t right);
     bool valueLeft();
@@ -140,18 +115,13 @@ public:
 };
 
 /*Motor: M1-M4*/
-class Motor
+class Motor : public IOPin
 {
-protected:
-    uint8_t pin;
-    FISH_X1_TRANSFER *pTArea;
-
 public:
     Motor(FISH_X1_TRANSFER *, uint8_t pin);
     void left(uint16_t level);
     void right(uint16_t level);
     void stop();
-    uint8_t getPin();
 };
 
 /*EncoderMotor: M1-M4, C1-C4
@@ -174,13 +144,13 @@ class TXT
 private:
     FISH_X1_TRANSFER *pTArea;
     bool _extension;
+    TXT(FISH_X1_TRANSFER *, bool);
 
 public:
     TXT();
-    TXT(FISH_X1_TRANSFER *, bool);
     ~TXT();
     bool isExtension();
-    FISH_X1_TRANSFER *getArea();
+    FISH_X1_TRANSFER *getTransferArea();
     Output output(uint8_t pin);
     Motor motor(uint8_t pin);
     EncoderMotor encoderMotor(uint8_t pin);

@@ -1,4 +1,5 @@
 #include "utils.h"
+#include "math.h"
 #include <chrono>
 
 void sleep(std::chrono::microseconds micros)
@@ -8,13 +9,17 @@ void sleep(std::chrono::microseconds micros)
 
 Color convertToColor(uint16_t value)
 {
-    if (value > 1600)
+    if (value < 500)
     {
-        return Color::BLUE;
+        return Color::WHITE;
     }
-    else if (value > 1200)
+    else if (value < 1300)
     {
         return Color::RED;
     }
-    return Color::WHITE;
+    return Color::BLUE;
+}
+
+double convertToTemperature(uint16_t value){
+    return log(value) * log(value) * 1.3932 + log(value) * -43.942 + 271.87;
 }

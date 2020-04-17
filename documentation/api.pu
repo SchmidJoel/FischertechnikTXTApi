@@ -1,74 +1,82 @@
 @startuml low-level-api
-class Output {
-    -pin: uint8_t
-    -pTArea: *FISH_X1_TRANSFER
 
+class IOPin {
+    #pin: uint8_t
+    #pTArea: *FISH_X1_TRANSFER
+    --Constructor--
+    #IOPin(*FISH_X1_TRANSFER, uint8_t pin, bool)
+    ----
+    +getPin(): uint8_t
+}
+
+class Output {
+    --Constructor--
+    +Output(*FISH_X1_TRANSFER, uint8_t pin)
+    ----
     +on()
     +off()
-    +setLevel()
-    +getPin(): uint8_t
+    +setLevel(uint16_t)
 }
 
 class DigitalInput {
-    -pin: uint8_t
-    -pTArea: *FISH_X1_TRANSFER
-
+    --Constructor--
+    +DigitalInput(*FISH_X1_TRANSFER, uint8_t pin)
+    ----
     +value(): bool
     +waitFor(DigitalState)
-    +getPin(): uint8_t
 }
 
 class Counter {
-    -pin: uint8_t
-    -pTArea: *FISH_X1_TRANSFER
-
+    --Constructor--
+    +Counter(*FISH_X1_TRANSFER, uint8_t pin)
+    ----
     +value(): bool
     +waitSteps(uint16_t)
-    +getPin(): uint8_t
 }
 
 class AnalogInput {
-    -pin: uint8_t
-    -pTArea: *FISH_X1_TRANSFER
-
+    --Constructor--
+    +AnalogInput(*FISH_X1_TRANSFER, uint8_t pin)
+    ----
     +value(): uint16_t
-    +getPin(): uint8_t
 }
 
 class NTC {
+    --Constructor--
+    +NTC(*FISH_X1_TRANSFER, uint8_t pin)
+    ----
     +getTemperature(): double
 }
 
 class Ultrasonic {
-    -pin: uint8_t
-    -pTArea: *FISH_X1_TRANSFER
-
+    --Constructor--
+    +Ultrasonic(*FISH_X1_TRANSFER, uint8_t pin)
+    ----
     +value(): uint16_t
-    +getPin(): uint8_t
 }
 
 class ColorSensor {
-    -pin: uint8_t
-    -pTArea: *FISH_X1_TRANSFER
-
+    --Constructor--
+    +ColorSensor(*FISH_X1_TRANSFER, uint8_t pin)
+    ----
     +value(): uint16_t
-    +getPin(): uint8_t
     +color(): Color
 }
 
 class Voltage {
-    -pin: uint8_t
-    -pTArea: *FISH_X1_TRANSFER
-
+    --Constructor--
+    +Voltage(*FISH_X1_TRANSFER, uint8_t pin)
+    ----
     +value(): uint16_t
-    +getPin(): uint8_t
 }
 
 class TrackSensor {
     -left: uint8_t
     -right: uint8_t
     -pTArea: *FISH_X1_TRANSFER
-
+    --Constructor--
+    +Output(*FISH_X1_TRANSFER, uint8_t left, uint8_t right)
+    ----
     +valueLeft(): bool
     +valueRight(): bool
     +getPinLeft(): uint8_t
@@ -76,16 +84,18 @@ class TrackSensor {
 }
 
 class Motor {
-    -pin: uint8_t
-    -pTArea: *FISH_X1_TRANSFER
-
+    --Constructor--
+    +Motor(*FISH_X1_TRANSFER, uint8_t pin)
+    ----
     +left(uint16_t level)
     +right(uint16_t level)
     +stop()
-    +getPin(): uint8_t
 }
 
 class EncoderMotor {
+    --Constructor--
+    +EncoderMotor(*FISH_X1_TRANSFER, uint8_t pin)
+    ----
     +distanceLeft(uint16_t steps, uint16_t level)
     +distanceRight(uint16_t steps, uint16_t level)
     +synchronizeTo(EncoderMotor &other)
@@ -98,24 +108,27 @@ class EncoderMotor {
 class TXT {
     -pTArea: *FISH_X1_TRANSFER
     -_extension: bool
-
-    isExtension(): bool
-    getArea(): *FISH_X1_TRANSFER
-    output(uint8_t pin): Output
-    motor(uint8_t pin): Motor
-    encoderMotor(uint8_t pin): EncoderMotor
-    analogInput(uint8_t pin): AnalogInput
-    ntc(uint8_t pin): NTC
-    digitalInput(uint8_t pin): DigitalInput
-    counter(uint8_t pin): Counter
-    ultrasonic(uint8_t pin): Ultrasonic
-    voltage(uint8_t pin): Voltage
-    colorSensor(uint8_t pin): ColorSensor
-    trackSensor(uint8_t left, uint8_t right): TrackSensor
-    extension(): TXT
-    playSound(uint8_t index, uint8_t repeats)
-    playSoundAndWait(uint8_t index, uint8_t repeats)
-    getTXTVoltage(): uint16_t
+    --Constructor--
+    -TXT(*FISH_X1_TRANSFER, bool extension)
+    +TXT()
+    ----
+    +isExtension(): bool
+    +getTransferArea(): *FISH_X1_TRANSFER
+    +output(uint8_t pin): Output
+    +motor(uint8_t pin): Motor
+    +encoderMotor(uint8_t pin): EncoderMotor
+    +analogInput(uint8_t pin): AnalogInput
+    +ntc(uint8_t pin): NTC
+    +digitalInput(uint8_t pin): DigitalInput
+    +counter(uint8_t pin): Counter
+    +ultrasonic(uint8_t pin): Ultrasonic
+    +voltage(uint8_t pin): Voltage
+    +colorSensor(uint8_t pin): ColorSensor
+    +trackSensor(uint8_t left, uint8_t right): TrackSensor
+    +extension(): TXT
+    +playSound(uint8_t index, uint8_t repeats)
+    +playSoundAndWait(uint8_t index, uint8_t repeats)
+    +getTXTVoltage(): uint16_t
 }
 
 enum Color {
@@ -130,6 +143,7 @@ enum DigitalState {
 }
 
 AnalogInput <|-- NTC
+Voltage <|-- ColorSensor
 Motor <|-- EncoderMotor
 
 ColorSensor --> Color
@@ -142,6 +156,15 @@ Ultrasonic -[hidden]-> Motor
 Output -[hidden]-> TXT
 Counter -[hidden]> TrackSensor
 @enduml
+
+IOPin <|-- DigitalInput
+IOPin <|-- Motor
+IOPin <|-- Voltage
+IOPin <|-- AnalogInput
+IOPin <|-- Ultrasonic
+IOPin <|-- Output
+IOPin <|-- Counter
+IOPin <|-- ColorSensor
 
 TXT --> Output
 TXT --> Motor
@@ -192,6 +215,9 @@ class AxisEM {
     -speed: uint16_t
     -state: AxisState
     -mode: ButtonMode
+    --Constructor--
+    #AxisEM(TXT, uint8_t motor, uint8_t ref, ButtonMode, uint16_t max)
+    ----
     -drive()
 }
 
@@ -205,17 +231,21 @@ class AxisXS {
     -speed: uint16_t
     -state: AxisState
     -mode: ButtonMode
+    --Constructor--
+    #AxisXS(TXT, uint8_t motor, uint8_t ref, uint8_t cnt ButtonMode, uint16_t max)
+    ----
     -drive()
 }
 
-class NRefAxis
-{
+class NRefAxis {
     #m: Motor
     #speed: uint16_t
     #postitions: std::vector<std::pair<DigitalInput, ButtonMode>>
     #state: AxisState
     #lastpos: uint8_t
-
+    --Constructor--
+    #NRefAxis(TXT, uint8_t motor, uint8_t ref, std::vector<uint8_t> pos)
+    ----
     +reference()
     +referenceAsync(): std::thread
     +isPos(uint8_t pos): bool
@@ -226,6 +256,9 @@ class NRefAxis
 }
 
 class TwoRefAxis {
+    --Constructor--
+    #TwoRefAxis(TXT, uint8_t motor, uint8_t pos1, uint8_t pos2, ButtonMode, ButtonMode)
+    ----
     +pos1()
     +pos2()
     +pos1Async(): std::thread
@@ -234,11 +267,51 @@ class TwoRefAxis {
     +isPos2(): bool
 }
 
-PosAxis -(0- AxisEM
-PosAxis -(0- AxisXS
+PosAxis <|-- AxisEM
+PosAxis <|-- AxisXS
 NRefAxis <|-- TwoRefAxis
 ButtonMode <-- NRefAxis
 AxisState <-- NRefAxis
 AxisState <-- PosAxis
 ButtonMode <-- PosAxis
+@enduml
+PosAxis -(0- AxisEM
+PosAxis -(0- AxisXS
+
+@startuml pos-axis-states
+hide empty description
+[*] --> UNREFERENCED
+UNREFERENCED --> READY : Referenzpunkt erreicht
+
+READY -left-> LEFT : Bewegung nach links
+READY -right-> RIGHT : Bewegung nach rechts
+
+LEFT -right-> READY : stop() oder Ziel erreicht
+RIGHT -left-> READY : stop() oder Ziel erreicht
+@enduml
+
+@startuml two-ref-axis-states
+hide empty description
+[*] --> UNREFERENCED
+UNREFERENCED --> READY : Referenzpunkt erreicht
+UNREFERENCED --> LEFT : pos1()
+UNREFERENCED --> RIGHT : pos2()
+
+READY -left-> LEFT : pos1()
+READY -right-> RIGHT : pos2()
+
+LEFT -right-> READY : Position 1 erreicht
+RIGHT -left-> READY : Position 2 erreicht
+@enduml
+
+@startuml decision-tree-color
+start
+if (value < 500) then (yes)
+  :Color::WHITE;
+elseif (value < 1300) then (yes)
+  :Color::RED;
+else ()
+  :Color::BLUE;
+endif
+stop
 @enduml
