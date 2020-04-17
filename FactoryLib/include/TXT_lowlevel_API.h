@@ -81,16 +81,6 @@ public:
     uint16_t value();
 };
 
-/*ColorSensor: I1-I8
-*/
-class ColorSensor : public IOPin
-{
-public:
-    ColorSensor(FISH_X1_TRANSFER *, uint8_t pin);
-    uint16_t value();
-    Color color();
-};
-
 /*For measure the Voltage (same as the ColorSensor): I1-I8
 */
 class Voltage : public IOPin
@@ -100,10 +90,20 @@ public:
     uint16_t value();
 };
 
+/*ColorSensor: I1-I8
+*/
+class ColorSensor : public Voltage
+{
+public:
+    ColorSensor(FISH_X1_TRANSFER *, uint8_t pin);
+    Color color();
+};
+
 /*TrackSensor: I1-I8*/
-class TrackSensor : public IOPin
+class TrackSensor
 {
 private:
+    FISH_X1_TRANSFER *pTArea;
     uint8_t left;
     uint8_t right;
 public:
@@ -144,10 +144,10 @@ class TXT
 private:
     FISH_X1_TRANSFER *pTArea;
     bool _extension;
+    TXT(FISH_X1_TRANSFER *, bool);
 
 public:
     TXT();
-    TXT(FISH_X1_TRANSFER *, bool);
     ~TXT();
     bool isExtension();
     FISH_X1_TRANSFER *getTransferArea();

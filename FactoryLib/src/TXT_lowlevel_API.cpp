@@ -236,18 +236,7 @@ double NTC::getTemperature()
 }
 
 //Farbsensor
-ColorSensor::ColorSensor(FISH_X1_TRANSFER *pTArea, uint8_t pin) : IOPin(pTArea, pin, true)
-{
-    pin = (*this).pin;
-    pTArea->ftX1config.uni[pin].mode = MODE_U; //	Spannung
-    pTArea->ftX1config.uni[pin].digital = 0;   //  analog Input
-    pTArea->ftX1state.config_id++;
-}
-
-uint16_t ColorSensor::value()
-{
-    return pTArea->ftX1in.uni[pin];
-}
+ColorSensor::ColorSensor(FISH_X1_TRANSFER *pTArea, uint8_t pin) : Voltage(pTArea, pin){}
 
 Color ColorSensor::color()
 {
@@ -282,13 +271,27 @@ uint16_t Ultrasonic::value()
 }
 
 //Spurensensor
-TrackSensor::TrackSensor(FISH_X1_TRANSFER *pTArea, uint8_t left, uint8_t right) : IOPin(pTArea, left, true)
+TrackSensor::TrackSensor(FISH_X1_TRANSFER *pTArea, uint8_t left, uint8_t right)
 {
-    if(left%7 != right%7){
+    left--;
+    right--;
+    if(left/7 != right/7){
         throw std::invalid_argument(ERR_SAME_TXT);
     }
-    left = (left-1)%7;
-    right = (right-1)%7;
+    if (left > 15  || right > 15)
+    {
+        throw std::invalid_argument(ERR_8_PIN);
+    }
+
+    if(left > 7){
+        (*this).pTArea = pTArea+1;
+
+    }
+    else{
+        (*this).pTArea = pTArea;
+    }      
+    left = left%7;
+    right = right%7;
     (*this).left = left;
     (*this).right = right;
     pTArea->ftX1config.uni[left].mode = MODE_U;
