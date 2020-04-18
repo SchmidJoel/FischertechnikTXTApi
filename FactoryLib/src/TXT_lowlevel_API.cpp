@@ -13,22 +13,23 @@ FILE *DebugFile;
 #define ERR_SAME_TXT "both pins must be on the same TXT"
 
 IOPin::IOPin(FISH_X1_TRANSFER *pTArea, uint8_t pin, bool eight) {
-    if (pin > 16 && eight)
+    if ((pin > 16 || pin < 1) && eight)
     {
         throw std::invalid_argument(ERR_8_PIN);
     }
-    else if (pin > 8 && !eight){
+    else if ((pin > 8 || pin < 1) && !eight){
         throw std::invalid_argument(ERR_4_PIN);
     }
 
-    if((pin > 8 && eight) || pin > 4){
+    if((pin > 8 && eight) || (!eight && pin > 4)){
         (*this).pTArea = pTArea+1;
 
     }
     else{
         (*this).pTArea = pTArea;
-    }      
-    (*this).pin = eight ? (pin-1)%7 : (pin-1)%3;
+    }   
+    
+    (*this).pin = eight ? (pin-1)%8 : (pin-1)%4;
 }
 
 uint8_t IOPin::getPin(){
