@@ -8,15 +8,15 @@ void sleep(std::chrono::microseconds micros)
 
 Color convertToColor(uint16_t value)
 {
-    if (value < 500)
+    if (value > 1600)
     {
-        return Color::WHITE;
+        return Color::BLUE;
     }
-    else if (value < 1300)
+    else if (value > 1200)
     {
         return Color::RED;
     }
-    return Color::BLUE;
+    return Color::WHITE;
 }
 
 double convertToTemperature(uint16_t value){
