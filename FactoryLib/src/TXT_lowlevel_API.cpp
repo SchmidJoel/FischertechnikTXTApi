@@ -378,7 +378,7 @@ void EncoderMotor::waitToEnd()
 {
     while (!pTArea->ftX1in.motor_ex_reached[pin])
     {
-        sleep(1ms);
+        sleep(10ms);
     }
     stop();
 }
