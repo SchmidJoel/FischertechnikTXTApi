@@ -2,6 +2,8 @@
 #include "TxtMqttFactoryClient.h"
 #include <thread>
 
+#include "debug.h"
+
 enum SortingLineState
 {
     WAITING,
@@ -34,6 +36,8 @@ int main(void)
     std::thread detection = std::thread(ColorDetection);
     mqttClient.publishMessageAsync(TOPIC_INPUT_SORTINGLINE_LAST_COLOR, "");
     mqttClient.publishMessageAsync(TOPIC_INPUT_SORTINGLINE_RAW_LAST_COLOR, "");
+
+    mqttClient.publishMessageAsync(TOPIC_DEBUG_SORTINGLINE, txtStateObject(txt));
 
     while (true)
     {

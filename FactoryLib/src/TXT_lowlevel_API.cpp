@@ -134,6 +134,10 @@ void TXT::playSoundAndWait(uint8_t index, uint8_t repeats)
     }
 }
 
+bool TXT::isExtension() {
+    return _extension;
+}
+
 TXT TXT::extension()
 {
     if (_extension)

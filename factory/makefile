@@ -30,7 +30,8 @@ LIBS = -l"SDLWidgetsLib" \
 	-l"txtlowlevelapi"\
 	-l"txthighlevelapi"\
 	-l"utils"\
-	-l"mqttclient"
+	-l"mqttclient"\
+	-l"debug"
 
 $(shell mkdir -p "bin")
 $(shell mkdir -p "obj")

@@ -22,6 +22,11 @@
 #define TOPIC_INPUT_WAREHOUSE_STATE "/i/wh/state"
 #define TOPIC_INPUT_PROCESSINGSTATION_STATE "/i/ps/state"
 
+#define TOPIC_DEBUG_PROCESSINGSTATION "/d/ps"
+#define TOPIC_DEBUG_SORTINGLINE "/d/sl"
+#define TOPIC_DEBUG_VACUUMROBOT "/d/vr"
+#define TOPIC_DEBUG_MESSAGE "/d/msg"
+
 class callback : public virtual mqtt::callback
 {
 public:

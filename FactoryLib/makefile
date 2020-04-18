@@ -5,7 +5,7 @@ CXXFLAGS = -std=gnu++17 -O3 -Wall -c -fmessage-length=0 -Wno-psabi -shared -Wnar
 
 $(shell mkdir -p "obj")
 
-all: libutils.so libmqttclient.so libtxthighlevelapi.so libtxtlowlevelapi.so
+all: libutils.so libmqttclient.so libtxthighlevelapi.so libtxtlowlevelapi.so libdebug.so
 
 libutils.so: include/utils.h
 	$(CXX) $(CXXFLAGS) src/utils.cpp -o obj/$@
@@ -18,3 +18,6 @@ libtxthighlevelapi.so: include/TXT_highlevel_API.h
 
 libtxtlowlevelapi.so: include/TXT_lowlevel_API.h
 	$(CXX) $(CXXFLAGS) src/TXT_lowlevel_API.cpp -o obj/$@
+
+libdebug.so: include/debug.h
+	$(CXX) $(CXXFLAGS) src/debug.cpp -o obj/$@
