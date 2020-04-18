@@ -1,20 +1,23 @@
 #include "debug.h"
 
-Json::StreamWriterBuilder writer;
-
 std::string txtStateObject(TXT &txt) {
     Json::Value object;
     FISH_X1_TRANSFER *pTArea = txt.getTransferArea();
 
     Json::Value input;
+    std::stringstream ss;
     for (int i = 0; i < 8; i++) {
-        input["i" + i] = pTArea->ftX1in.uni[i];
+        ss << "i" << i;
+        input[ss.str()] = pTArea->ftX1in.uni[i];
+        ss.str("");
     }
     object["input"] = input;
 
     Json::Value output;
     for (int i = 0; i < 8; i++) {
-        input["o" + i] = pTArea->ftX1out.duty[i];
+        ss << "o" << i;
+        output[ss.str()] = pTArea->ftX1out.duty[i];
+        ss.str("");
     }
     object["output"] = output;
 
@@ -22,5 +25,5 @@ std::string txtStateObject(TXT &txt) {
 
     object["extension"] = txt.isExtension();
 
-    return Json::writeString(writer, object);
+    return jsonToString(object);
 }

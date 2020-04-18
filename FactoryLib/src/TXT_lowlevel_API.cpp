@@ -1,8 +1,4 @@
 #include "TXT_lowlevel_API.h"
-#include <stdexcept>
-#include <fstream>
-#include "utils.h"
-#include <chrono>
 
 // needed for some debugging stuff of the ft-Libraries ("KeLibTxtDl.h", "FtShmem.h")
 unsigned int DebugFlags;

@@ -1,7 +1,5 @@
 #include "WarehouseStorage.h"
 
-Json::StreamWriterBuilder writer;
-
 FileStorage::FileStorage()
 {
     std::ifstream file(STORAGE_LOCATION);
@@ -67,5 +65,5 @@ std::string FileStorage::getAsJson()
         msg.append((int)values[i]);
     }
 
-    return Json::writeString(writer, msg);
+    return jsonToString(msg);
 }

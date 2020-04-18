@@ -1,5 +1,4 @@
 #include "VacuumRobot.h"
-#include <fstream>
 
 #define YAXIS_OFFSET 100
 

@@ -1,8 +1,4 @@
 #include "TXT_highlevel_API.h"
-#include <fstream>
-#include <iostream>
-#include <limits>
-#include <thread>
 
 /*Axis with encodermotor, referenceswitch (opener) and maxpos*/
 AxisEM::AxisEM(TXT &txt, uint8_t motorpin, uint8_t refpin, ButtonMode refButtonMode, uint16_t max) : 
