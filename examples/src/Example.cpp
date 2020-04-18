@@ -9,6 +9,8 @@ void ExtensionExample(TXT &txt);
 void AxisEM_example(TXT &txt);
 void NRefAxisExample(TXT &txt);
 void TwoRefAxisExample(TXT &txt);
+void TrackSensorExample(TXT &txt);
+void ColorSensorExample(TXT &txt);
 
 
 int main(void)
@@ -17,20 +19,27 @@ int main(void)
 	//digitalInputExample(txt);
 	//synchronizedEncoderMotors(txt);
 	//ExtensionExample(txt);
-	AxisEM_example(txt);
+	//AxisEM_example(txt);
 	//NRefAxisExample(txt);
 	//TwoRefAxisExample(txt);
-
+	//TrackSensorExample(txt);
+	//ColorSensorExample(txt);
 	return 0;
 }
 
 void digitalInputExample(TXT &txt){
 	DigitalInput taster1 = DigitalInput(txt.getTransferArea(),1);
 	//alternativ
-	DigitalInput taster2 = txt.digitalInput(1);
-	if(taster1.value()){
-		//Wenn Taster 1 gedrueckt (Taster muss als Schliesser angeschlossen sein)
-	}
+	DigitalInput taster2 = txt.digitalInput(2);
+	Output out = txt.output(1);
+	while(true){
+		if(taster1.value() || taster2.value()){
+			out.on();
+		}
+		else{
+			out.off();
+		}
+	}	
 }
 
 void synchronizedEncoderMotors(TXT &txt){
@@ -54,15 +63,16 @@ void ExtensionExample(TXT &txt){
 
 void AxisEM_example(TXT &txt){
 	//Encodermotor an M1, Referenztaster an I2
-	AxisEM xaxis = AxisEM{txt, 1, 2}; 
+	AxisEM xaxis = AxisEM{txt, 1, 1}; 
 	//state: UNREFERENCED
 	xaxis.reference();
 	//state: READY
-	xaxis.moveAbsolut(50); //state: RIGHT
+	xaxis.moveAbsolut(600); //state: RIGHT
 	//state: READY
-	std::thread t = xaxis.moveRelativeAsync(-20);
+	std::thread t = xaxis.moveRelativeAsync(-200);
 	//state: left
 	t.join();
+	xaxis.reference();
 	//state: READY
 }
 
@@ -81,7 +91,7 @@ void NRefAxisExample(TXT &txt){
 
 void TwoRefAxisExample(TXT &txt){
 	//Motor an M1, Positionstaster an I2 und I3
-	TwoRefAxis ax = TwoRefAxis{txt, 1, 1, 2};
+	TwoRefAxis ax = TwoRefAxis{txt, 1, 2, 3};
 	//state: UNREFERENCED
 	ax.pos2(); //state: RIGHT
 	//state: READY
@@ -99,4 +109,38 @@ void UtilsExample(TXT &txt){
 	Color c = convertToColor(v.value());
 	AnalogInput ai = txt.analogInput(2);
 	double temp = convertToTemperature(ai.value());
+}
+
+void TrackSensorExample(TXT &txt){
+	TrackSensor ts = txt.trackSensor(4,5);
+	Output o1 = txt.output(1);
+	Output o2 = txt.output(2);
+	while(true){
+		if(ts.valueLeft()){
+			o1.on();
+		}
+		if(ts.valueRight()){
+			o2.on();
+		}
+		sleep(10ms);
+		o1.off();
+		o2.off();
+	}
+}
+
+void ColorSensorExample(TXT &txt){
+	ColorSensor cs = txt.colorSensor(8);
+	Output o1 = txt.output(5);
+	Output o2 = txt.output(6);
+	while(true){
+		if(cs.color() == Color::WHITE){
+			o1.on();
+		}
+		if(cs.color() == Color::RED){
+			o2.on();
+		}
+		sleep(10ms);
+		o1.off();
+		o2.off();
+	}
 }
