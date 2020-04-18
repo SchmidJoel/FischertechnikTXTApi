@@ -306,12 +306,12 @@ RIGHT -left-> READY : Position 2 erreicht
 
 @startuml decision-tree-color
 start
-if (value < 500) then (yes)
-  :Color::WHITE;
-elseif (value < 1300) then (yes)
+if (value > 1600) then (yes)
+  :Color::BLUE;
+elseif (value > 1200) then (yes)
   :Color::RED;
 else ()
-  :Color::BLUE;
+  :Color::WHITE;
 endif
 stop
 @enduml
