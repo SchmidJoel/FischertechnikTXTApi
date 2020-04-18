@@ -6,6 +6,7 @@
 
 #include <fstream>
 #include <map>
+#include "json/json.h"
 
 enum class WarehouseContent
 {

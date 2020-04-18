@@ -26,14 +26,14 @@ std::thread VacuumRobot::referenceAsync()
 void VacuumRobot::suck()
 {
     compressor.on();
-    sleep(100ms);
+    sleep(500ms);
     ventil.on();
 }
 
 void VacuumRobot::release()
 {
-    compressor.off();
     ventil.off();
+    compressor.off();
 }
 
 void VacuumRobot::drive(uint16_t x, uint16_t y, uint16_t z)
