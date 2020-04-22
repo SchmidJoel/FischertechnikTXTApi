@@ -24,6 +24,10 @@ Output white = txt.output(5);
 Output red = txt.output(6);
 Output blue = txt.output(7);
 
+// Monitor
+NTC motorTemperture = txt.ntc(4);
+Voltage motorVoltage = txt.voltage(5);
+
 SortingLineState colorDetectionUnit = SortingLineState::WAITING;
 SortingLineState sortingUnit = SortingLineState::WAITING;
 
@@ -45,6 +49,17 @@ int main(void)
         });
         debug.detach();
     }
+
+    // start monitor thread
+    std::thread monitor = std::thread([] {
+        while (true)
+        {
+            mqttClient.publishMessageAsync(TOPIC_MONITOR_SL_M1_VOLTAGE, std::to_string(motorVoltage.value()));
+            mqttClient.publishMessageAsync(TOPIC_MONITOR_SL_M1_TEMPERATURE, std::to_string(motorTemperture.getTemperature()));
+            sleep(500ms);
+        }
+    });
+    monitor.detach();
 
     std::thread detection = std::thread(ColorDetection);
     mqttClient.publishMessageAsync(TOPIC_INPUT_SORTINGLINE_LAST_COLOR, "");

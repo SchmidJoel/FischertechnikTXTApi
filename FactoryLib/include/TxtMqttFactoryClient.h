@@ -14,7 +14,6 @@
 #define DFLT_MESSAGE_RETAIN false
 
 #define TOPIC_INPUT_STOCK "/i/wh/stock"
-#define TOPIC_INPUT_TEMPERATURE "/i/motor/temp"
 #define TOPIC_INPUT_SORTINGLINE_STATE "/i/sl/state"
 #define TOPIC_INPUT_SORTINGLINE_LAST_COLOR "/i/sl/lastcolor"
 #define TOPIC_INPUT_SORTINGLINE_RAW_LAST_COLOR "/i/sl/rawlastcolor"
@@ -26,6 +25,11 @@
 #define TOPIC_DEBUG_SORTINGLINE "/d/sl"
 #define TOPIC_DEBUG_VACUUMROBOT "/d/vr"
 #define TOPIC_DEBUG_MESSAGE "/d/msg"
+
+#define TOPIC_MONITOR_VR_M2_TEMPERATURE "/m/vr/m2/t"
+#define TOPIC_MONITOR_VR_O7_VOLTAGE "/m/vr/o7/v"
+#define TOPIC_MONITOR_SL_M1_TEMPERATURE "/m/sl/m1/t"
+#define TOPIC_MONITOR_SL_M1_VOLTAGE "/m/sl/m1/v"
 
 class callback : public virtual mqtt::callback
 {

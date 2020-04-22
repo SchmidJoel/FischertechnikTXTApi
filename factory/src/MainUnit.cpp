@@ -26,6 +26,10 @@ DigitalInput white_available = txt.digitalInput(12);
 DigitalInput red_available = txt.digitalInput(13);
 DigitalInput blue_available = txt.digitalInput(14);
 
+// Monitor
+NTC motorTemperature = txt.ntc(15);
+Voltage vaccuumVoltage = txt.voltage(16);
+
 BeltState beltstate = BeltState::WAREHOUSE;
 
 void driveToWarehouse(Color);
@@ -43,17 +47,25 @@ int main()
 {
     mqttClient.connect(1000);
 
-    std::thread debug;
     if (DEBUG_MAINUNIT) {
-        debug = std::thread([]() {
+        std::thread([]() {
             while (true)
             {
                 mqttClient.publishMessageAsync(TOPIC_DEBUG_VACUUMROBOT, txtStateObject(txt));
                 sleep(250ms);
             }
-        });
-        debug.detach();
+        }).detach();
     }
+
+    // start monitor thread
+    std::thread([] {
+        while (true)
+        {
+            mqttClient.publishMessageAsync(TOPIC_MONITOR_VR_M2_TEMPERATURE, std::to_string(motorTemperature.getTemperature()));
+            mqttClient.publishMessageAsync(TOPIC_MONITOR_VR_O7_VOLTAGE, std::to_string(vaccuumVoltage.value()));
+            sleep(500ms);
+        }
+    }).detach();
 
     std::thread thread_vacuum = robot.referenceAsync();
     std::thread thread_warehouse = warehouse.referenceAsync();
@@ -144,6 +156,7 @@ void checkAvailableWorkpieces()
     }
     else
     {
+        // TODO move vaccuum robot to warehouse
         getFullBox();
         driveBeltTo(BeltState::VACUUM_ROBOT);
         std::thread processing = std::thread(driveToProcessing);

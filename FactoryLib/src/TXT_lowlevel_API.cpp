@@ -19,7 +19,6 @@ IOPin::IOPin(FISH_X1_TRANSFER *pTArea, uint8_t pin, bool eight) {
 
     if((pin > 8 && eight) || (!eight && pin > 4)){
         (*this).pTArea = pTArea+1;
-
     }
     else{
         (*this).pTArea = pTArea;
