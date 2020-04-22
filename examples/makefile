@@ -35,7 +35,7 @@ LIBS = -l"SDLWidgetsLib" \
 $(shell mkdir -p "bin")
 $(shell mkdir -p "obj")
 
-all: Ampel Example MqttTest Threads
+all: Ampel Example MqttTest Threads Uebungsaufgabe1
 
 Ampel.o : src/Ampel.cpp
 	$(CXX) $(CXXFLAGS) $^ -o obj/$@
@@ -49,6 +49,9 @@ MqttTest.o: src/MqttTest.cpp
 Threads.o: src/Threads.cpp 
 	$(CXX) $(CXXFLAGS) $^ -o obj/$@
 
+Uebungsaufgabe1.o : src/Uebungsaufgabe1.cpp
+	$(CXX) $(CXXFLAGS) $^ -o obj/$@
+
 Ampel: Ampel.o
 	$(CXX) $(LFLAGS) $(LIBPATH) obj/$^ $(LIBS) -o bin/$@
 
@@ -59,4 +62,7 @@ MqttTest: MqttTest.o
 	$(CXX) $(LFLAGS) $(LIBPATH) obj/$^ $(LIBS) -o bin/$@
 
 Threads: Threads.o
+	$(CXX) $(LFLAGS) $(LIBPATH) obj/$^ $(LIBS) -o bin/$@
+
+Uebungsaufgabe1: Uebungsaufgabe1.o
 	$(CXX) $(LFLAGS) $(LIBPATH) obj/$^ $(LIBS) -o bin/$@
