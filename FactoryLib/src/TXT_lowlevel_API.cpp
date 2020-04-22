@@ -28,7 +28,6 @@ IOPin::IOPin(FISH_X1_TRANSFER *pTArea, uint8_t pin, bool eight) {
     else{
         (*this).pTArea = pTArea;
     }   
-    
     (*this).pin = eight ? (pin-1)%8 : (pin-1)%4;
 }
 
@@ -172,9 +171,9 @@ void Output::setLevel(uint16_t level)
 DigitalInput::DigitalInput(FISH_X1_TRANSFER *pTArea, uint8_t pin) : IOPin(pTArea, pin, true)
 {   
     pin = (*this).pin;
-    pTArea->ftX1config.uni[pin].mode = MODE_R; //  resistor
-    pTArea->ftX1config.uni[pin].digital = 1;   //  digital Input
-    pTArea->ftX1state.config_id++;
+    (*this).pTArea->ftX1config.uni[pin].mode = MODE_R; //  resistor
+    (*this).pTArea->ftX1config.uni[pin].digital = 1;   //  digital Input
+    (*this).pTArea->ftX1state.config_id++;
 }
 
 bool DigitalInput::value()
@@ -218,9 +217,9 @@ void Counter::waitSteps(uint16_t steps)
 AnalogInput::AnalogInput(FISH_X1_TRANSFER *pTArea, uint8_t pin) : IOPin(pTArea, pin, true)
 {
     pin = (*this).pin;
-    pTArea->ftX1config.uni[pin].mode = MODE_R; //  resistor
-    pTArea->ftX1config.uni[pin].digital = 0;   //  analog Input
-    pTArea->ftX1state.config_id++;
+    (*this).pTArea->ftX1config.uni[pin].mode = MODE_R; //  resistor
+    (*this).pTArea->ftX1config.uni[pin].digital = 0;   //  analog Input
+    (*this).pTArea->ftX1state.config_id++;
 }
 
 uint16_t AnalogInput::value()
@@ -248,9 +247,9 @@ Color ColorSensor::color()
 Voltage::Voltage(FISH_X1_TRANSFER *pTArea, uint8_t pin) : IOPin(pTArea, pin, true)
 {
     pin = (*this).pin;
-    pTArea->ftX1config.uni[pin].mode = MODE_U; //	Spannung
-    pTArea->ftX1config.uni[pin].digital = 0;   //  analog Input
-    pTArea->ftX1state.config_id++;
+    (*this).pTArea->ftX1config.uni[pin].mode = MODE_U; //	Spannung
+    (*this).pTArea->ftX1config.uni[pin].digital = 0;   //  analog Input
+    (*this).pTArea->ftX1state.config_id++;
 }
 
 uint16_t Voltage::value()
@@ -262,8 +261,8 @@ uint16_t Voltage::value()
 Ultrasonic::Ultrasonic(FISH_X1_TRANSFER *pTArea, uint8_t pin) : IOPin(pTArea, pin, true)
 {
     pin = (*this).pin;
-    pTArea->ftX1config.uni[pin].mode = MODE_ULTRASONIC;
-    pTArea->ftX1state.config_id++;
+    (*this).pTArea->ftX1config.uni[pin].mode = MODE_ULTRASONIC;
+    (*this).pTArea->ftX1state.config_id++;
 }
 
 uint16_t Ultrasonic::value()
@@ -295,11 +294,11 @@ TrackSensor::TrackSensor(FISH_X1_TRANSFER *pTArea, uint8_t left, uint8_t right)
     right = right%7;
     (*this).left = left;
     (*this).right = right;
-    pTArea->ftX1config.uni[left].mode = MODE_U;
-    pTArea->ftX1config.uni[left].digital = 1;
-    pTArea->ftX1config.uni[right].mode = MODE_U;
-    pTArea->ftX1config.uni[right].digital = 1;
-    pTArea->ftX1state.config_id++;
+    (*this).pTArea->ftX1config.uni[left].mode = MODE_U;
+    (*this).pTArea->ftX1config.uni[left].digital = 1;
+    (*this).pTArea->ftX1config.uni[right].mode = MODE_U;
+    (*this).pTArea->ftX1config.uni[right].digital = 1;
+    (*this).pTArea->ftX1state.config_id++;
 }
 
 bool TrackSensor::valueLeft()
