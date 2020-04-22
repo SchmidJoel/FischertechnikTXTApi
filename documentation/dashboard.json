@@ -7,78 +7,188 @@
         "info": ""
     },
     {
-        "id": "7af6645.2185b9c",
-        "type": "mqtt in",
-        "z": "3ab18b33.80e8fc",
-        "name": "Temperature",
-        "topic": "/i/motor/temp",
-        "qos": "1",
-        "datatype": "auto",
-        "broker": "c3bf2db5.246d6",
-        "x": 310,
-        "y": 220,
-        "wires": [
-            [
-                "16f01f06.442f59",
-                "1bafd609.8ab1ba"
-            ]
-        ]
+        "id": "50f709fd.db73e",
+        "type": "ui_base",
+        "theme": {
+            "name": "theme-dark",
+            "lightTheme": {
+                "default": "#0094CE",
+                "baseColor": "#0094CE",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": true,
+                "reset": false
+            },
+            "darkTheme": {
+                "default": "#097479",
+                "baseColor": "#008000",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": true,
+                "reset": false
+            },
+            "customTheme": {
+                "name": "Untitled Theme 1",
+                "default": "#4B7930",
+                "baseColor": "#4B7930",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+            },
+            "themeState": {
+                "base-color": {
+                    "default": "#097479",
+                    "value": "#008000",
+                    "edited": true
+                },
+                "page-titlebar-backgroundColor": {
+                    "value": "#008000",
+                    "edited": false
+                },
+                "page-backgroundColor": {
+                    "value": "#111111",
+                    "edited": false
+                },
+                "page-sidebar-backgroundColor": {
+                    "value": "#000000",
+                    "edited": false
+                },
+                "group-textColor": {
+                    "value": "#00cc00",
+                    "edited": false
+                },
+                "group-borderColor": {
+                    "value": "#555555",
+                    "edited": false
+                },
+                "group-backgroundColor": {
+                    "value": "#333333",
+                    "edited": false
+                },
+                "widget-textColor": {
+                    "value": "#eeeeee",
+                    "edited": false
+                },
+                "widget-backgroundColor": {
+                    "value": "#008000",
+                    "edited": false
+                },
+                "widget-borderColor": {
+                    "value": "#333333",
+                    "edited": false
+                },
+                "base-font": {
+                    "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+                }
+            },
+            "angularTheme": {
+                "primary": "indigo",
+                "accents": "blue",
+                "warn": "red",
+                "background": "grey"
+            }
+        },
+        "site": {
+            "name": "Node-RED Dashboard",
+            "hideToolbar": "false",
+            "allowSwipe": "false",
+            "lockMenu": "false",
+            "allowTempTheme": "true",
+            "dateFormat": "DD/MM/YYYY",
+            "sizes": {
+                "sx": 48,
+                "sy": 48,
+                "gx": 6,
+                "gy": 6,
+                "cx": 6,
+                "cy": 6,
+                "px": 0,
+                "py": 0
+            }
+        }
     },
     {
-        "id": "16f01f06.442f59",
-        "type": "ui_chart",
-        "z": "3ab18b33.80e8fc",
-        "name": "temperature",
-        "group": "7bcaaa81.f278cc",
-        "order": 0,
-        "width": "0",
-        "height": "0",
-        "label": "Temperatur",
-        "chartType": "line",
-        "legend": "false",
-        "xformat": "HH:mm:ss",
-        "interpolate": "linear",
-        "nodata": "",
-        "dot": false,
-        "ymin": "",
-        "ymax": "",
-        "removeOlder": 1,
-        "removeOlderPoints": "",
-        "removeOlderUnit": "3600",
-        "cutout": 0,
-        "useOneColor": false,
-        "colors": [
-            "#1f77b4",
-            "#aec7e8",
-            "#ff7f0e",
-            "#2ca02c",
-            "#98df8a",
-            "#d62728",
-            "#ff9896",
-            "#9467bd",
-            "#c5b0d5"
-        ],
-        "useOldStyle": false,
-        "outputs": 1,
-        "x": 590,
-        "y": 220,
-        "wires": [
-            []
-        ]
+        "id": "13f1be34.7f0552",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Dashboard",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
     },
     {
-        "id": "1bafd609.8ab1ba",
-        "type": "debug",
-        "z": "3ab18b33.80e8fc",
-        "name": "",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "x": 600,
-        "y": 300,
-        "wires": []
+        "id": "7bcaaa81.f278cc",
+        "type": "ui_group",
+        "z": "",
+        "name": "Überwachen",
+        "tab": "13f1be34.7f0552",
+        "order": 4,
+        "disp": true,
+        "width": "12",
+        "collapse": false
+    },
+    {
+        "id": "c3bf2db5.246d6",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "local",
+        "broker": "192.168.178.66",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": false,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "9759233.684136",
+        "type": "ui_group",
+        "z": "",
+        "name": "System",
+        "tab": "13f1be34.7f0552",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "33203872.f72e78",
+        "type": "ui_group",
+        "z": "",
+        "name": "Hochregallager",
+        "tab": "13f1be34.7f0552",
+        "order": 3,
+        "disp": true,
+        "width": "12",
+        "collapse": false
+    },
+    {
+        "id": "d10cd46c.1244d8",
+        "type": "ui_group",
+        "z": "",
+        "name": "Zustände",
+        "tab": "13f1be34.7f0552",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "71289a33.27acdc",
+        "type": "ui_group",
+        "z": "",
+        "name": "Sortierstrecke",
+        "tab": "13f1be34.7f0552",
+        "order": 5,
+        "disp": true,
+        "width": "6",
+        "collapse": false
     },
     {
         "id": "674f2834.fe5208",
@@ -89,16 +199,16 @@
         "qos": "1",
         "datatype": "auto",
         "broker": "c3bf2db5.246d6",
-        "x": 310,
-        "y": 600,
+        "x": 190,
+        "y": 460,
         "wires": [
             [
                 "1358ae91.264569",
-                "6b6df3a4.066644",
                 "b0981a85.34c1a",
                 "1b1a0492.230a7b",
                 "7dd884ab.df336c",
-                "82d43184.4baa1"
+                "82d43184.4baa1",
+                "6b6df3a4.066644"
             ]
         ]
     },
@@ -110,8 +220,8 @@
         "func": "msg.payload = new Date(msg.payload).toLocaleString('de-DE');\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 490,
-        "y": 120,
+        "x": 390,
+        "y": 220,
         "wires": [
             [
                 "81f0cb9c.050c4"
@@ -130,8 +240,8 @@
         "label": "Zeit",
         "format": "{{msg.payload}}",
         "layout": "row-spread",
-        "x": 630,
-        "y": 120,
+        "x": 530,
+        "y": 220,
         "wires": []
     },
     {
@@ -144,11 +254,12 @@
         "width": "8",
         "height": "6",
         "format": "<style>\n    .circle {\n        width: 5rem;\n        height: 5rem;\n        display: inline-block;\n        -webkit-border-radius: 100%;\n        -moz-border-radius: 100%;\n        border-radius: 100%;\n        border-color: transparent;\n        background-color: gray;\n        border-width: 1px;\n        border-style: solid;\n        margin: 2px;\n    }\n    \n    .white {\n        border-color: black;\n        background-color: white;\n    }\n    \n    .red {\n        border-color: black;\n        background-color: red;\n    }\n    \n    .blue {\n        border-color: black;\n        background-color: blue;\n    }\n</style>\n<div ng-bind-html=\"msg.payload\"></div>",
-        "storeOutMessages": true,
-        "fwdInMessages": true,
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
         "templateScope": "local",
-        "x": 810,
-        "y": 480,
+        "x": 690,
+        "y": 340,
         "wires": [
             []
         ]
@@ -165,8 +276,8 @@
         "crontab": "",
         "once": false,
         "onceDelay": 0.1,
-        "x": 330,
-        "y": 120,
+        "x": 230,
+        "y": 220,
         "wires": [
             [
                 "a3665f4.035e62"
@@ -181,8 +292,8 @@
         "func": "let list = JSON.parse(msg.payload);\nlet payload = \"\";\n\nfor (let row = 0; row < 3; row++) {\n    payload = payload + \"<div>\";\n    for (let column = 2; column >= 0; column--) {\n        payload = payload + \"<span class=\\\"circle \";\n        switch (list[row * 3 + column]) {\n            case 1:\n                payload = payload + \"white\";\n                break;\n            case 2:\n                payload = payload + \"red\";\n                break;\n            case 3:\n                payload = payload + \"blue\";\n                break;\n            default:\n                break;\n        }\n        payload = payload + \"\\\"></span>\";\n    }\n    payload = payload + \"</div>\";\n}\n\nmsg.payload = payload;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 560,
-        "y": 480,
+        "x": 440,
+        "y": 340,
         "wires": [
             [
                 "813dc846.0629"
@@ -211,8 +322,8 @@
         ],
         "seg1": "",
         "seg2": "",
-        "x": 800,
-        "y": 540,
+        "x": 680,
+        "y": 400,
         "wires": []
     },
     {
@@ -223,8 +334,8 @@
         "func": "let list = JSON.parse(msg.payload);\nlet amount = 0;\nfor (let i = 0; i < list.length; i++) {\n    if (list[i] > 0) {\n        amount = amount + 1;\n    }\n}\nmsg.payload = amount;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 550,
-        "y": 540,
+        "x": 430,
+        "y": 400,
         "wires": [
             [
                 "57914b17.dfd354"
@@ -242,9 +353,9 @@
         "name": "white amount",
         "label": "weiß",
         "format": "{{msg.payload}}",
-        "layout": "row-left",
-        "x": 810,
-        "y": 600,
+        "layout": "col-center",
+        "x": 690,
+        "y": 460,
         "wires": []
     },
     {
@@ -255,8 +366,8 @@
         "func": "let list = JSON.parse(msg.payload);\nlet amount = 0;\nfor (let i = 0; i < list.length; i++) {\n    if (list[i] === 1) {\n        amount = amount + 1;\n    }\n}\nmsg.payload = amount;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 530,
-        "y": 600,
+        "x": 410,
+        "y": 460,
         "wires": [
             [
                 "3a46fa3e.8bcb9e"
@@ -274,9 +385,9 @@
         "name": "red amount",
         "label": "rot",
         "format": "{{msg.payload}}",
-        "layout": "row-left",
-        "x": 810,
-        "y": 660,
+        "layout": "col-center",
+        "x": 690,
+        "y": 520,
         "wires": []
     },
     {
@@ -287,8 +398,8 @@
         "func": "let list = JSON.parse(msg.payload);\nlet amount = 0;\nfor (let i = 0; i < list.length; i++) {\n    if (list[i] === 2) {\n        amount = amount + 1;\n    }\n}\nmsg.payload = amount;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 530,
-        "y": 660,
+        "x": 410,
+        "y": 520,
         "wires": [
             [
                 "9d529b2.e61dbe8"
@@ -306,9 +417,9 @@
         "name": "blue amount",
         "label": "blau",
         "format": "{{msg.payload}}",
-        "layout": "row-left",
-        "x": 810,
-        "y": 720,
+        "layout": "col-center",
+        "x": 690,
+        "y": 580,
         "wires": []
     },
     {
@@ -319,8 +430,8 @@
         "func": "let list = JSON.parse(msg.payload);\nlet amount = 0;\nfor (let i = 0; i < list.length; i++) {\n    if (list[i] === 3) {\n        amount = amount + 1;\n    }\n}\nmsg.payload = amount;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 530,
-        "y": 720,
+        "x": 410,
+        "y": 580,
         "wires": [
             [
                 "a8c38d6e.65aab8"
@@ -336,8 +447,8 @@
         "qos": "1",
         "datatype": "auto",
         "broker": "c3bf2db5.246d6",
-        "x": 320,
-        "y": 920,
+        "x": 200,
+        "y": 780,
         "wires": [
             [
                 "c1a8a02c.f69918"
@@ -349,15 +460,15 @@
         "type": "ui_text",
         "z": "3ab18b33.80e8fc",
         "group": "d10cd46c.1244d8",
-        "order": 0,
+        "order": 4,
         "width": 0,
         "height": 0,
         "name": "Sorting Line",
         "label": "Sortierstrecke",
         "format": "{{msg.payload}}",
         "layout": "row-spread",
-        "x": 630,
-        "y": 920,
+        "x": 510,
+        "y": 780,
         "wires": []
     },
     {
@@ -369,8 +480,8 @@
         "qos": "1",
         "datatype": "auto",
         "broker": "c3bf2db5.246d6",
-        "x": 340,
-        "y": 1020,
+        "x": 220,
+        "y": 880,
         "wires": [
             [
                 "65d182a7.96bc74"
@@ -389,8 +500,8 @@
         "label": "Bearbeitungs-Station",
         "format": "{{msg.payload}}",
         "layout": "row-spread",
-        "x": 610,
-        "y": 1020,
+        "x": 490,
+        "y": 880,
         "wires": []
     },
     {
@@ -402,8 +513,8 @@
         "qos": "1",
         "datatype": "auto",
         "broker": "c3bf2db5.246d6",
-        "x": 330,
-        "y": 1120,
+        "x": 210,
+        "y": 980,
         "wires": [
             [
                 "6bd4d4e4.204554"
@@ -415,15 +526,15 @@
         "type": "ui_text",
         "z": "3ab18b33.80e8fc",
         "group": "d10cd46c.1244d8",
-        "order": 1,
+        "order": 2,
         "width": 0,
         "height": 0,
         "name": "Vacuumrobot",
         "label": "Vakuumroboter",
         "format": "{{msg.payload}}",
         "layout": "row-spread",
-        "x": 630,
-        "y": 1120,
+        "x": 510,
+        "y": 980,
         "wires": []
     },
     {
@@ -435,8 +546,8 @@
         "qos": "1",
         "datatype": "auto",
         "broker": "c3bf2db5.246d6",
-        "x": 320,
-        "y": 1200,
+        "x": 200,
+        "y": 1060,
         "wires": [
             [
                 "61409ab5.be68f4"
@@ -448,15 +559,15 @@
         "type": "ui_text",
         "z": "3ab18b33.80e8fc",
         "group": "d10cd46c.1244d8",
-        "order": 1,
+        "order": 3,
         "width": 0,
         "height": 0,
         "name": "Warehouse",
         "label": "Hochregallager",
         "format": "{{msg.payload}}",
         "layout": "row-spread",
-        "x": 630,
-        "y": 1200,
+        "x": 510,
+        "y": 1060,
         "wires": []
     },
     {
@@ -468,8 +579,8 @@
         "qos": "1",
         "datatype": "auto",
         "broker": "c3bf2db5.246d6",
-        "x": 300,
-        "y": 1280,
+        "x": 180,
+        "y": 1140,
         "wires": [
             [
                 "84127229.09d75"
@@ -480,7 +591,7 @@
         "id": "1f97e04e.16f5a",
         "type": "ui_text",
         "z": "3ab18b33.80e8fc",
-        "group": "d10cd46c.1244d8",
+        "group": "71289a33.27acdc",
         "order": 1,
         "width": 0,
         "height": 0,
@@ -488,8 +599,8 @@
         "label": "erkannte Farbe",
         "format": "{{msg.payload}}",
         "layout": "row-spread",
-        "x": 720,
-        "y": 1280,
+        "x": 600,
+        "y": 1140,
         "wires": []
     },
     {
@@ -501,8 +612,8 @@
         "qos": "1",
         "datatype": "auto",
         "broker": "c3bf2db5.246d6",
-        "x": 310,
-        "y": 1360,
+        "x": 190,
+        "y": 1220,
         "wires": [
             [
                 "d8197021.5f32f8"
@@ -513,16 +624,16 @@
         "id": "d8197021.5f32f8",
         "type": "ui_text",
         "z": "3ab18b33.80e8fc",
-        "group": "d10cd46c.1244d8",
-        "order": 1,
+        "group": "71289a33.27acdc",
+        "order": 2,
         "width": 0,
         "height": 0,
         "name": "raw color detection",
         "label": "erkannter Farbwert",
         "format": "{{msg.payload}}",
         "layout": "row-spread",
-        "x": 610,
-        "y": 1360,
+        "x": 490,
+        "y": 1220,
         "wires": []
     },
     {
@@ -535,8 +646,8 @@
         "console": false,
         "tostatus": false,
         "complete": "false",
-        "x": 540,
-        "y": 800,
+        "x": 420,
+        "y": 660,
         "wires": []
     },
     {
@@ -547,8 +658,8 @@
         "func": "switch (msg.payload) {\n    case \"0\":\n        msg.payload = \"weiß\";\n        break;\n    case \"1\":\n        msg.payload = \"rot\";\n        break;\n    case \"2\":\n        msg.payload = \"blau\";\n        break;\n    default:\n        msg.payload = \"leer\"\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 500,
-        "y": 1280,
+        "x": 380,
+        "y": 1140,
         "wires": [
             [
                 "1f97e04e.16f5a"
@@ -556,78 +667,325 @@
         ]
     },
     {
-        "id": "c3bf2db5.246d6",
-        "type": "mqtt-broker",
-        "z": "",
-        "name": "local",
-        "broker": "192.168.178.66",
-        "port": "1883",
-        "clientid": "",
-        "usetls": false,
-        "compatmode": false,
-        "keepalive": "60",
-        "cleansession": true,
-        "birthTopic": "",
-        "birthQos": "0",
-        "birthPayload": "",
-        "closeTopic": "",
-        "closeQos": "0",
-        "closePayload": "",
-        "willTopic": "",
-        "willQos": "0",
-        "willPayload": ""
+        "id": "edb22b2c.18357",
+        "type": "mqtt in",
+        "z": "3ab18b33.80e8fc",
+        "name": "Debug SortingLine",
+        "topic": "/d/sl",
+        "qos": "1",
+        "datatype": "auto",
+        "broker": "c3bf2db5.246d6",
+        "x": 1110,
+        "y": 80,
+        "wires": [
+            [
+                "56dd26e3.d48e28"
+            ]
+        ]
     },
     {
-        "id": "7bcaaa81.f278cc",
-        "type": "ui_group",
-        "z": "",
-        "name": "Motor",
-        "tab": "13f1be34.7f0552",
-        "order": 3,
-        "disp": true,
-        "width": "12",
-        "collapse": false
+        "id": "56dd26e3.d48e28",
+        "type": "debug",
+        "z": "3ab18b33.80e8fc",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 1530,
+        "y": 160,
+        "wires": []
     },
     {
-        "id": "9759233.684136",
-        "type": "ui_group",
-        "z": "",
-        "name": "System",
-        "tab": "13f1be34.7f0552",
+        "id": "9a6f4bd5.3f51a8",
+        "type": "mqtt in",
+        "z": "3ab18b33.80e8fc",
+        "name": "Debug Processingstation",
+        "topic": "/d/ps",
+        "qos": "1",
+        "datatype": "auto",
+        "broker": "c3bf2db5.246d6",
+        "x": 1130,
+        "y": 140,
+        "wires": [
+            [
+                "56dd26e3.d48e28"
+            ]
+        ]
+    },
+    {
+        "id": "e0062162.3e9b4",
+        "type": "mqtt in",
+        "z": "3ab18b33.80e8fc",
+        "name": "Debug Vacuumrobot",
+        "topic": "/d/vr",
+        "qos": "1",
+        "datatype": "auto",
+        "broker": "c3bf2db5.246d6",
+        "x": 1110,
+        "y": 200,
+        "wires": [
+            [
+                "56dd26e3.d48e28"
+            ]
+        ]
+    },
+    {
+        "id": "c228aeeb.b80c5",
+        "type": "mqtt in",
+        "z": "3ab18b33.80e8fc",
+        "name": "Debug Message",
+        "topic": "/d/msg",
+        "qos": "1",
+        "datatype": "auto",
+        "broker": "c3bf2db5.246d6",
+        "x": 1100,
+        "y": 260,
+        "wires": [
+            [
+                "56dd26e3.d48e28"
+            ]
+        ]
+    },
+    {
+        "id": "25fbcd41.32f5b2",
+        "type": "mqtt in",
+        "z": "3ab18b33.80e8fc",
+        "name": "VR Motor Temperature",
+        "topic": "/m/vr/m2/t",
+        "qos": "1",
+        "datatype": "auto",
+        "broker": "c3bf2db5.246d6",
+        "x": 1120,
+        "y": 440,
+        "wires": [
+            [
+                "d574d1c8.a52768"
+            ]
+        ]
+    },
+    {
+        "id": "b4e5c13b.e1e148",
+        "type": "mqtt in",
+        "z": "3ab18b33.80e8fc",
+        "name": "VR Vaccuum Voltage",
+        "topic": "/m/vr/o7/v",
+        "qos": "1",
+        "datatype": "auto",
+        "broker": "c3bf2db5.246d6",
+        "x": 1120,
+        "y": 500,
+        "wires": [
+            [
+                "c5494c4a.1cd988"
+            ]
+        ]
+    },
+    {
+        "id": "d2f58cb5.38d02",
+        "type": "mqtt in",
+        "z": "3ab18b33.80e8fc",
+        "name": "SL Motor Temperature",
+        "topic": "/m/sl/m1/t",
+        "qos": "1",
+        "datatype": "auto",
+        "broker": "c3bf2db5.246d6",
+        "x": 1120,
+        "y": 560,
+        "wires": [
+            [
+                "98f1aa.efe62658"
+            ]
+        ]
+    },
+    {
+        "id": "8dbe8677.47cb98",
+        "type": "mqtt in",
+        "z": "3ab18b33.80e8fc",
+        "name": "SL Motor Voltage",
+        "topic": "/m/sl/m1/v",
+        "qos": "1",
+        "datatype": "auto",
+        "broker": "c3bf2db5.246d6",
+        "x": 1100,
+        "y": 620,
+        "wires": [
+            [
+                "e478388c.8ec8a"
+            ]
+        ]
+    },
+    {
+        "id": "d574d1c8.a52768",
+        "type": "ui_chart",
+        "z": "3ab18b33.80e8fc",
+        "name": "VR Temperature chart",
+        "group": "7bcaaa81.f278cc",
         "order": 1,
-        "disp": true,
-        "width": "6",
-        "collapse": false
+        "width": 0,
+        "height": 0,
+        "label": "Sauggreifer Temperatur",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "step",
+        "nodata": "Vaccuum Robot Motor Temperature",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#d20005",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 1540,
+        "y": 440,
+        "wires": [
+            []
+        ]
     },
     {
-        "id": "33203872.f72e78",
-        "type": "ui_group",
-        "z": "",
-        "name": "Hochregallager",
-        "tab": "13f1be34.7f0552",
+        "id": "c5494c4a.1cd988",
+        "type": "ui_chart",
+        "z": "3ab18b33.80e8fc",
+        "name": "VR Voltage chart",
+        "group": "7bcaaa81.f278cc",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "label": "Sauggreifer Vakuum Spannung",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "step",
+        "nodata": "Vaccuum Robot Vaccuum Voltage",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 1530,
+        "y": 500,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "98f1aa.efe62658",
+        "type": "ui_chart",
+        "z": "3ab18b33.80e8fc",
+        "name": "SL Temperature chart",
+        "group": "7bcaaa81.f278cc",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "label": "Sortierstrecke Temperatur",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "bezier",
+        "nodata": "Sortierstrecke Temperatur",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#d20005",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 1540,
+        "y": 560,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e478388c.8ec8a",
+        "type": "ui_chart",
+        "z": "3ab18b33.80e8fc",
+        "name": "SL Voltage chart",
+        "group": "7bcaaa81.f278cc",
         "order": 2,
-        "disp": true,
-        "width": "12",
-        "collapse": false
-    },
-    {
-        "id": "d10cd46c.1244d8",
-        "type": "ui_group",
-        "z": "",
-        "name": "Status",
-        "tab": "13f1be34.7f0552",
-        "disp": true,
-        "width": "6",
-        "collapse": false
-    },
-    {
-        "id": "13f1be34.7f0552",
-        "type": "ui_tab",
-        "z": "",
-        "name": "Dashboard",
-        "icon": "dashboard",
-        "order": 1,
-        "disabled": false,
-        "hidden": false
+        "width": 0,
+        "height": 0,
+        "label": "Sortierstrecke Spannung",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "step",
+        "nodata": "Sortierstrecke Spannung",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 1530,
+        "y": 620,
+        "wires": [
+            []
+        ]
     }
 ]

@@ -30,7 +30,8 @@ LIBS = -l"SDLWidgetsLib" \
 	-l"txtlowlevelapi"\
 	-l"txthighlevelapi"\
 	-l"utils"\
-	-l"mqttclient"
+	-l"mqttclient"\
+	-l"debug"
 
 $(shell mkdir -p "bin")
 $(shell mkdir -p "obj")
@@ -40,7 +41,7 @@ all: SortingLineMain ProcessingStationMain MainUnit
 VacuumRobot.o : src/VacuumRobot.cpp
 	$(CXX) $(CXXFLAGS) $^ -o obj/$@
 
-Storage.o : src/Storage.cpp
+WarehouseStorage.o : src/WarehouseStorage.cpp
 	$(CXX) $(CXXFLAGS) $^ -o obj/$@
 
 HighBayWarehouse.o : src/HighBayWarehouse.cpp
@@ -55,8 +56,8 @@ ProcessingStationMain.o: src/ProcessingStationMain.cpp
 SortingLineMain.o: src/SortingLineMain.cpp
 	$(CXX) $(CXXFLAGS) $^ -o obj/$@
 
-MainUnit: MainUnit.o HighBayWarehouse.o VacuumRobot.o Storage.o
-	$(CXX) $(LFLAGS) $(LIBPATH) obj/MainUnit.o obj/HighBayWarehouse.o obj/VacuumRobot.o obj/Storage.o $(LIBS) -o bin/$@
+MainUnit: MainUnit.o HighBayWarehouse.o VacuumRobot.o WarehouseStorage.o
+	$(CXX) $(LFLAGS) $(LIBPATH) obj/MainUnit.o obj/HighBayWarehouse.o obj/VacuumRobot.o obj/WarehouseStorage.o $(LIBS) -o bin/$@
 
 ProcessingStationMain: ProcessingStationMain.o
 	$(CXX) $(LFLAGS) $(LIBPATH) obj/$^ $(LIBS) -o bin/$@

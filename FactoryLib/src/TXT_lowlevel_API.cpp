@@ -1,8 +1,4 @@
 #include "TXT_lowlevel_API.h"
-#include <stdexcept>
-#include <fstream>
-#include "utils.h"
-#include <chrono>
 
 // needed for some debugging stuff of the ft-Libraries ("KeLibTxtDl.h", "FtShmem.h")
 unsigned int DebugFlags;
@@ -23,7 +19,6 @@ IOPin::IOPin(FISH_X1_TRANSFER *pTArea, uint8_t pin, bool eight) {
 
     if((pin > 8 && eight) || (!eight && pin > 4)){
         (*this).pTArea = pTArea+1;
-
     }
     else{
         (*this).pTArea = pTArea;
@@ -132,6 +127,10 @@ void TXT::playSoundAndWait(uint8_t index, uint8_t repeats)
     {
         sleep(1ms);
     }
+}
+
+bool TXT::isExtension() {
+    return _extension;
 }
 
 TXT TXT::extension()

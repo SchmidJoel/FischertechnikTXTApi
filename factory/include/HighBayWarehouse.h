@@ -1,7 +1,7 @@
 #ifndef HIGHBAYWAREHOUSE
 #define HIGHBAYWAREHOUSE
 #include "TXT_highlevel_API.h"
-#include "Storage.h"
+#include "WarehouseStorage.h"
 
 #define REL_MOVE 60 //move to pull/put workpiece
 

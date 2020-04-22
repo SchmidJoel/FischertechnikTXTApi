@@ -1,6 +1,4 @@
-#include "Storage.h"
-
-Json::StreamWriterBuilder writer;
+#include "WarehouseStorage.h"
 
 FileStorage::FileStorage()
 {
@@ -67,5 +65,5 @@ std::string FileStorage::getAsJson()
         msg.append((int)values[i]);
     }
 
-    return Json::writeString(writer, msg);
+    return jsonToString(msg);
 }

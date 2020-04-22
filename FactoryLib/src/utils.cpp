@@ -1,6 +1,6 @@
 #include "utils.h"
-#include "math.h"
-#include <chrono>
+
+Json::StreamWriterBuilder writer;
 
 void sleep(std::chrono::microseconds micros)
 {
@@ -22,4 +22,14 @@ Color convertToColor(uint16_t value)
 
 double convertToTemperature(uint16_t value){
     return log(value) * log(value) * 1.3932 + log(value) * -43.942 + 271.87;
+}
+
+std::string jsonToString(Json::Value obj) {
+    writer["indentation"] = "";
+    return Json::writeString(writer, obj);
+}
+
+std::string jsonToStyledString(Json::Value obj) {
+    writer["indentation"] = "\t";
+    return Json::writeString(writer, obj);
 }

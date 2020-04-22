@@ -1,5 +1,8 @@
 #include "TXT_highlevel_API.h"
 #include "TxtMqttFactoryClient.h"
+#include "debug.h"
+
+#define DEBUG_PROCESSINGSTATION false
 
 TXT txt;
 TxtMqttFactoryClient mqttClient("ProcessingStation", "192.168.178.66", "", "");
@@ -27,6 +30,18 @@ int main(void)
 {
     mqttClient.connect(1000);
 
+    std::thread debug;
+    if (DEBUG_PROCESSINGSTATION) {
+        debug = std::thread([]() {
+            while (true)
+            {
+                mqttClient.publishMessageAsync(TOPIC_DEBUG_PROCESSINGSTATION, txtStateObject(txt));
+                sleep(250ms);
+            }
+        });
+        debug.detach();
+    }
+
     mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "referenzieren");
     comp.on();
     oven_gate.on();
@@ -39,6 +54,7 @@ int main(void)
     thread2.join();
     thread3.join();
 
+    oven_gate.off();
     comp.off();
 
     mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "bereit");

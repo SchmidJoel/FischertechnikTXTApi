@@ -1,13 +1,14 @@
 #include "VacuumRobot.h"
 #include "HighBayWarehouse.h"
 #include "TxtMqttFactoryClient.h"
+#include "debug.h"
+
+#define DEBUG_MAINUNIT false
 
 enum BeltState
 {
     WAREHOUSE,
-    VACUUM_ROBOT,
-    AT_WAREHOUSE,
-    AT_VACUUM_ROBOT
+    VACUUM_ROBOT
 };
 
 TXT txt;
@@ -25,8 +26,11 @@ DigitalInput white_available = txt.digitalInput(12);
 DigitalInput red_available = txt.digitalInput(13);
 DigitalInput blue_available = txt.digitalInput(14);
 
+// Monitor
+NTC motorTemperature = txt.ntc(15);
+Voltage vaccuumVoltage = txt.voltage(16);
+
 BeltState beltstate = BeltState::WAREHOUSE;
-//todo soll/ist state für belt
 
 void driveToWarehouse(Color);
 void driveToProcessing();
@@ -36,10 +40,32 @@ void checkAvailableWorkpieces();
 void getEmptyBox(Color);
 void storeBox(WarehouseContent);
 void getFullBox();
+void driveBeltTo(BeltState);
+std::thread driveBeltToAsync(BeltState);
 
 int main()
 {
     mqttClient.connect(1000);
+
+    if (DEBUG_MAINUNIT) {
+        std::thread([]() {
+            while (true)
+            {
+                mqttClient.publishMessageAsync(TOPIC_DEBUG_VACUUMROBOT, txtStateObject(txt));
+                sleep(250ms);
+            }
+        }).detach();
+    }
+
+    // start monitor thread
+    std::thread([] {
+        while (true)
+        {
+            mqttClient.publishMessageAsync(TOPIC_MONITOR_VR_M2_TEMPERATURE, std::to_string(motorTemperature.getTemperature()));
+            mqttClient.publishMessageAsync(TOPIC_MONITOR_VR_O7_VOLTAGE, std::to_string(vaccuumVoltage.value()));
+            sleep(500ms);
+        }
+    }).detach();
 
     std::thread thread_vacuum = robot.referenceAsync();
     std::thread thread_warehouse = warehouse.referenceAsync();
@@ -47,6 +73,8 @@ int main()
     mqttClient.publishMessageAsync(TOPIC_INPUT_STOCK, warehouse.storage.getAsJson());
     mqttClient.publishMessageAsync(TOPIC_INPUT_VACUUMROBOT_STATE, "referenzieren");
     mqttClient.publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "referenzieren");
+
+    // TODO check belt
 
     thread_vacuum.join();
     thread_warehouse.join();
@@ -56,12 +84,13 @@ int main()
     mqttClient.publishMessageAsync(TOPIC_INPUT_VACUUMROBOT_STATE, "bereit");
     mqttClient.publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "bereit");
 
-    std::thread run = std::thread(checkAvailableWorkpieces);
-    run.detach();
+    //std::thread run = std::thread(checkAvailableWorkpieces);
+    //run.detach();
 
     while (true)
     {
-        if (beltstate == BeltState::WAREHOUSE && !light_sensor_vacuum_robot.value())
+        checkAvailableWorkpieces();
+        /*if (beltstate == BeltState::WAREHOUSE && !light_sensor_vacuum_robot.value())
         {
             belt.left(450);
             light_sensor_warehouse.waitFor(DigitalState::LOW);
@@ -75,7 +104,7 @@ int main()
             belt.stop();
             beltstate = BeltState::AT_VACUUM_ROBOT;
         }
-        sleep(10ms);
+        sleep(10ms);*/
     }
 
     return 0;
@@ -83,62 +112,60 @@ int main()
 
 void checkAvailableWorkpieces()
 {
-    while (true)
+    if (!white_available.value())
     {
-        if (!white_available.value())
-        {
-            std::thread wait = std::thread([] {
-                while (warehouse.state != HighBayState::H_READY)
-                {
-                    sleep(10ms);
-                }
-                getEmptyBox(Color::WHITE);
-            });
-            driveToWarehouse(Color::WHITE);
-            wait.join();
-            storeBox(WarehouseContent::WHITE);
-        }
-        else if (!red_available.value())
-        {
-            std::thread wait = std::thread([] {
-                while (warehouse.state != HighBayState::H_READY)
-                {
-                    sleep(10ms);
-                }
-                getEmptyBox(Color::RED);
-            });
-            driveToWarehouse(Color::RED);
-            wait.join();
-            storeBox(WarehouseContent::RED);
-        }
-        else if (!blue_available.value())
-        {
-            std::thread wait = std::thread([] {
-                while (warehouse.state != HighBayState::H_READY)
-                {
-                    sleep(10ms);
-                }
-                getEmptyBox(Color::BLUE);
-            });
-            driveToWarehouse(Color::BLUE);
-            wait.join();
-            storeBox(WarehouseContent::BLUE);
-        }
-        else
-        {
-            getFullBox();
-            while (beltstate != BeltState::AT_VACUUM_ROBOT)
+        std::thread wait = std::thread([] {
+            while (warehouse.state != HighBayState::H_READY)
             {
                 sleep(10ms);
             }
-            std::thread processing = std::thread(driveToProcessing);
-            while (beltstate != BeltState::AT_WAREHOUSE)
+            getEmptyBox(Color::WHITE);
+            driveBeltTo(BeltState::VACUUM_ROBOT);
+        });
+        driveToWarehouse(Color::WHITE);
+        wait.join();
+        storeBox(WarehouseContent::WHITE);
+    }
+    else if (!red_available.value())
+    {
+        std::thread wait = std::thread([] {
+            while (warehouse.state != HighBayState::H_READY)
             {
                 sleep(10ms);
             }
-            storeBox(WarehouseContent::EMPTY_BOX);
-            processing.join();
+            getEmptyBox(Color::RED);
+            driveBeltTo(BeltState::VACUUM_ROBOT);
+        });
+        driveToWarehouse(Color::RED);
+        wait.join();
+        storeBox(WarehouseContent::RED);
+    }
+    else if (!blue_available.value())
+    {
+        std::thread wait = std::thread([] {
+            while (warehouse.state != HighBayState::H_READY)
+            {
+                sleep(10ms);
+            }
+            getEmptyBox(Color::BLUE);
+            driveBeltTo(BeltState::VACUUM_ROBOT);
+        });
+        driveToWarehouse(Color::BLUE);
+        wait.join();
+        storeBox(WarehouseContent::BLUE);
+    }
+    else
+    {
+        // TODO move vaccuum robot to warehouse
+        getFullBox();
+        driveBeltTo(BeltState::VACUUM_ROBOT);
+        std::thread processing = std::thread(driveToProcessing);
+        while (beltstate != BeltState::WAREHOUSE)
+        {
+            sleep(10ms);
         }
+        storeBox(WarehouseContent::EMPTY_BOX);
+        processing.join();
     }
 }
 
@@ -162,7 +189,7 @@ void driveToWarehouse(Color color)
     robot.yaxis.moveAbsolut(0);
     robot.drive(WAREHOUSE_X, 0, 0);
     robot.zaxis.moveAbsolut(WAREHOUSE_Z);
-    while (beltstate != BeltState::AT_VACUUM_ROBOT)
+    while (beltstate != BeltState::VACUUM_ROBOT)
     {
         sleep(10ms);
     }
@@ -179,13 +206,14 @@ void driveToProcessing()
     robot.drive(WAREHOUSE_X, WAREHOUSE_Y, WAREHOUSE_Z);
     robot.suck();
     robot.yaxis.moveAbsolut(0);
-    beltstate = BeltState::WAREHOUSE;
+    std::thread beltState = driveBeltToAsync(BeltState::WAREHOUSE);
     robot.zaxis.moveAbsolut(0);
     robot.xaxis.moveAbsolut(PROCESS_STATION_X);
     robot.drive(PROCESS_STATION_X, PROCESS_STATION_Y, PROCESS_STATION_Z);
     robot.release();
     std::thread xaxis = robot.yaxis.moveAbsolutAsync(0);
     robot.zaxis.moveAbsolut(0);
+    beltState.join();
     xaxis.join();
     mqttClient.publishMessageAsync(TOPIC_INPUT_VACUUMROBOT_STATE, "bereit");
 }
@@ -194,12 +222,9 @@ void storeWorkpieceHighBay(uint8_t x, uint8_t y, WarehouseContent content)
 {
     mqttClient.publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "einlagern");
     warehouse.state = HighBayState::H_STORE_WORKIECE;
-    beltstate = BeltState::WAREHOUSE;
+    std::thread beltThread = driveBeltToAsync(BeltState::WAREHOUSE);
     warehouse.drive(3, 3);
-    while (beltstate != BeltState::AT_WAREHOUSE)
-    {
-        sleep(10ms);
-    }
+    beltThread.join();
     warehouse.pull();
     warehouse.drive(x, y);
     warehouse.put();
@@ -246,7 +271,6 @@ void getWorkpieceHighBay(uint8_t x, uint8_t y)
     warehouse.drive(3, 3);
     warehouse.put(true);
     warehouse.state = HighBayState::H_READY;
-    beltstate = BeltState::VACUUM_ROBOT;
     mqttClient.publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "bereit");
 }
 
@@ -264,4 +288,25 @@ void getFullBox()
         }
     }
     getWorkpieceHighBay(x, y);
+}
+
+void driveBeltTo(BeltState state) {
+    if (state == BeltState::WAREHOUSE && !light_sensor_vacuum_robot.value())
+    {
+        belt.left(450);
+        light_sensor_warehouse.waitFor(DigitalState::LOW);
+        belt.stop();
+        beltstate = BeltState::WAREHOUSE;
+    }
+    else if (state == BeltState::VACUUM_ROBOT && !light_sensor_warehouse.value())
+    {
+        belt.right(450);
+        light_sensor_vacuum_robot.waitFor(DigitalState::LOW);
+        belt.stop();
+        beltstate = BeltState::VACUUM_ROBOT;
+    }
+}
+
+std::thread driveBeltToAsync(BeltState state) {
+    return std::thread(driveBeltTo, state);
 }
