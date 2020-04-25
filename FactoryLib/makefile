@@ -1,4 +1,4 @@
-INCLUDE = -I"..\deps\include" -I"include"
+INCLUDE = -I"../deps/include" -I"include"
 
 CXX =arm-linux-gnueabihf-g++ $(INCLUDE)
 CXXFLAGS = -std=gnu++17 -O3 -Wall -c -fmessage-length=0 -Wno-psabi -shared -Wnarrowing -Wparentheses

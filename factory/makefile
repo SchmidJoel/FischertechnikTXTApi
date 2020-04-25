@@ -1,9 +1,9 @@
-INCLUDE = -I"..\deps\include" -I"..\FactoryLib\include" -I"include"
+INCLUDE = -I"../deps/include" -I"../FactoryLib/include" -I"include"
 
 CXX =arm-linux-gnueabihf-g++ $(INCLUDE)
 CXXFLAGS = -std=gnu++17 -O3 -Wall -c -fmessage-length=0 -Wno-psabi 
 LFLAGS = -Wall
-LIBPATH = -L"..\deps\lib" -L"..\FactoryLib\obj" 
+LIBPATH = -L"../deps/lib" -L"../FactoryLib/obj" 
 
 LIBS = -l"SDLWidgetsLib" \
 	-l"paho-mqtt3c" \
