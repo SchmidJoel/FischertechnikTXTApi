@@ -302,6 +302,8 @@ void driveBeltTo(BeltState state) {
     {
         belt.right(450);
         light_sensor_vacuum_robot.waitFor(DigitalState::LOW);
+        // drive a bit more than the light sensor
+        sleep(100ms);
         belt.stop();
         beltstate = BeltState::VACUUM_ROBOT;
     }

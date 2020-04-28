@@ -14,6 +14,7 @@ TxtMqttFactoryClient::TxtMqttFactoryClient(std::string clientname, std::string h
 	connOpts.set_password(mqtt_pass);
 
 	cli.set_callback(cb);
+	
 	// TODO will message
 }
 
