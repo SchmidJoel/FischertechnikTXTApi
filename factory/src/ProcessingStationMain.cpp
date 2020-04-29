@@ -42,7 +42,7 @@ int main(void)
         debug.detach();
     }
 
-    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "referenzieren");
+    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "referenzieren", DFLT_QUALITY_OF_SERVICE, true);
     comp.on();
     oven_gate.on();
     sleep(10ms);
@@ -57,7 +57,7 @@ int main(void)
     oven_gate.off();
     comp.off();
 
-    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "bereit");
+    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "bereit", DFLT_QUALITY_OF_SERVICE, true);
     while (true)
     {
         ProcessWorkpiece();
@@ -69,11 +69,11 @@ int main(void)
 void ProcessWorkpiece()
 {
     oven_light_sensor.waitFor(DigitalState::LOW);
-    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "starte...");
+    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "starte...", DFLT_QUALITY_OF_SERVICE, true);
     comp.on();
     sleep(2s);
     std::thread thread2 = vacuum_roboter.pos2Async();
-    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "brennen");
+    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "brennen", DFLT_QUALITY_OF_SERVICE, true);
     oven_gate.on();
     oven.pos2();
     oven_gate.off();
@@ -93,7 +93,7 @@ void ProcessWorkpiece()
 
     sleep(500ms);
     ventil_vacuum.on();
-    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "transportieren");
+    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "transportieren", DFLT_QUALITY_OF_SERVICE, true);
     sleep(500ms);
 
     ventil_roboter.off();
@@ -107,13 +107,13 @@ void ProcessWorkpiece()
     ventil_roboter.off();
     sleep(100ms);
     table.pos(1);
-    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "sägen");
+    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "sägen", DFLT_QUALITY_OF_SERVICE, true);
     saw.right(OUTPUT_MAX_LEVEL);
     sleep(3s);
     saw.stop();
     table.pos(2);
 
-    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "fertig");
+    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "fertig", DFLT_QUALITY_OF_SERVICE, true);
     belt.right(OUTPUT_MAX_LEVEL);
     table_ventil.on();
     sleep(100ms);
@@ -125,5 +125,5 @@ void ProcessWorkpiece()
     belt_light_sensor.waitFor(DigitalState::LOW);
     sleep(5s);
     belt.stop();
-    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "bereit");
+    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "bereit", DFLT_QUALITY_OF_SERVICE, true);
 }
