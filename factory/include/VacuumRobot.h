@@ -18,18 +18,6 @@
 #define PROCESS_STATION_Y 550
 #define PROCESS_STATION_Z 880
 
-enum VacuumRobotState
-{
-    V_UNREFERENCED,
-    V_REFERENCING,
-    V_MOVE_TO_SORTINGLINE,
-    V_PICK_UP_WORKPIECE,
-    V_MOVE_TO_WAREHOUSE,
-    V_DROP_WORKPIECE,
-    V_MOVE_TO_PROCESSINGSTATION,
-    V_READY
-};
-
 class VacuumRobot
 {
 private:
@@ -46,7 +34,6 @@ public:
     void drive(uint16_t x, uint16_t y, uint16_t z);
     void suck();
     void release();
-    VacuumRobotState state;
 };
 
 #endif

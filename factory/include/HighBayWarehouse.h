@@ -9,7 +9,7 @@ enum HighBayState
 {
     H_UNREFERENCED,
     H_REFERENCING,
-    H_STORE_WORKIECE,
+    H_STORE_WORKPIECE,
     H_PROVIDE_WORKPIECE,
     H_READY
 };
@@ -27,7 +27,6 @@ public:
     void drive(uint8_t x, uint8_t y);
     void pull(bool = false);
     void put(bool = false);
-    void x(bool = true);
     HighBayState state = HighBayState::H_UNREFERENCED;
     FileStorage storage;
 };

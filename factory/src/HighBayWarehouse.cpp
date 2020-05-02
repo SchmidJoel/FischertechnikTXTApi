@@ -14,6 +14,7 @@ void HighbayWarehouse::reference()
     std::thread yt = yaxis.referenceAsync();
     xt.join();
     yt.join();
+    state = HighBayState::H_READY;
 }
 
 std::thread HighbayWarehouse::referenceAsync()

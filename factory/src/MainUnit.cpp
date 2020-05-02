@@ -78,8 +78,6 @@ int main()
 
     thread_vacuum.join();
     thread_warehouse.join();
-    warehouse.state = HighBayState::H_READY;
-    robot.state = VacuumRobotState::V_READY;
 
     mqttClient.publishMessageAsync(TOPIC_INPUT_VACUUMROBOT_STATE, "bereit");
     mqttClient.publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "bereit");
@@ -184,8 +182,8 @@ void driveToWarehouse(Color color)
     else if (color == Color::BLUE)
     {
         robot.drive(BLUE_PICK_UP_X, PICK_UP_Y, BLUE_PICK_UP_Z);
-    }
-    robot.suck();
+    }    
+    robot.suck();    
     robot.yaxis.moveAbsolut(0);
     robot.drive(WAREHOUSE_X, 0, 0);
     robot.zaxis.moveAbsolut(WAREHOUSE_Z);
@@ -205,11 +203,11 @@ void driveToProcessing()
     robot.yaxis.moveAbsolut(0);
     robot.drive(WAREHOUSE_X, WAREHOUSE_Y, WAREHOUSE_Z);
     robot.suck();
-    robot.yaxis.moveAbsolut(0);
+    robot.yaxis.moveAbsolut(0);    
     std::thread beltState = driveBeltToAsync(BeltState::WAREHOUSE);
     robot.zaxis.moveAbsolut(0);
     robot.xaxis.moveAbsolut(PROCESS_STATION_X);
-    robot.drive(PROCESS_STATION_X, PROCESS_STATION_Y, PROCESS_STATION_Z);
+    robot.drive(PROCESS_STATION_X, PROCESS_STATION_Y, PROCESS_STATION_Z); 
     robot.release();
     std::thread xaxis = robot.yaxis.moveAbsolutAsync(0);
     robot.zaxis.moveAbsolut(0);
@@ -221,7 +219,7 @@ void driveToProcessing()
 void storeWorkpieceHighBay(uint8_t x, uint8_t y, WarehouseContent content)
 {
     mqttClient.publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "einlagern");
-    warehouse.state = HighBayState::H_STORE_WORKIECE;
+    warehouse.state = HighBayState::H_STORE_WORKPIECE;
     std::thread beltThread = driveBeltToAsync(BeltState::WAREHOUSE);
     warehouse.drive(3, 3);
     beltThread.join();
