@@ -405,3 +405,41 @@ H_PROVIDE_WORKPIECE --> H_READY: Werkstück ausgelagert
 
 H_STORE_WORKPIECE --> H_READY: Werkstück eingelagert
 @enduml
+
+@startuml mqtt_client
+class TxtMqttFactoryClient {
+    #clientname: std::string
+	#host: mqtt::string
+	#port: mqtt::string
+	#mqtt_user: mqtt::string
+	#mqtt_pass: mqtt::binary_ref
+
+	#cli: mqtt::async_client
+	#connOpts: mqtt::connect_options
+
+	#cb: FactoryCallback
+    --Constructor--
+    +TxtMqttFactoryClient(std::string clientname, std::string host, std::string mqtt_user, mqtt::binary_ref mqtt_pass, std::string port)
+    ----
+    +publishMessageSync(const std::string &topicFilter, const std::string &message, long timeout, int qos, bool retained): bool
+    +publishMessageAsync(const std::string &topicFilter, const std::string &message, int qos, bool retained)
+    +subTopicAsync(const std::string &topicFilter, void (*func)(const std::string &message), int qos, long timeout): bool
+    +subTopicSync(const std::string &topicFilter, int qos, long timeout): bool
+    +unsubTopic(const std::string &topicFilter, long timeout): bool
+    +consume_topic(const std::string &topicFilter): std::string
+}
+
+class FactoryCallback {
+    -callback_func: std::unordered_map<std::string, void (*)(const std::string &message)>
+    ----
+    -message_arrived(mqtt::const_message_ptr msg)
+    +register_topic(std::string topic, void (*func)(const std::string &message))
+    +remove_topic(const std::string &topic)
+}
+
+abstract class mqtt::callback
+
+mqtt::callback <|-- FactoryCallback
+
+FactoryCallback <-- TxtMqttFactoryClient
+@enduml

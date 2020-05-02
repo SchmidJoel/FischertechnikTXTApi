@@ -74,7 +74,7 @@ int main(void)
         else
         {
             belt.stop();
-            mqttClient.publishMessageAsync(TOPIC_INPUT_SORTINGLINE_STATE, "bereit");
+            mqttClient.publishMessageAsync(TOPIC_INPUT_SORTINGLINE_STATE, "bereit", 0, true);
         }
         sleep(50ms);
     }
@@ -88,7 +88,7 @@ void ColorDetection()
     {
         light_sensor_start.waitFor(DigitalState::LOW);
         colorDetectionUnit = SortingLineState::WORKING;
-        mqttClient.publishMessageAsync(TOPIC_INPUT_SORTINGLINE_STATE, "Farbe erkennen");
+        mqttClient.publishMessageAsync(TOPIC_INPUT_SORTINGLINE_STATE, "Farbe erkennen", DFLT_QUALITY_OF_SERVICE, true);
 
         int min = color_sensor.value();
         while (light_sensor_end.value())
@@ -112,7 +112,7 @@ void ColorDetection()
 void SortWorkpiece(Color color)
 {
     sortingUnit = SortingLineState::WORKING;
-    mqttClient.publishMessageAsync(TOPIC_INPUT_SORTINGLINE_STATE, "Werkstück sortieren");
+    mqttClient.publishMessageAsync(TOPIC_INPUT_SORTINGLINE_STATE, "Werkstück sortieren", DFLT_QUALITY_OF_SERVICE, true);
 
     comp.on();
     switch (color)

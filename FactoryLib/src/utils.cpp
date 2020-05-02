@@ -20,7 +20,7 @@ Color convertToColor(uint16_t value)
     return Color::WHITE;
 }
 
-double convertToTemperature(uint16_t value){
+double convertToTemperature(uint16_t value) {
     return log(value) * log(value) * 1.3932 + log(value) * -43.942 + 271.87;
 }
 

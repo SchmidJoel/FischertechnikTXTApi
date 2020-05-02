@@ -31,10 +31,10 @@
 #define TOPIC_MONITOR_SL_M1_TEMPERATURE "/m/sl/m1/t"
 #define TOPIC_MONITOR_SL_M1_VOLTAGE "/m/sl/m1/v"
 
-class callback : public virtual mqtt::callback
+class FactoryCallback : public virtual mqtt::callback
 {
 public:
-	callback(){};
+	virtual ~FactoryCallback() {}
 
 	void register_topic(std::string topic, void (*func)(const std::string &message))
 	{
@@ -54,13 +54,35 @@ public:
 	}
 
 private:
+	std::unordered_map<std::string, void (*)(const std::string &message)> callback_func;
+
+	/**
+	 * This method is called when the client is connected.
+	 * @param cause
+	 */
+	void connected(const std::string& cause) override {}
+
+	/**
+	 * This method is called when the connection to the server is lost.
+	 * @param cause
+	 */
+	void connection_lost(const std::string& cause) override {}
+
+	/**
+	 * This method is called when a message arrives from the server.
+	 * @param msg The message
+	 */
 	void message_arrived(mqtt::const_message_ptr msg) override
 	{
-		// TODO message received
 		callback_func[msg->get_topic()](msg->get_payload_str());
 	}
 
-	std::unordered_map<std::string, void (*)(const std::string &message)> callback_func;
+	/**
+	 * Called when delivery for a message has been completed, and all
+	 * acknowledgments have been received.
+	 * @param tok The token tracking the message delivery.
+	 */
+	void delivery_complete(mqtt::delivery_token_ptr tok) override {}
 };
 
 class TxtMqttFactoryClient
@@ -92,7 +114,7 @@ protected:
 	mqtt::async_client cli;
 	mqtt::connect_options connOpts;
 
-	callback cb;
+	FactoryCallback cb;
 };
 
 #endif
