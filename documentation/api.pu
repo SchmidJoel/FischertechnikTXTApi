@@ -191,7 +191,7 @@ enum ButtonMode {
     OPENER
 }
 
-abstract PosAxis {
+interface PosAxis {
     +getPos(): uint16_t
     +reference()
     +referenceAsync(): std::thread
@@ -314,4 +314,94 @@ else ()
   :Color::WHITE;
 endif
 stop
+@enduml
+
+@startuml warehouse-vacuumrobot
+
+class VacuumRobot {
+    -compressor: Output
+    -ventil: Output
+    +xaxis: AxisEM
+    +yaxis: AxisEM
+    +zaxis: AxisEM
+
+    --Constructor--
+    +VacuumRobot(TXT)
+    ----
+    +reference()
+    +referenceAsync():std::thread
+    +drive(uint16_t x, uint16_t y, uint16_t z);
+    +suck();
+    +release();
+}
+
+enum HighBayState{
+    H_UNREFERENCED
+    H_REFERENCING
+    H_STORE_WORKPIECE
+    H_PROVIDE_WORKPIECE
+    H_READY
+}
+
+class HighbayWarehouse{
+    -xaxis: AxisEM
+    -yaxis:AxisEM
+    -zaxis:TwoRefAxis    
+    +state:HighBayState
+    +storage:FileStorage
+    --Constructor--
+    +HighbayWarehouse(TXT)
+    ----
+    +reference()
+    +referenceAsync()
+    +drive(uint8_t x, uint8_t y)
+    +pull(bool)
+    +put(bool)
+}
+
+enum WarehouseContent{
+    NO_BOX
+    EMPTY_BOX
+    WHITE
+    RED
+    BLUE
+}
+
+interface IStorage{
+    getWorkpieceAt(uint8_t):WarehouseContent
+    setWorkpieceAt(uint8_t, WarehouseContent)
+    getPositionOf(WarehouseContent): int
+    getAsJson():std::string
+}
+
+class FileStorage{
+    -values WarehouseContent[]
+    --Constructor--
+    +FileStorage()
+    ----
+    +getWorkpieceAt(uint8_t):WarehouseContent
+    +setWorkpieceAt(uint8_t, WarehouseContent)
+    +getPositionOf(WarehouseContent):int
+    +getAsJson() std::string
+}
+
+IStorage <|-- FileStorage
+FileStorage <-right- HighbayWarehouse
+HighBayState <-- HighbayWarehouse
+WarehouseContent <-- IStorage
+@enduml
+
+@startuml highbay-statemachine
+hide empty description
+[*] --> H_UNREFERENCED
+H_UNREFERENCED --> H_REFERENCING: reference()
+
+H_REFERENCING --> H_READY: Referenzierung abgeschlossen
+
+H_READY -left-> H_PROVIDE_WORKPIECE: Werkstück auslagern
+H_READY -right-> H_STORE_WORKPIECE: Werkstück einlagern
+
+H_PROVIDE_WORKPIECE --> H_READY: Werkstück ausgelagert
+
+H_STORE_WORKPIECE --> H_READY: Werkstück eingelagert
 @enduml
