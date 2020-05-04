@@ -433,11 +433,19 @@ class FactoryCallback {
     -callback_func: std::unordered_map<std::string, void (*)(const std::string &message)>
     ----
     -message_arrived(mqtt::const_message_ptr msg)
+    -connected(const std::string& cause)
+    -connection_lost(const std::string& cause)
+    -delivery_complete(mqtt::delivery_token_ptr tok)
     +register_topic(std::string topic, void (*func)(const std::string &message))
     +remove_topic(const std::string &topic)
 }
 
-abstract class mqtt::callback
+abstract class mqtt::callback {
+    +message_arrived(mqtt::const_message_ptr msg)
+    +connected(const std::string& cause)
+    +connection_lost(const std::string& cause)
+    +delivery_complete(mqtt::delivery_token_ptr tok)
+}
 
 mqtt::callback <|-- FactoryCallback
 
