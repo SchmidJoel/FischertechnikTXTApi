@@ -1,6 +1,28 @@
 # Fischertechnik Factory API
 
-This is a lowlevel API for Programming the fischertechnik TXT controller.
+Dieses Projekt entstand während einer Studienarbeit der [DHBW Stuttgart Campus Horb](https://www.dhbw-stuttgart.de/horb/home/) im Studiengang Informatik.
+
+In diesem 
+
+## Verzeichnisstruktur
+
+### deps 
+Von fischertechnik bereitgestellte Bibliotheken und Header Dateien zur Entwicklung von Software für den TXT-Controller in C++.
+
+### documentation
+UML-Diagramme und ähnliches zur Entwicklung mit Highlevel und Lowlevel API
+
+### examples
+Beispiele, wie die Highlevel und Lowlevel API genutzt werden
+
+### exercises
+Vorlagen für die Bearbeitung der Laborübungen der Studienarbeit von Joel Schmid
+
+### factory
+Beispielprogramme für die Modellfabrik mit Highlevel und Lowlevel API
+
+### FactoryLib
+Implementierung der Highlevel und Lowlevel API für den TXT-Controller
 
 ## Links
 
