@@ -38,7 +38,7 @@ void ColorDetection();
 int main(void)
 {
     readConfig();
-    mqttClient = new TxtMqttFactoryClient("SortingLine", "192.168.178.66", "", "");
+    mqttClient = new TxtMqttFactoryClient("SortingLine", ip_adress, "", "");
     mqttClient->connect(1000);
 
     std::thread debug;
