@@ -2,6 +2,7 @@
 #include "HighBayWarehouse.h"
 #include "TxtMqttFactoryClient.h"
 #include "debug.h"
+#include "config.h"
 
 #define DEBUG_MAINUNIT false
 
@@ -12,7 +13,7 @@ enum BeltState
 };
 
 TXT txt;
-TxtMqttFactoryClient mqttClient("MainUnit", "192.168.178.66", "", "");
+TxtMqttFactoryClient* mqttClient;
 
 VacuumRobot robot = VacuumRobot(txt);
 HighbayWarehouse warehouse = HighbayWarehouse(txt);
@@ -45,13 +46,15 @@ std::thread driveBeltToAsync(BeltState);
 
 int main()
 {
-    mqttClient.connect(1000);
+    readConfig();
+    mqttClient = new TxtMqttFactoryClient("MainUnit", ip_adress, "", "");
+    mqttClient->connect(1000);
 
     if (DEBUG_MAINUNIT) {
         std::thread([]() {
             while (true)
             {
-                mqttClient.publishMessageAsync(TOPIC_DEBUG_VACUUMROBOT, txtStateObject(txt));
+                mqttClient->publishMessageAsync(TOPIC_DEBUG_VACUUMROBOT, txtStateObject(txt));
                 sleep(250ms);
             }
         }).detach();
@@ -61,8 +64,8 @@ int main()
     std::thread([] {
         while (true)
         {
-            mqttClient.publishMessageAsync(TOPIC_MONITOR_VR_M2_TEMPERATURE, std::to_string(motorTemperature.getTemperature()));
-            mqttClient.publishMessageAsync(TOPIC_MONITOR_VR_O7_VOLTAGE, std::to_string(vaccuumVoltage.value()));
+            mqttClient->publishMessageAsync(TOPIC_MONITOR_VR_M2_TEMPERATURE, std::to_string(motorTemperature.getTemperature()));
+            mqttClient->publishMessageAsync(TOPIC_MONITOR_VR_O7_VOLTAGE, std::to_string(vaccuumVoltage.value()));
             sleep(500ms);
         }
     }).detach();
@@ -70,17 +73,17 @@ int main()
     std::thread thread_vacuum = robot.referenceAsync();
     std::thread thread_warehouse = warehouse.referenceAsync();
 
-    mqttClient.publishMessageAsync(TOPIC_INPUT_STOCK, warehouse.storage.getAsJson(), DFLT_QUALITY_OF_SERVICE, true);
-    mqttClient.publishMessageAsync(TOPIC_INPUT_VACUUMROBOT_STATE, "referenzieren", DFLT_QUALITY_OF_SERVICE, true);
-    mqttClient.publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "referenzieren", DFLT_QUALITY_OF_SERVICE, true);
+    mqttClient->publishMessageAsync(TOPIC_INPUT_STOCK, warehouse.storage.getAsJson(), DFLT_QUALITY_OF_SERVICE, true);
+    mqttClient->publishMessageAsync(TOPIC_INPUT_VACUUMROBOT_STATE, "referenzieren", DFLT_QUALITY_OF_SERVICE, true);
+    mqttClient->publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "referenzieren", DFLT_QUALITY_OF_SERVICE, true);
 
     // TODO check belt
 
     thread_vacuum.join();
     thread_warehouse.join();
 
-    mqttClient.publishMessageAsync(TOPIC_INPUT_VACUUMROBOT_STATE, "bereit", DFLT_QUALITY_OF_SERVICE, true);
-    mqttClient.publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "bereit", DFLT_QUALITY_OF_SERVICE, true);
+    mqttClient->publishMessageAsync(TOPIC_INPUT_VACUUMROBOT_STATE, "bereit", DFLT_QUALITY_OF_SERVICE, true);
+    mqttClient->publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "bereit", DFLT_QUALITY_OF_SERVICE, true);
 
     //std::thread run = std::thread(checkAvailableWorkpieces);
     //run.detach();
@@ -104,7 +107,7 @@ int main()
         }
         sleep(10ms);*/
     }
-
+    delete mqttClient;
     return 0;
 }
 
@@ -169,7 +172,7 @@ void checkAvailableWorkpieces()
 
 void driveToWarehouse(Color color)
 {
-    mqttClient.publishMessageAsync(TOPIC_INPUT_VACUUMROBOT_STATE, "holen", DFLT_QUALITY_OF_SERVICE, true);
+    mqttClient->publishMessageAsync(TOPIC_INPUT_VACUUMROBOT_STATE, "holen", DFLT_QUALITY_OF_SERVICE, true);
     robot.yaxis.moveAbsolut(0);
     if (color == Color::WHITE)
     {
@@ -194,12 +197,12 @@ void driveToWarehouse(Color color)
     robot.yaxis.moveAbsolut(WAREHOUSE_Y);
     robot.release();
     robot.yaxis.moveAbsolut(0);
-    mqttClient.publishMessageAsync(TOPIC_INPUT_VACUUMROBOT_STATE, "bereit", DFLT_QUALITY_OF_SERVICE, true);
+    mqttClient->publishMessageAsync(TOPIC_INPUT_VACUUMROBOT_STATE, "bereit", DFLT_QUALITY_OF_SERVICE, true);
 }
 
 void driveToProcessing()
 {
-    mqttClient.publishMessageAsync(TOPIC_INPUT_VACUUMROBOT_STATE, "abliefern", DFLT_QUALITY_OF_SERVICE, true);
+    mqttClient->publishMessageAsync(TOPIC_INPUT_VACUUMROBOT_STATE, "abliefern", DFLT_QUALITY_OF_SERVICE, true);
     robot.yaxis.moveAbsolut(0);
     robot.drive(WAREHOUSE_X, WAREHOUSE_Y, WAREHOUSE_Z);
     robot.suck();
@@ -213,12 +216,12 @@ void driveToProcessing()
     robot.zaxis.moveAbsolut(0);
     beltState.join();
     xaxis.join();
-    mqttClient.publishMessageAsync(TOPIC_INPUT_VACUUMROBOT_STATE, "bereit", DFLT_QUALITY_OF_SERVICE, true);
+    mqttClient->publishMessageAsync(TOPIC_INPUT_VACUUMROBOT_STATE, "bereit", DFLT_QUALITY_OF_SERVICE, true);
 }
 
 void storeWorkpieceHighBay(uint8_t x, uint8_t y, WarehouseContent content)
 {
-    mqttClient.publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "einlagern", DFLT_QUALITY_OF_SERVICE, true);
+    mqttClient->publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "einlagern", DFLT_QUALITY_OF_SERVICE, true);
     warehouse.state = HighBayState::H_STORE_WORKPIECE;
     std::thread beltThread = driveBeltToAsync(BeltState::WAREHOUSE);
     warehouse.drive(3, 3);
@@ -228,10 +231,10 @@ void storeWorkpieceHighBay(uint8_t x, uint8_t y, WarehouseContent content)
     warehouse.put();
     warehouse.storage.setWorkpieceAt(y * 3 + x, content);
 
-    mqttClient.publishMessageAsync(TOPIC_INPUT_STOCK, warehouse.storage.getAsJson(), DFLT_QUALITY_OF_SERVICE, true);
+    mqttClient->publishMessageAsync(TOPIC_INPUT_STOCK, warehouse.storage.getAsJson(), DFLT_QUALITY_OF_SERVICE, true);
 
     warehouse.state = HighBayState::H_READY;
-    mqttClient.publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "bereit", DFLT_QUALITY_OF_SERVICE, true);
+    mqttClient->publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "bereit", DFLT_QUALITY_OF_SERVICE, true);
 }
 
 void getEmptyBox(Color color)
@@ -258,18 +261,18 @@ void storeBox(WarehouseContent content)
 
 void getWorkpieceHighBay(uint8_t x, uint8_t y)
 {
-    mqttClient.publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "auslagern", DFLT_QUALITY_OF_SERVICE, true);
+    mqttClient->publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "auslagern", DFLT_QUALITY_OF_SERVICE, true);
     warehouse.state = HighBayState::H_PROVIDE_WORKPIECE;
     warehouse.drive(x, y);
     warehouse.pull();
     warehouse.storage.setWorkpieceAt(y * 3 + x, WarehouseContent::NO_BOX);
 
-    mqttClient.publishMessageAsync(TOPIC_INPUT_STOCK, warehouse.storage.getAsJson(), DFLT_QUALITY_OF_SERVICE, true);
+    mqttClient->publishMessageAsync(TOPIC_INPUT_STOCK, warehouse.storage.getAsJson(), DFLT_QUALITY_OF_SERVICE, true);
 
     warehouse.drive(3, 3);
     warehouse.put(true);
     warehouse.state = HighBayState::H_READY;
-    mqttClient.publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "bereit", DFLT_QUALITY_OF_SERVICE, true);
+    mqttClient->publishMessageAsync(TOPIC_INPUT_WAREHOUSE_STATE, "bereit", DFLT_QUALITY_OF_SERVICE, true);
 }
 
 void getFullBox()

@@ -1,8 +1,9 @@
 # Fischertechnik Factory API
 
-Dieses Projekt entstand während einer Studienarbeit der [DHBW Stuttgart Campus Horb](https://www.dhbw-stuttgart.de/horb/home/) im Studiengang Informatik.
+Dieses Projekt entstand während einer Studienarbeit der [DHBW Stuttgart Campus Horb](https://www.dhbw-stuttgart.de/horb/home/) im Studiengang Informatik.  
+Bearbeiter: Johannes Gaiser und Joel Schmid
 
-In diesem 
+Während dieser Arbeit wurde eine Lowlevel API für die einfache Entwicklung von Programmen für den TXT-Controller in der Sprache C++ entworfen und umgesetzt. Aufbauend auf die Lowlevel API wurde eine Highlevel API entwickelt, welche Erweiterungen für die Entwicklung von Programmen für die [9-Volt Modellfabrik](https://www.fischertechnik.de/de-de/produkte/simulieren/simulationsmodelle/536629-sim-fabrik-simulation-9v-simulation) enthält.
 
 ## Verzeichnisstruktur
 
@@ -23,11 +24,3 @@ Beispielprogramme für die Modellfabrik mit Highlevel und Lowlevel API
 
 ### FactoryLib
 Implementierung der Highlevel und Lowlevel API für den TXT-Controller
-
-## Links
-
-To compile programms you need the [arm cross-compiler](https://releases.linaro.org/components/toolchain/binaries/7.2-2017.11/arm-linux-gnueabihf/gcc-linaro-7.2.1-2017.11-i686-mingw32_arm-linux-gnueabihf.tar.xz)
-
-[TXT Training Factory Industry Program](https://github.com/fischertechnik/txt_training_factory)
-
-## Paths

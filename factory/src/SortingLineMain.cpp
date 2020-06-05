@@ -2,6 +2,7 @@
 #include "TxtMqttFactoryClient.h"
 #include <thread>
 #include "debug.h"
+#include "config.h"
 
 #define DEBUG_SORTINGLINE false
 
@@ -12,7 +13,7 @@ enum SortingLineState
 };
 
 TXT txt;
-TxtMqttFactoryClient mqttClient("SortingLine", "192.168.178.66", "", "");
+TxtMqttFactoryClient* mqttClient;
 
 DigitalInput light_sensor_start = txt.digitalInput(1);
 DigitalInput light_sensor_end = txt.digitalInput(3);
@@ -36,14 +37,16 @@ void ColorDetection();
 
 int main(void)
 {
-    mqttClient.connect(1000);
+    readConfig();
+    mqttClient = new TxtMqttFactoryClient("SortingLine", "192.168.178.66", "", "");
+    mqttClient->connect(1000);
 
     std::thread debug;
     if (DEBUG_SORTINGLINE) {
         debug = std::thread([]() {
             while (true)
             {
-                mqttClient.publishMessageAsync(TOPIC_DEBUG_SORTINGLINE, txtStateObject(txt));
+                mqttClient->publishMessageAsync(TOPIC_DEBUG_SORTINGLINE, txtStateObject(txt));
                 sleep(250ms);
             }
         });
@@ -54,16 +57,16 @@ int main(void)
     std::thread monitor = std::thread([] {
         while (true)
         {
-            mqttClient.publishMessageAsync(TOPIC_MONITOR_SL_M1_VOLTAGE, std::to_string(motorVoltage.value()));
-            mqttClient.publishMessageAsync(TOPIC_MONITOR_SL_M1_TEMPERATURE, std::to_string(motorTemperture.getTemperature()));
+            mqttClient->publishMessageAsync(TOPIC_MONITOR_SL_M1_VOLTAGE, std::to_string(motorVoltage.value()));
+            mqttClient->publishMessageAsync(TOPIC_MONITOR_SL_M1_TEMPERATURE, std::to_string(motorTemperture.getTemperature()));
             sleep(500ms);
         }
     });
     monitor.detach();
 
     std::thread detection = std::thread(ColorDetection);
-    mqttClient.publishMessageAsync(TOPIC_INPUT_SORTINGLINE_LAST_COLOR, "");
-    mqttClient.publishMessageAsync(TOPIC_INPUT_SORTINGLINE_RAW_LAST_COLOR, "");    
+    mqttClient->publishMessageAsync(TOPIC_INPUT_SORTINGLINE_LAST_COLOR, "");
+    mqttClient->publishMessageAsync(TOPIC_INPUT_SORTINGLINE_RAW_LAST_COLOR, "");    
 
     while (true)
     {
@@ -74,11 +77,11 @@ int main(void)
         else
         {
             belt.stop();
-            mqttClient.publishMessageAsync(TOPIC_INPUT_SORTINGLINE_STATE, "bereit", 0, true);
+            mqttClient->publishMessageAsync(TOPIC_INPUT_SORTINGLINE_STATE, "bereit", 0, true);
         }
         sleep(50ms);
     }
-
+    delete mqttClient;
     return 0;
 }
 
@@ -88,7 +91,7 @@ void ColorDetection()
     {
         light_sensor_start.waitFor(DigitalState::LOW);
         colorDetectionUnit = SortingLineState::WORKING;
-        mqttClient.publishMessageAsync(TOPIC_INPUT_SORTINGLINE_STATE, "Farbe erkennen", DFLT_QUALITY_OF_SERVICE, true);
+        mqttClient->publishMessageAsync(TOPIC_INPUT_SORTINGLINE_STATE, "Farbe erkennen", DFLT_QUALITY_OF_SERVICE, true);
 
         int min = color_sensor.value();
         while (light_sensor_end.value())
@@ -100,10 +103,10 @@ void ColorDetection()
             }
         }
 
-        mqttClient.publishMessageAsync(TOPIC_INPUT_SORTINGLINE_LAST_COLOR, std::to_string(convertToColor(min)));
-        mqttClient.publishMessageAsync(TOPIC_INPUT_SORTINGLINE_RAW_LAST_COLOR, std::to_string(min));
+        mqttClient->publishMessageAsync(TOPIC_INPUT_SORTINGLINE_LAST_COLOR, std::to_string(convertToColor(min, blue_lower, red_lower)));
+        mqttClient->publishMessageAsync(TOPIC_INPUT_SORTINGLINE_RAW_LAST_COLOR, std::to_string(min));
 
-        std::thread sort = std::thread(SortWorkpiece, convertToColor(min));
+        std::thread sort = std::thread(SortWorkpiece, convertToColor(min, blue_lower, red_lower));
         sort.detach();
         colorDetectionUnit = SortingLineState::WAITING;
     }
@@ -112,7 +115,7 @@ void ColorDetection()
 void SortWorkpiece(Color color)
 {
     sortingUnit = SortingLineState::WORKING;
-    mqttClient.publishMessageAsync(TOPIC_INPUT_SORTINGLINE_STATE, "Werkstück sortieren", DFLT_QUALITY_OF_SERVICE, true);
+    mqttClient->publishMessageAsync(TOPIC_INPUT_SORTINGLINE_STATE, "Werkstück sortieren", DFLT_QUALITY_OF_SERVICE, true);
 
     comp.on();
     switch (color)

@@ -7,13 +7,13 @@ void sleep(std::chrono::microseconds micros)
     std::this_thread::sleep_for(micros);
 }
 
-Color convertToColor(uint16_t value)
+Color convertToColor(uint16_t value, int blue_lower, int red_lower)
 {
-    if (value > 1600)
+    if (value >= blue_lower)
     {
         return Color::BLUE;
     }
-    else if (value > 1200)
+    else if (value >= red_lower)
     {
         return Color::RED;
     }

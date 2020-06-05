@@ -1,11 +1,12 @@
 #include "TXT_highlevel_API.h"
 #include "TxtMqttFactoryClient.h"
 #include "debug.h"
+#include "config.h"
 
 #define DEBUG_PROCESSINGSTATION false
 
 TXT txt;
-TxtMqttFactoryClient mqttClient("ProcessingStation", "192.168.178.66", "", "");
+TxtMqttFactoryClient* mqttClient;
 
 TwoRefAxis oven = TwoRefAxis{txt, 5, 10, 9};
 TwoRefAxis vacuum_roboter = TwoRefAxis{txt, 6, 5, 11};
@@ -28,21 +29,23 @@ void ProcessWorkpiece();
 
 int main(void)
 {
-    mqttClient.connect(1000);
+    readConfig();
+    mqttClient = new TxtMqttFactoryClient("ProcessingStation", ip_adress, "", "");
+    mqttClient->connect(1000);
 
     std::thread debug;
     if (DEBUG_PROCESSINGSTATION) {
         debug = std::thread([]() {
             while (true)
             {
-                mqttClient.publishMessageAsync(TOPIC_DEBUG_PROCESSINGSTATION, txtStateObject(txt));
+                mqttClient->publishMessageAsync(TOPIC_DEBUG_PROCESSINGSTATION, txtStateObject(txt));
                 sleep(250ms);
             }
         });
         debug.detach();
     }
 
-    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "referenzieren", DFLT_QUALITY_OF_SERVICE, true);
+    mqttClient->publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "referenzieren", DFLT_QUALITY_OF_SERVICE, true);
     comp.on();
     oven_gate.on();
     sleep(10ms);
@@ -57,23 +60,23 @@ int main(void)
     oven_gate.off();
     comp.off();
 
-    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "bereit", DFLT_QUALITY_OF_SERVICE, true);
+    mqttClient->publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "bereit", DFLT_QUALITY_OF_SERVICE, true);
     while (true)
     {
         ProcessWorkpiece();
     }
-
+    delete mqttClient;
     return 0;
 }
 
 void ProcessWorkpiece()
 {
     oven_light_sensor.waitFor(DigitalState::LOW);
-    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "starte...", DFLT_QUALITY_OF_SERVICE, true);
+    mqttClient->publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "starte...", DFLT_QUALITY_OF_SERVICE, true);
     comp.on();
     sleep(2s);
     std::thread thread2 = vacuum_roboter.pos2Async();
-    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "brennen", DFLT_QUALITY_OF_SERVICE, true);
+    mqttClient->publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "brennen", DFLT_QUALITY_OF_SERVICE, true);
     oven_gate.on();
     oven.pos2();
     oven_gate.off();
@@ -93,7 +96,7 @@ void ProcessWorkpiece()
 
     sleep(500ms);
     ventil_vacuum.on();
-    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "transportieren", DFLT_QUALITY_OF_SERVICE, true);
+    mqttClient->publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "transportieren", DFLT_QUALITY_OF_SERVICE, true);
     sleep(500ms);
 
     ventil_roboter.off();
@@ -107,13 +110,13 @@ void ProcessWorkpiece()
     ventil_roboter.off();
     sleep(100ms);
     table.pos(1);
-    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "sägen", DFLT_QUALITY_OF_SERVICE, true);
+    mqttClient->publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "sägen", DFLT_QUALITY_OF_SERVICE, true);
     saw.right(OUTPUT_MAX_LEVEL);
     sleep(3s);
     saw.stop();
     table.pos(2);
 
-    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "fertig", DFLT_QUALITY_OF_SERVICE, true);
+    mqttClient->publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "fertig", DFLT_QUALITY_OF_SERVICE, true);
     belt.right(OUTPUT_MAX_LEVEL);
     table_ventil.on();
     sleep(100ms);
@@ -125,5 +128,5 @@ void ProcessWorkpiece()
     belt_light_sensor.waitFor(DigitalState::LOW);
     sleep(5s);
     belt.stop();
-    mqttClient.publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "bereit", DFLT_QUALITY_OF_SERVICE, true);
+    mqttClient->publishMessageAsync(TOPIC_INPUT_PROCESSINGSTATION_STATE, "bereit", DFLT_QUALITY_OF_SERVICE, true);
 }

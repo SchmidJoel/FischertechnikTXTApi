@@ -55,6 +55,9 @@ Uebungsaufgabe1.o : src/Uebungsaufgabe1.cpp
 Ampel_lowlevelapi.o : src/Ampel/Ampel_lowlevelapi.cpp
 	$(CXX) $(CXXFLAGS) $^ -o obj/$@
 
+Json.o : src/Json.cpp
+	$(CXX) $(CXXFLAGS) $^ -o obj/$@
+
 Ampel: Ampel.o
 	$(CXX) $(LFLAGS) $(LIBPATH) obj/$^ $(LIBS) -o bin/$@
 
@@ -71,4 +74,7 @@ Uebungsaufgabe1: Uebungsaufgabe1.o
 	$(CXX) $(LFLAGS) $(LIBPATH) obj/$^ $(LIBS) -o bin/$@
 
 Ampel_lowlevelapi: Ampel_lowlevelapi.o
+	$(CXX) $(LFLAGS) $(LIBPATH) obj/$^ $(LIBS) -o bin/$@
+
+Json: Json.o
 	$(CXX) $(LFLAGS) $(LIBPATH) obj/$^ $(LIBS) -o bin/$@
