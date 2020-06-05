@@ -1,5 +1,5 @@
 {
-    "ip_adress":"192.168.0.9",
-    "red_lower": 1000,
-    "blue_lower": 1500
+    "ip_adress":"192.168.178.66",
+    "red_lower": 1200,
+    "blue_lower": 1600
 }
