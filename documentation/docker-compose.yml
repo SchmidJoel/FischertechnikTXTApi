@@ -1,0 +1,39 @@
+version: '3.7'
+
+services:
+  broker:
+    image: eclipse-mosquitto:latest
+    networks:
+      - node_red_network
+      - iobroker_network
+    restart: unless-stopped
+    ports:
+      - 1883:1883
+      - 9001:9001
+
+  node-red:
+    image: nodered/node-red
+    restart: unless-stopped
+    networks:
+      - node_red_network
+    ports:
+      - 1880:1880
+    volumes:
+      - ./node-red-data:/data
+
+  iobroker:
+    image: buanet/iobroker
+    restart: "no"
+    hostname: iobroker
+    networks:
+      - iobroker_network
+    ports:
+      - 8081:8081
+      - 8082:8082
+    volumes:
+      - ./iobroker-data:/opt/iobroker
+
+
+networks:
+  node_red_network:
+  iobroker_network:

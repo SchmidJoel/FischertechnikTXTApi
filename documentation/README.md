@@ -47,3 +47,12 @@ Topic | Wert | Beschreibung
 /m/vr/o7/v | int | Spannung von O7 am Vakuumgreifer
 /m/sl/m1/t | double | Temperatur von M1 an der Sortierstrecke
 /m/sl/m1/v | int | Spannung von M1 an der Sortierstrecke
+
+## Versionen
+
+* [arm cross-compiler](https://releases.linaro.org/components/toolchain/binaries]): v. 7.2.1-2017.11-i686-mingw32_arm-linux-gnueabihf
+* [TXT Helper Classes](https://github.com/fischertechnik/txt_demo_c_download)
+* [Mosquitto MQTT](https://hub.docker.com/_/eclipse-mosquitto): v. 1.6
+* [Node-RED](https://hub.docker.com/r/nodered/node-red): v. 1.0
+* [IOBroker](https://hub.docker.com/r/buanet/iobroker): v. 4.2
+* [Thingsboard](https://thingsboard.io/docs/user-guide/install/rpi/): v. 3.0.1
