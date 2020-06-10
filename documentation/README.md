@@ -37,12 +37,10 @@ Topic | Wert | Beschreibung
 /i/ps/state | text | Bearbeitungsstation Status
 /i/sl/lastcolor | text | zuletzt erkannte Farbe (Farbsensor)
 /i/sl/rawlastcolor | double | zuletzt gemessener Wert (Farbsensor)
-|
 /d/ps | json objekt | TXT state der Bearbeitungsstation
 /d/sl | json objekt | TXT state der Sortierstrecke
 /d/vr | json objekt | TXT state Vakuumgreifer/Hochregallager
 /d/msg | text | Debug Message
-|
 /m/vr/m2/t | double | Temperatur von M2 am Vakuumgreifer
 /m/vr/o7/v | int | Spannung von O7 am Vakuumgreifer
 /m/sl/m1/t | double | Temperatur von M1 an der Sortierstrecke
